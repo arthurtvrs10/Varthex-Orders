@@ -3,8 +3,21 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VarthexComanda.Desktop"
         mc:Ignorable="d"
         Title="Varthex Comanda" Height="700" Width="1200">
+    <Window.InputBindings>
+        <KeyBinding Key="D1" Modifiers="Control" Command="{x:Static local:MainWindow.IrParaAtendimentoCommand}" />
+        <KeyBinding Key="NumPad1" Modifiers="Control" Command="{x:Static local:MainWindow.IrParaAtendimentoCommand}" />
+        <KeyBinding Key="D2" Modifiers="Control" Command="{x:Static local:MainWindow.IrParaProdutosCommand}" />
+        <KeyBinding Key="NumPad2" Modifiers="Control" Command="{x:Static local:MainWindow.IrParaProdutosCommand}" />
+        <KeyBinding Key="D3" Modifiers="Control" Command="{x:Static local:MainWindow.IrParaHistoricoCommand}" />
+        <KeyBinding Key="NumPad3" Modifiers="Control" Command="{x:Static local:MainWindow.IrParaHistoricoCommand}" />
+        <KeyBinding Key="D4" Modifiers="Control" Command="{x:Static local:MainWindow.IrParaBackupCommand}" />
+        <KeyBinding Key="NumPad4" Modifiers="Control" Command="{x:Static local:MainWindow.IrParaBackupCommand}" />
+        <KeyBinding Key="D5" Modifiers="Control" Command="{x:Static local:MainWindow.IrParaConfiguracoesCommand}" />
+        <KeyBinding Key="NumPad5" Modifiers="Control" Command="{x:Static local:MainWindow.IrParaConfiguracoesCommand}" />
+    </Window.InputBindings>
     <DockPanel>
         <!-- Visivel apenas no modo de restauracao (banco corrompido): ver MainWindow.EntrarModoRestauracao. -->
         <Border x:Name="FaixaRestauracao" DockPanel.Dock="Top" Background="#B71C1C" Padding="16,12" Visibility="Collapsed">
@@ -12,11 +25,11 @@
                        Foreground="White" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap" />
         </Border>
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="8">
-            <Button x:Name="BotaoAtendimento" Content="Atendimento" Padding="18,8" FontSize="15" Margin="0,0,8,0" Click="MostrarAtendimento_Click" />
-            <Button x:Name="BotaoProdutos" Content="Produtos" Padding="18,8" FontSize="15" Margin="0,0,8,0" Click="MostrarProdutos_Click" />
-            <Button x:Name="BotaoHistorico" Content="Histórico" Padding="18,8" FontSize="15" Margin="0,0,8,0" Click="MostrarHistorico_Click" />
-            <Button x:Name="BotaoBackup" Content="Backup" Padding="18,8" FontSize="15" Margin="0,0,8,0" Click="MostrarBackup_Click" />
-            <Button x:Name="BotaoConfiguracoes" Content="Configurações" Padding="18,8" FontSize="15" Click="MostrarConfiguracao_Click" />
+            <Button x:Name="BotaoAtendimento" Content="Atendimento" ToolTip="Ctrl+1" AutomationProperties.AccessKey="Ctrl+1" Padding="18,8" FontSize="15" Margin="0,0,8,0" Click="MostrarAtendimento_Click" />
+            <Button x:Name="BotaoProdutos" Content="Produtos" ToolTip="Ctrl+2" AutomationProperties.AccessKey="Ctrl+2" Padding="18,8" FontSize="15" Margin="0,0,8,0" Click="MostrarProdutos_Click" />
+            <Button x:Name="BotaoHistorico" Content="Histórico" ToolTip="Ctrl+3" AutomationProperties.AccessKey="Ctrl+3" Padding="18,8" FontSize="15" Margin="0,0,8,0" Click="MostrarHistorico_Click" />
+            <Button x:Name="BotaoBackup" Content="Backup" ToolTip="Ctrl+4" AutomationProperties.AccessKey="Ctrl+4" Padding="18,8" FontSize="15" Margin="0,0,8,0" Click="MostrarBackup_Click" />
+            <Button x:Name="BotaoConfiguracoes" Content="Configurações" ToolTip="Ctrl+5" AutomationProperties.AccessKey="Ctrl+5" Padding="18,8" FontSize="15" Click="MostrarConfiguracao_Click" />
         </StackPanel>
         <ContentControl x:Name="ConteudoPrincipal" />
     </DockPanel>
