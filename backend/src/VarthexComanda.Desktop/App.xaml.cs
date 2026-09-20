@@ -164,6 +164,9 @@ public partial class App : System.Windows.Application
 
             _logger.Information("Banco pronto");
 
+            var abertas = _serviceProvider.GetRequiredService<IComandaRepository>().ListarAbertas().Count;
+            _logger.Information("Comandas abertas recuperadas: {Quantidade}", abertas);
+
             _serviceProvider.GetRequiredService<CriarBackupAutomatico>().Executar();
 
             _serviceProvider.GetRequiredService<MainWindow>().Show();
