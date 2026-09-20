@@ -12,7 +12,7 @@ public static class LoggingConfigurator
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(options.TamanhoMaximoArquivoBytes);
         ArgumentOutOfRangeException.ThrowIfLessThan(options.QuantidadeMaximaArquivos, 1);
 
-        return new LoggerConfiguration()
+        var arquivo = new LoggerConfiguration()
             .WriteTo.File(
                 path: Path.Combine(logsDirectory, "varthex-comanda-.log"),
                 rollingInterval: RollingInterval.Day,
@@ -20,6 +20,11 @@ public static class LoggingConfigurator
                 fileSizeLimitBytes: options.TamanhoMaximoArquivoBytes,
                 retainedFileCountLimit: options.QuantidadeMaximaArquivos,
                 outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+            .CreateLogger();
+
+        // RF26: todo evento passa pela mascara de caminhos antes de chegar ao arquivo.
+        return new LoggerConfiguration()
+            .WriteTo.Sink(new MascaraCaminhosSink(arquivo))
             .CreateLogger();
     }
 }
