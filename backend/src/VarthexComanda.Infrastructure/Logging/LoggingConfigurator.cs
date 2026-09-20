@@ -6,7 +6,7 @@ public static class LoggingConfigurator
 {
     // Teto de disco = QuantidadeMaximaArquivos x TamanhoMaximoArquivoBytes (padrao: 30 x 5 MB = 150 MB).
     // Com um arquivo por dia, 30 arquivos equivalem a ~30 dias em uso normal; o arquivo mais antigo e removido.
-    public static ILogger CreateLogger(string logsDirectory, LogOptions? options = null)
+    public static ILogger CreateLogger(string logsDirectory, LogOptions? options = null, string? perfilUsuario = null)
     {
         options ??= new LogOptions();
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(options.TamanhoMaximoArquivoBytes);
@@ -24,7 +24,7 @@ public static class LoggingConfigurator
 
         // RF26: todo evento passa pela mascara de caminhos antes de chegar ao arquivo.
         return new LoggerConfiguration()
-            .WriteTo.Sink(new MascaraCaminhosSink(arquivo))
+            .WriteTo.Sink(new MascaraCaminhosSink(arquivo, perfilUsuario))
             .CreateLogger();
     }
 }

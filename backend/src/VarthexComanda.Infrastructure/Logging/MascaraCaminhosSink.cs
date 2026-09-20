@@ -14,20 +14,20 @@ public sealed class MascaraCaminhosSink : ILogEventSink, IDisposable
     private static readonly MessageTemplateTextFormatter FormatadorMensagem = new("{Message:lj}");
 
     private readonly ILogEventSink _interno;
-    private readonly string? _perfilUsuario;
+    private readonly Func<string, string> _mascara;
 
     public MascaraCaminhosSink(ILogEventSink interno, string? perfilUsuario = null)
     {
         _interno = interno;
-        _perfilUsuario = perfilUsuario;
+        _mascara = LogMascara.CriarMascara(perfilUsuario);
     }
 
     public void Emit(LogEvent logEvent)
     {
-        var mensagem = LogMascara.Aplicar(Renderizar(logEvent), _perfilUsuario);
+        var mensagem = _mascara(Renderizar(logEvent));
         var excecao = logEvent.Exception is null
             ? null
-            : new ExcecaoMascarada(LogMascara.Aplicar(logEvent.Exception.ToString(), _perfilUsuario));
+            : new ExcecaoMascarada(_mascara(logEvent.Exception.ToString()));
 
         var propriedades = new[] { new LogEventProperty("Mensagem", new ScalarValue(mensagem)) };
         _interno.Emit(new LogEvent(logEvent.Timestamp, logEvent.Level, excecao, Template, propriedades));

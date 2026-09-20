@@ -123,7 +123,8 @@ public class CriarBackupAutomaticoTests
 
         var evento = Assert.Single(captura.Eventos);
         Assert.Equal(LogEventLevel.Warning, evento.Level);
-        Assert.Contains("D:\\backups", evento.RenderMessage());
+        Assert.DoesNotContain("D:\\backups", evento.RenderMessage());
+        Assert.DoesNotContain("Pasta", evento.Properties.Keys);
         Assert.Contains("Falha simulada ao criar backup externo.", evento.RenderMessage());
     }
 

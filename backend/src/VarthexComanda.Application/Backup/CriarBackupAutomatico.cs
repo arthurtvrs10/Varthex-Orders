@@ -47,8 +47,8 @@ public class CriarBackupAutomatico
                     var resultadoExterno = _backupService.CriarBackupExterno(configuracao.PastaBackupExterna);
                     if (!resultadoExterno.Sucesso)
                     {
-                        _logger.Warning("Cópia externa automática falhou em {Pasta}: {Mensagem}",
-                            configuracao.PastaBackupExterna, string.Join(" ", resultadoExterno.Erros));
+                        _logger.Warning("Cópia externa automática falhou: {Mensagem}",
+                            string.Join(" ", resultadoExterno.Erros));
                     }
                 }
             }
