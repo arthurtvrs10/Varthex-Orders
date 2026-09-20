@@ -18,7 +18,7 @@
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
             <Button Content="Criar backup agora" Padding="18,0" Height="56" FontSize="16" Margin="0,0,8,0" Command="{Binding CriarBackupCommand}" />
-            <Button Content="Escolher pasta externa e criar backup..." Padding="18,0" Height="56" FontSize="16" Click="EscolherPastaExterna_Click" />
+            <Button Content="Escolher pasta externa e criar backup..." Padding="18,0" Height="56" FontSize="16" Click="EscolherPastaExterna_Click" IsEnabled="{Binding PodeCriarBackup}" />
         </StackPanel>
 
         <ListView Grid.Row="1" ItemsSource="{Binding Backups}" SelectedItem="{Binding BackupSelecionado}">

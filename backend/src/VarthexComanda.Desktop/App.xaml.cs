@@ -125,6 +125,7 @@ public partial class App : System.Windows.Application
         _serviceProvider = services.BuildServiceProvider();
 
         var bancoCorrompido = false;
+        var janelaPrincipalExibida = false;
         try
         {
             var factory = _serviceProvider.GetRequiredService<IDbContextFactory<VarthexComandaDbContext>>();
@@ -169,10 +170,13 @@ public partial class App : System.Windows.Application
                 _serviceProvider.GetRequiredService<CriarBackupAutomatico>().Executar();
 
                 _serviceProvider.GetRequiredService<MainWindow>().Show();
+                janelaPrincipalExibida = true;
                 _startupConcluido = true;
             }
         }
-        catch (Exception ex) when (CorrupcaoDeBanco.EhErroDeCorrupcao(ex))
+        // só entra em modo de restauração se a corrupção apareceu antes de a MainWindow existir na tela;
+        // depois disso resolver uma segunda MainWindow seria errado (cai no tratamento genérico)
+        catch (Exception ex) when (!janelaPrincipalExibida && CorrupcaoDeBanco.EhErroDeCorrupcao(ex))
         {
             _logger.Error(ex, "Banco de dados corrompido ou inválido");
             bancoCorrompido = true;
@@ -239,26 +243,22 @@ public partial class App : System.Windows.Application
         _serviceProvider?.Dispose();
 
         // o logger so e descartado depois da tentativa, para registrar uma falha ao reiniciar
-        var reiniciou = false;
         try
         {
             var caminhoExecutavel = Environment.ProcessPath
                 ?? throw new InvalidOperationException("Não foi possível determinar o caminho do executável.");
             Process.Start(caminhoExecutavel);
-            reiniciou = true;
         }
         catch (Exception ex)
         {
             _logger?.Warning(ex, "Falha em {Operacao}", "ReiniciarAplicativo");
-            (_logger as IDisposable)?.Dispose();
             MessageBox.Show(
                 "A restauração foi concluída, mas não foi possível reiniciar automaticamente. Feche e abra o Varthex Comanda manualmente.",
                 "Varthex Comanda",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
         }
-
-        if (reiniciou)
+        finally
         {
             (_logger as IDisposable)?.Dispose();
         }

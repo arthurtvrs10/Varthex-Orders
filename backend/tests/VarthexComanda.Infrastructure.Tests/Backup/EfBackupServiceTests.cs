@@ -350,10 +350,20 @@ public class EfBackupServiceTests : IDisposable
             : File.ReadAllBytes(_paths.DatabasePath).Take(4096 + 512).ToArray();
         File.WriteAllBytes(_paths.DatabasePath, bytesCorrompidos);
 
+        var hashAntes = System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(_paths.DatabasePath));
+        var registrosAntes = _registros.ListarRecentes(100).Count;
+
         relogio.UtcNow = relogio.UtcNow.AddSeconds(5);
         var resultado = servico.RestaurarPara(caminhoBackup);
 
         Assert.True(resultado.Sucesso);
+        // nada foi escrito no banco corrompido antes da copia bruta: SHA-256 identico ao original
+        // e nenhuma tentativa de registrar falha de backup (o registro vive no banco corrompido)
+        var copiaBrutaHash = System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(Assert.Single(Directory.GetFiles(_paths.BackupsDirectory, "corrompido-*.db.bak"))));
+        Assert.Equal(hashAntes, copiaBrutaHash);
+        Assert.Equal(registrosAntes, _registros.ListarRecentes(100).Count);
+        // so o backup bom original: nenhum varthex-comanda-*.db extra (preventivo) foi criado
+        Assert.Single(Directory.GetFiles(_paths.BackupsDirectory, "varthex-comanda-*.db"));
         using (var conexao = new SqliteConnection($"Data Source={_paths.DatabasePath};Pooling=False"))
         {
             conexao.Open();
@@ -392,6 +402,52 @@ public class EfBackupServiceTests : IDisposable
         Assert.False(resultado.Sucesso);
         Assert.Contains("Não foi possível guardar uma cópia do banco atual; restauração cancelada.", resultado.Erros);
         Assert.Equal(bytesCorrompidos, File.ReadAllBytes(_paths.DatabasePath));
+    }
+
+    [Fact]
+    public void RestaurarPara_ComBancoAtivoBloqueado_NaoTrataComoCorrupcaoECancelaSemAlterarNada()
+    {
+        var relogio = new FakeClockDeIntegracao();
+        var servico = new EfBackupService(_paths, _registros, relogio);
+        var backupValido = servico.CriarBackupGerenciado();
+        var caminhoBackup = Path.Combine(backupValido.Valor!.Destino, backupValido.Valor.Arquivo);
+        SqliteConnection.ClearAllPools();
+        var hashAntes = System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(_paths.DatabasePath));
+        relogio.UtcNow = relogio.UtcNow.AddSeconds(5);
+
+        // outra conexao segura o banco com lock exclusivo (SQLITE_BUSY para quem tentar ler)
+        using (var trava = new SqliteConnection($"Data Source={_paths.DatabasePath};Pooling=False"))
+        {
+            trava.Open();
+            using (var pragma = trava.CreateCommand())
+            {
+                pragma.CommandText = "PRAGMA locking_mode=EXCLUSIVE";
+                pragma.ExecuteNonQuery();
+            }
+            using (var inicio = trava.CreateCommand())
+            {
+                inicio.CommandText = "BEGIN IMMEDIATE";
+                inicio.ExecuteNonQuery();
+            }
+            using (var escrita = trava.CreateCommand())
+            {
+                escrita.CommandText = "CREATE TABLE trava_teste (x INTEGER)";
+                escrita.ExecuteNonQuery();
+            }
+
+            var resultado = servico.RestaurarPara(caminhoBackup);
+
+            Assert.False(resultado.Sucesso);
+            Assert.Empty(Directory.GetFiles(_paths.BackupsDirectory, "corrompido-*"));
+            Assert.Single(Directory.GetFiles(_paths.BackupsDirectory, "varthex-comanda-*.db"));
+
+            using var desfazer = trava.CreateCommand();
+            desfazer.CommandText = "ROLLBACK";
+            desfazer.ExecuteNonQuery();
+        }
+
+        SqliteConnection.ClearAllPools();
+        Assert.Equal(hashAntes, System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(_paths.DatabasePath)));
     }
 
     [Fact]

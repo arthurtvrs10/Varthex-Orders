@@ -28,9 +28,19 @@ public class CorrupcaoDeBancoTests : IDisposable
     }
 
     [Theory]
+    [InlineData(267)] // SQLITE_CORRUPT_VTAB
+    [InlineData(779)] // SQLITE_CORRUPT_INDEX
+    public void EhErroDeCorrupcao_CodigosEstendidosDeCorrupcao_ReduzidosAoPrimario(int codigo)
+    {
+        Assert.True(CorrupcaoDeBanco.EhErroDeCorrupcao(new SqliteException("erro", codigo)));
+    }
+
+    [Theory]
     [InlineData(1)]
     [InlineData(5)]
+    [InlineData(6)]
     [InlineData(13)]
+    [InlineData(261)] // SQLITE_BUSY_RECOVERY
     public void EhErroDeCorrupcao_OutrosCodigos_Falso(int codigo)
     {
         Assert.False(CorrupcaoDeBanco.EhErroDeCorrupcao(new SqliteException("erro", codigo)));

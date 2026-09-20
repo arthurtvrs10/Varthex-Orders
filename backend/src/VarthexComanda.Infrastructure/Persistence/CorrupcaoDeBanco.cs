@@ -15,8 +15,9 @@ public static class CorrupcaoDeBanco
     {
         for (var atual = excecao; atual is not null; atual = atual.InnerException)
         {
+            // & 0xFF reduz códigos estendidos (ex.: 779 = CORRUPT_INDEX) ao código primário
             if (atual is SqliteException sqlite
-                && (sqlite.SqliteErrorCode == SqliteCorrupt || sqlite.SqliteErrorCode == SqliteNotADb))
+                && ((sqlite.SqliteErrorCode & 0xFF) == SqliteCorrupt || (sqlite.SqliteErrorCode & 0xFF) == SqliteNotADb))
             {
                 return true;
             }

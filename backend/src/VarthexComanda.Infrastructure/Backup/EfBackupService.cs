@@ -124,7 +124,15 @@ public class EfBackupService : IBackupService
                 Checksum = null,
                 Mensagem = ex.Message
             };
-            try { _registros.Registrar(registroFalha); } catch { /* nao mascarar a falha original */ }
+            try
+            {
+                _registros.Registrar(registroFalha);
+            }
+            catch (Exception exRegistro)
+            {
+                // nao mascarar a falha original
+                _logger?.Warning(exRegistro, "Falha em {Operacao}", "RegistrarFalhaDeBackup");
+            }
             return Resultado<BackupRegistro>.Falha(ex.Message);
         }
     }
@@ -281,6 +289,39 @@ public class EfBackupService : IBackupService
         };
     }
 
+    private enum EstadoDoBancoAtivo
+    {
+        Saudavel,
+        Corrompido,
+        Indeterminado
+    }
+
+    /// <summary>
+    /// Verifica o banco ativo sem escrever nada. Só é "Corrompido" quando o PRAGMA devolve algo
+    /// diferente de "ok" ou o SQLite reporta CORRUPT/NOTADB; qualquer outra falha (banco ocupado,
+    /// travado, I/O) é "Indeterminado" e nunca deve ser tratada como corrupção.
+    /// </summary>
+    private EstadoDoBancoAtivo ClassificarBancoAtivo()
+    {
+        try
+        {
+            using var conexao = new SqliteConnection($"Data Source={_paths.DatabasePath};Pooling=False;Default Timeout=2");
+            conexao.Open();
+            using var comando = conexao.CreateCommand();
+            comando.CommandText = "PRAGMA integrity_check";
+            return (string?)comando.ExecuteScalar() == "ok" ? EstadoDoBancoAtivo.Saudavel : EstadoDoBancoAtivo.Corrompido;
+        }
+        catch (Exception ex) when (CorrupcaoDeBanco.EhErroDeCorrupcao(ex))
+        {
+            return EstadoDoBancoAtivo.Corrompido;
+        }
+        catch (Exception ex)
+        {
+            _logger?.Warning(ex, "Falha em {Operacao}", "VerificarBancoAtivo");
+            return EstadoDoBancoAtivo.Indeterminado;
+        }
+    }
+
     private Resultado<BackupRegistro> GuardarCopiaBrutaDoBancoCorrompido()
     {
         const string mensagemFalha = "Não foi possível guardar uma cópia do banco atual; restauração cancelada.";
@@ -334,25 +375,34 @@ public class EfBackupService : IBackupService
 
         try
         {
-            var preventivo = CriarBackupGerenciado();
-            if (!preventivo.Sucesso)
+            Resultado<BackupRegistro> preventivo;
+            switch (ClassificarBancoAtivo())
             {
-                // Com o banco ativo saudável, falhar em criar a cópia preventiva continua
-                // cancelando a restauração. Só quando o banco ativo está corrompido (ou nem
-                // abre como SQLite) a cópia por BackupDatabase é impossível: guardamos o
-                // arquivo bruto e seguimos, senão o modo de restauração nunca restauraria.
-                if (VerificarIntegridade(_paths.DatabasePath))
-                {
-                    return Resultado<BackupRegistro>.Falha("Não foi possível criar a cópia preventiva; restauração cancelada.");
-                }
+                case EstadoDoBancoAtivo.Corrompido:
+                    // Banco corrompido: a cópia bruta vem ANTES de qualquer outra coisa. Nada é
+                    // escrito no arquivo corrompido (CriarBackupGerenciado tenta registrar a falha
+                    // no próprio banco) e o SHA-256 da cópia bate com o do arquivo original.
+                    preventivo = GuardarCopiaBrutaDoBancoCorrompido();
+                    if (!preventivo.Sucesso)
+                    {
+                        return preventivo;
+                    }
 
-                var copiaBruta = GuardarCopiaBrutaDoBancoCorrompido();
-                if (!copiaBruta.Sucesso)
-                {
-                    return copiaBruta;
-                }
+                    break;
 
-                preventivo = copiaBruta;
+                case EstadoDoBancoAtivo.Indeterminado:
+                    // Não foi possível verificar (ex.: banco ocupado/travado): não é corrupção.
+                    // Cancela sem alterar nada.
+                    return Resultado<BackupRegistro>.Falha("Não foi possível verificar o banco atual; restauração cancelada.");
+
+                default:
+                    preventivo = CriarBackupGerenciado();
+                    if (!preventivo.Sucesso)
+                    {
+                        return Resultado<BackupRegistro>.Falha("Não foi possível criar a cópia preventiva; restauração cancelada.");
+                    }
+
+                    break;
             }
 
             var temporario = _paths.DatabasePath + ".restaurando";

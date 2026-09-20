@@ -37,6 +37,7 @@ public partial class MainWindow : Window
         BotaoConfiguracoes.IsEnabled = false;
         FaixaRestauracao.Visibility = Visibility.Visible;
 
+        _backupView.ViewModel.ModoRestauracao = true;
         _backupView.ViewModel.AtualizarLista();
         ConteudoPrincipal.Content = _backupView;
     }
