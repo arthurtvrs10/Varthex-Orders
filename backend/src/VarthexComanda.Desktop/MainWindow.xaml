@@ -6,12 +6,17 @@
         mc:Ignorable="d"
         Title="Varthex Comanda" Height="700" Width="1200">
     <DockPanel>
+        <!-- Visivel apenas no modo de restauracao (banco corrompido): ver MainWindow.EntrarModoRestauracao. -->
+        <Border x:Name="FaixaRestauracao" DockPanel.Dock="Top" Background="#B71C1C" Padding="16,12" Visibility="Collapsed">
+            <TextBlock Text="O banco de dados está corrompido. Restaure um backup para continuar. Nenhuma outra função está disponível."
+                       Foreground="White" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap" />
+        </Border>
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="8">
-            <Button Content="Atendimento" Padding="18,8" FontSize="15" Margin="0,0,8,0" Click="MostrarAtendimento_Click" />
-            <Button Content="Produtos" Padding="18,8" FontSize="15" Margin="0,0,8,0" Click="MostrarProdutos_Click" />
-            <Button Content="Histórico" Padding="18,8" FontSize="15" Margin="0,0,8,0" Click="MostrarHistorico_Click" />
-            <Button Content="Backup" Padding="18,8" FontSize="15" Margin="0,0,8,0" Click="MostrarBackup_Click" />
-            <Button Content="Configurações" Padding="18,8" FontSize="15" Click="MostrarConfiguracao_Click" />
+            <Button x:Name="BotaoAtendimento" Content="Atendimento" Padding="18,8" FontSize="15" Margin="0,0,8,0" Click="MostrarAtendimento_Click" />
+            <Button x:Name="BotaoProdutos" Content="Produtos" Padding="18,8" FontSize="15" Margin="0,0,8,0" Click="MostrarProdutos_Click" />
+            <Button x:Name="BotaoHistorico" Content="Histórico" Padding="18,8" FontSize="15" Margin="0,0,8,0" Click="MostrarHistorico_Click" />
+            <Button x:Name="BotaoBackup" Content="Backup" Padding="18,8" FontSize="15" Margin="0,0,8,0" Click="MostrarBackup_Click" />
+            <Button x:Name="BotaoConfiguracoes" Content="Configurações" Padding="18,8" FontSize="15" Click="MostrarConfiguracao_Click" />
         </StackPanel>
         <ContentControl x:Name="ConteudoPrincipal" />
     </DockPanel>

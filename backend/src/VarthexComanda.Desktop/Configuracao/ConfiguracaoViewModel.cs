@@ -17,7 +17,16 @@ public partial class ConfiguracaoViewModel : ObservableObject
         _salvarConfiguracao = salvarConfiguracao;
         _logger = logger;
 
-        Carregar();
+        // Com o banco corrompido (modo de restauração) a leitura lança; a construção não pode
+        // falhar, senão a MainWindow nem abre. Segue com os campos vazios.
+        try
+        {
+            Carregar();
+        }
+        catch (Exception ex)
+        {
+            _logger?.Error(ex, "Falha em {Operacao}", "CarregarConfiguracao");
+        }
     }
 
     [ObservableProperty]

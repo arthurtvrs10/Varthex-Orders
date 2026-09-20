@@ -46,8 +46,19 @@ public partial class ProdutosViewModel : ObservableObject
         Categorias = new ObservableCollection<Categoria>();
         Produtos = new ObservableCollection<Produto>();
 
-        CarregarCategorias();
-        Pesquisar();
+        // Com o banco corrompido (modo de restauração) estas leituras lançam; a construção
+        // não pode falhar, senão a MainWindow nem abre. Segue com listas vazias.
+        try
+        {
+            CarregarCategorias();
+            Pesquisar();
+        }
+        catch (Exception ex)
+        {
+            _logger?.Error(ex, "Falha em {Operacao}", "CarregarProdutos");
+            Categorias.Clear();
+            Produtos.Clear();
+        }
     }
 
     public ObservableCollection<Categoria> Categorias { get; }

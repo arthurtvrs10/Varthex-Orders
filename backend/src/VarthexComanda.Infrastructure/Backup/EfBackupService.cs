@@ -281,6 +281,50 @@ public class EfBackupService : IBackupService
         };
     }
 
+    private Resultado<BackupRegistro> GuardarCopiaBrutaDoBancoCorrompido()
+    {
+        const string mensagemFalha = "Não foi possível guardar uma cópia do banco atual; restauração cancelada.";
+        var agora = _relogio.UtcNow;
+        try
+        {
+            // solta os handles em pool para o arquivo poder ser lido/copiado por inteiro
+            SqliteConnection.ClearAllPools();
+            Directory.CreateDirectory(_paths.BackupsDirectory);
+
+            // fora da retenção: o nome não casa com varthex-comanda-*.db
+            var nomeArquivo = $"corrompido-{agora:yyyy-MM-dd-HHmmss}.db.bak";
+            var destino = Path.Combine(_paths.BackupsDirectory, nomeArquivo);
+            var sufixo = 1;
+            while (File.Exists(destino))
+            {
+                nomeArquivo = $"corrompido-{agora:yyyy-MM-dd-HHmmss}-{sufixo}.db.bak";
+                destino = Path.Combine(_paths.BackupsDirectory, nomeArquivo);
+                sufixo++;
+            }
+
+            File.Copy(_paths.DatabasePath, destino, overwrite: false);
+            _logger?.Warning("Banco ativo corrompido; cópia bruta guardada antes da restauração");
+
+            // StatusBackup só tem Sucesso/Falha; a cópia bruta foi guardada com sucesso.
+            // Não é registrada no repositório: ele vive no próprio banco corrompido.
+            return Resultado<BackupRegistro>.Ok(new BackupRegistro
+            {
+                Id = 0,
+                Arquivo = nomeArquivo,
+                Destino = _paths.BackupsDirectory,
+                CriadoEm = agora,
+                Status = StatusBackup.Sucesso,
+                Checksum = CalcularChecksumSha256(destino),
+                Mensagem = "Cópia bruta do banco corrompido, guardada antes da restauração."
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger?.Error(ex, "Falha em {Operacao}", "GuardarCopiaBrutaDoBancoCorrompido");
+            return Resultado<BackupRegistro>.Falha(mensagemFalha);
+        }
+    }
+
     public Resultado<BackupRegistro> RestaurarPara(string caminhoArquivo)
     {
         if (!File.Exists(caminhoArquivo))
@@ -293,7 +337,22 @@ public class EfBackupService : IBackupService
             var preventivo = CriarBackupGerenciado();
             if (!preventivo.Sucesso)
             {
-                return Resultado<BackupRegistro>.Falha("Não foi possível criar a cópia preventiva; restauração cancelada.");
+                // Com o banco ativo saudável, falhar em criar a cópia preventiva continua
+                // cancelando a restauração. Só quando o banco ativo está corrompido (ou nem
+                // abre como SQLite) a cópia por BackupDatabase é impossível: guardamos o
+                // arquivo bruto e seguimos, senão o modo de restauração nunca restauraria.
+                if (VerificarIntegridade(_paths.DatabasePath))
+                {
+                    return Resultado<BackupRegistro>.Falha("Não foi possível criar a cópia preventiva; restauração cancelada.");
+                }
+
+                var copiaBruta = GuardarCopiaBrutaDoBancoCorrompido();
+                if (!copiaBruta.Sucesso)
+                {
+                    return copiaBruta;
+                }
+
+                preventivo = copiaBruta;
             }
 
             var temporario = _paths.DatabasePath + ".restaurando";

@@ -49,9 +49,20 @@ public partial class BackupViewModel : ObservableObject
     public void AtualizarLista()
     {
         Backups.Clear();
-        foreach (var registro in _listarBackupsRecentes.Executar(20))
+        try
         {
-            Backups.Add(registro);
+            foreach (var registro in _listarBackupsRecentes.Executar(20))
+            {
+                Backups.Add(registro);
+            }
+        }
+        catch (Exception ex)
+        {
+            // o registro de backups vive no próprio banco; se ele estiver corrompido a lista
+            // não carrega, mas a restauração por "Selecionar arquivo..." continua possível
+            _logger?.Error(ex, "Falha em {Operacao}", "ListarBackups");
+            Backups.Clear();
+            Mensagem = "Não foi possível listar os backups registrados. Use \"Selecionar arquivo...\" para escolher um backup.";
         }
     }
 

@@ -61,8 +61,29 @@ public partial class AtendimentoViewModel : ObservableObject
         ProdutosCatalogo = new ObservableCollection<Produto>();
         Slots = new ObservableCollection<ComandaSlotItem>();
 
-        AtualizarComandasAbertas();
-        CarregarCategorias();
+        // Com o banco corrompido (modo de restauração) estas leituras lançam; a construção
+        // não pode falhar, senão a MainWindow nem abre. Segue com listas vazias.
+        try
+        {
+            AtualizarComandasAbertas();
+        }
+        catch (Exception ex)
+        {
+            _logger?.Error(ex, "Falha em {Operacao}", "CarregarComandasAbertas");
+            ComandasAbertas.Clear();
+            Slots.Clear();
+        }
+
+        try
+        {
+            CarregarCategorias();
+        }
+        catch (Exception ex)
+        {
+            _logger?.Error(ex, "Falha em {Operacao}", "CarregarCategorias");
+            Categorias.Clear();
+            ProdutosCatalogo.Clear();
+        }
     }
 
     public ObservableCollection<Comanda> ComandasAbertas { get; }

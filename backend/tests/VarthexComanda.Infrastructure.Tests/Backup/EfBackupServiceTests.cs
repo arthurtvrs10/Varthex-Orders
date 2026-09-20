@@ -327,6 +327,114 @@ public class EfBackupServiceTests : IDisposable
         }
     }
 
+    // Etapa 7, ruling 4: com o banco ativo corrompido a restauracao continua possivel;
+    // o arquivo bruto e guardado em backups\corrompido-*.db.bak antes de ser substituido.
+    [Theory]
+    [InlineData("lixo")]
+    [InlineData("truncado")]
+    public void RestaurarPara_ComBancoAtivoCorrompido_RestauraEGuardaCopiaBruta(string tipoDeCorrupcao)
+    {
+        var relogio = new FakeClockDeIntegracao();
+        var servico = new EfBackupService(_paths, _registros, relogio);
+        using (var contexto = _fabrica.CreateDbContext())
+        {
+            contexto.Categorias.Add(new Categoria { Id = 0, Nome = "Original", Ativo = true, CriadoEm = relogio.UtcNow, AtualizadoEm = relogio.UtcNow });
+            contexto.SaveChanges();
+        }
+        var backupValido = servico.CriarBackupGerenciado();
+        var caminhoBackup = Path.Combine(backupValido.Valor!.Destino, backupValido.Valor.Arquivo);
+
+        SqliteConnection.ClearAllPools();
+        var bytesCorrompidos = tipoDeCorrupcao == "lixo"
+            ? System.Text.Encoding.UTF8.GetBytes(new string('x', 5000))
+            : File.ReadAllBytes(_paths.DatabasePath).Take(4096 + 512).ToArray();
+        File.WriteAllBytes(_paths.DatabasePath, bytesCorrompidos);
+
+        relogio.UtcNow = relogio.UtcNow.AddSeconds(5);
+        var resultado = servico.RestaurarPara(caminhoBackup);
+
+        Assert.True(resultado.Sucesso);
+        using (var conexao = new SqliteConnection($"Data Source={_paths.DatabasePath};Pooling=False"))
+        {
+            conexao.Open();
+            using var comando = conexao.CreateCommand();
+            comando.CommandText = "PRAGMA integrity_check";
+            Assert.Equal("ok", (string?)comando.ExecuteScalar());
+        }
+        SqliteConnection.ClearAllPools();
+        using (var contexto = _fabrica.CreateDbContext())
+        {
+            Assert.Contains("Original", contexto.Categorias.Select(c => c.Nome).ToList());
+        }
+
+        var copiaBruta = Assert.Single(Directory.GetFiles(_paths.BackupsDirectory, "corrompido-*.db.bak"));
+        Assert.Equal("corrompido-2026-09-18-120005.db.bak", Path.GetFileName(copiaBruta));
+        Assert.Equal(bytesCorrompidos, File.ReadAllBytes(copiaBruta));
+        Assert.Equal(Path.GetFileName(copiaBruta), resultado.Valor!.Arquivo);
+    }
+
+    [Fact]
+    public void RestaurarPara_ComBancoAtivoCorrompido_CopiaBrutaImpossivel_CancelaSemAlterarABase()
+    {
+        var relogio = new FakeClockDeIntegracao();
+        var servico = new EfBackupService(_paths, _registros, relogio);
+        var backupValido = servico.CriarBackupGerenciado();
+        var caminhoBackup = Path.Combine(backupValido.Valor!.Destino, backupValido.Valor.Arquivo);
+        SqliteConnection.ClearAllPools();
+        var bytesCorrompidos = System.Text.Encoding.UTF8.GetBytes(new string('x', 5000));
+        File.WriteAllBytes(_paths.DatabasePath, bytesCorrompidos);
+        relogio.UtcNow = relogio.UtcNow.AddSeconds(5);
+        // uma pasta ocupando o nome da copia bruta faz o File.Copy falhar
+        Directory.CreateDirectory(Path.Combine(_paths.BackupsDirectory, "corrompido-2026-09-18-120005.db.bak"));
+
+        var resultado = servico.RestaurarPara(caminhoBackup);
+
+        Assert.False(resultado.Sucesso);
+        Assert.Contains("Não foi possível guardar uma cópia do banco atual; restauração cancelada.", resultado.Erros);
+        Assert.Equal(bytesCorrompidos, File.ReadAllBytes(_paths.DatabasePath));
+    }
+
+    [Fact]
+    public void RestaurarPara_ComBancoAtivoSaudavel_ContinuaUsandoBackupGerenciado()
+    {
+        var relogio = new FakeClockDeIntegracao();
+        var servico = new EfBackupService(_paths, _registros, relogio);
+        var backupValido = servico.CriarBackupGerenciado();
+        var caminhoBackup = Path.Combine(backupValido.Valor!.Destino, backupValido.Valor.Arquivo);
+        relogio.UtcNow = relogio.UtcNow.AddSeconds(5);
+
+        var resultado = servico.RestaurarPara(caminhoBackup);
+
+        Assert.True(resultado.Sucesso);
+        Assert.Empty(Directory.GetFiles(_paths.BackupsDirectory, "corrompido-*"));
+        Assert.StartsWith("varthex-comanda-", resultado.Valor!.Arquivo);
+        Assert.Equal(2, Directory.GetFiles(_paths.BackupsDirectory, "varthex-comanda-*.db").Length);
+    }
+
+    [Fact]
+    public void RestaurarPara_ArquivoCorrompidoComoOrigem_ContinuaFalhandoESemAlterarABaseAtiva()
+    {
+        var relogio = new FakeClockDeIntegracao();
+        var servico = new EfBackupService(_paths, _registros, relogio);
+        using (var contexto = _fabrica.CreateDbContext())
+        {
+            contexto.Categorias.Add(new Categoria { Id = 0, Nome = "Preservada", Ativo = true, CriadoEm = relogio.UtcNow, AtualizadoEm = relogio.UtcNow });
+            contexto.SaveChanges();
+        }
+        var origemCorrompida = Path.Combine(_raizTeste, "corrompido.db");
+        File.WriteAllText(origemCorrompida, new string('x', 5000));
+
+        var resultado = servico.RestaurarPara(origemCorrompida);
+
+        Assert.False(resultado.Sucesso);
+        Assert.Empty(Directory.GetFiles(_paths.BackupsDirectory, "corrompido-*"));
+        SqliteConnection.ClearAllPools();
+        using (var contexto = _fabrica.CreateDbContext())
+        {
+            Assert.Contains("Preservada", contexto.Categorias.Select(c => c.Nome).ToList());
+        }
+    }
+
     // RNF16: falha tecnica real de I/O e registrada; falha esperada (arquivo inexistente) nao.
     [Fact]
     public void CriarBackupExterno_FalhaDeIO_RegistraErroNoLogEDevolveFalha()
