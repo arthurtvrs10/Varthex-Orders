@@ -42,6 +42,7 @@
                                     CommandParameter="{Binding}">
                                 <Button.Style>
                                     <Style TargetType="Button">
+                                        <Setter Property="FocusVisualStyle" Value="{StaticResource FocoVisivel}" />
                                         <Setter Property="Background" Value="White" />
                                         <Setter Property="BorderBrush" Value="#C4C4C4" />
                                         <Setter Property="BorderThickness" Value="1" />
@@ -150,6 +151,7 @@
                             Command="{Binding LimparFiltroCommand}">
                         <Button.Style>
                             <Style TargetType="Button">
+                                <Setter Property="FocusVisualStyle" Value="{StaticResource FocoVisivel}" />
                                 <Setter Property="Background" Value="White" />
                                 <Setter Property="BorderBrush" Value="#C4C4C4" />
                                 <Setter Property="BorderThickness" Value="1" />
@@ -180,6 +182,7 @@
                                     </Button.Background>
                                     <Button.Style>
                                         <Style TargetType="Button">
+                                            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoVisivel}" />
                                             <Setter Property="BorderBrush" Value="#C4C4C4" />
                                             <Setter Property="BorderThickness" Value="1" />
                                             <Setter Property="Content" Value="{Binding Nome}" />
