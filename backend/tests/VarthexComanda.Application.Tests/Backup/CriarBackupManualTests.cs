@@ -1,4 +1,6 @@
+using Serilog.Events;
 using VarthexComanda.Application.Backup;
+using VarthexComanda.Application.Tests.Suporte;
 using Xunit;
 
 namespace VarthexComanda.Application.Tests.Backup;
@@ -53,5 +55,20 @@ public class CriarBackupManualTests
         Assert.True(resultado.Sucesso);
         Assert.False(string.IsNullOrEmpty(resultado.Valor!.Mensagem));
         Assert.Contains("externa", resultado.Valor.Mensagem, StringComparison.OrdinalIgnoreCase);
+    }
+
+    // RNF16: excecao na copia externa e registrada como Error, e a mensagem amigavel ao usuario continua a mesma
+    [Fact]
+    public void Executar_ExternaLancaExcecao_RegistraErroNoLogEMantemMensagem()
+    {
+        var backupService = new FakeBackupService { LancarExcecaoAoCriarExterno = true };
+        var coletor = new ColetorDeLog();
+        var caso = new CriarBackupManual(backupService, coletor.Logger);
+
+        var resultado = caso.Executar("D:\\pendrive");
+
+        Assert.True(resultado.Sucesso);
+        Assert.Contains("a cópia na pasta externa falhou", resultado.Valor!.Mensagem);
+        coletor.AfirmarFalhaTecnica(LogEventLevel.Error, "CriarBackupExterno");
     }
 }

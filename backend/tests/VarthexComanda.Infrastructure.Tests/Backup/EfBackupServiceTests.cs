@@ -1,10 +1,12 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog.Events;
 using VarthexComanda.Application.Backup;
 using VarthexComanda.Domain;
 using VarthexComanda.Infrastructure.Backup;
 using VarthexComanda.Infrastructure.Persistence;
+using VarthexComanda.Infrastructure.Tests.Suporte;
 using VarthexComanda.Infrastructure.Storage;
 using VarthexComanda.Infrastructure.Time;
 using Xunit;
@@ -323,6 +325,53 @@ public class EfBackupServiceTests : IDisposable
         {
             Assert.Contains("Preservada", contexto.Categorias.Select(c => c.Nome).ToList());
         }
+    }
+
+    // RNF16: falha tecnica real de I/O e registrada; falha esperada (arquivo inexistente) nao.
+    [Fact]
+    public void CriarBackupExterno_FalhaDeIO_RegistraErroNoLogEDevolveFalha()
+    {
+        var coletor = new ColetorDeLog();
+        var servico = new EfBackupService(_paths, _registros, new FakeClockDeIntegracao(), logger: coletor.Logger);
+        var arquivoNoLugarDaPasta = Path.Combine(_raizTeste, "nao-e-pasta");
+        File.WriteAllText(arquivoNoLugarDaPasta, "x");
+
+        var resultado = servico.CriarBackupExterno(arquivoNoLugarDaPasta);
+
+        Assert.False(resultado.Sucesso);
+        var evento = Assert.Single(coletor.Eventos);
+        Assert.Equal(LogEventLevel.Error, evento.Level);
+        Assert.NotNull(evento.Exception);
+        Assert.Equal("CriarBackup", ((ScalarValue)evento.Properties["Operacao"]).Value);
+    }
+
+    [Fact]
+    public void RestaurarPara_ArquivoInexistente_NaoRegistraNoLog()
+    {
+        var coletor = new ColetorDeLog();
+        var servico = new EfBackupService(_paths, _registros, new FakeClockDeIntegracao(), logger: coletor.Logger);
+
+        var resultado = servico.RestaurarPara(Path.Combine(_raizTeste, "nao-existe.db"));
+
+        Assert.False(resultado.Sucesso);
+        Assert.Empty(coletor.Eventos);
+    }
+
+    [Fact]
+    public void RestaurarPara_ArquivoCorrompido_RegistraErroNoLog()
+    {
+        var coletor = new ColetorDeLog();
+        var servico = new EfBackupService(_paths, _registros, new FakeClockDeIntegracao(), logger: coletor.Logger);
+        var caminhoInvalido = Path.Combine(_raizTeste, "invalido.db");
+        File.WriteAllText(caminhoInvalido, "nao e um banco");
+
+        var resultado = servico.RestaurarPara(caminhoInvalido);
+
+        Assert.False(resultado.Sucesso);
+        var evento = Assert.Single(coletor.Eventos);
+        Assert.Equal(LogEventLevel.Error, evento.Level);
+        Assert.NotNull(evento.Exception);
+        Assert.Equal("RestaurarBackup", ((ScalarValue)evento.Properties["Operacao"]).Value);
     }
 
     private class FakeClockDeIntegracao : VarthexComanda.Application.Abstractions.IClock

@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using VarthexComanda.Application.Abstractions;
 using VarthexComanda.Application.Backup;
 using VarthexComanda.Application.Catalogo;
@@ -16,13 +17,15 @@ public class EfBackupService : IBackupService
     private readonly IBackupRegistroRepository _registros;
     private readonly IClock _relogio;
     private readonly int _retencaoMaxima;
+    private readonly ILogger? _logger;
 
-    public EfBackupService(AppPaths paths, IBackupRegistroRepository registros, IClock relogio, int retencaoMaxima = 30)
+    public EfBackupService(AppPaths paths, IBackupRegistroRepository registros, IClock relogio, int retencaoMaxima = 30, ILogger? logger = null)
     {
         _paths = paths;
         _registros = registros;
         _relogio = relogio;
         _retencaoMaxima = retencaoMaxima;
+        _logger = logger;
     }
 
     public Resultado<BackupRegistro> CriarBackupGerenciado() =>
@@ -105,6 +108,7 @@ public class EfBackupService : IBackupService
         }
         catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "CriarBackup");
             if (File.Exists(destinoTemporario))
             {
                 File.Delete(destinoTemporario);
@@ -315,6 +319,7 @@ public class EfBackupService : IBackupService
         }
         catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "RestaurarBackup");
             return Resultado<BackupRegistro>.Falha(ex.Message);
         }
     }

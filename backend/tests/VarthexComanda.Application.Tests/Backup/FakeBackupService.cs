@@ -21,6 +21,8 @@ public class FakeBackupService : IBackupService
         Motivo = string.Empty
     };
     public bool ProximaRestauracaoFalha { get; set; }
+    public bool LancarExcecaoAoRestaurar { get; set; }
+    public bool LancarExcecaoAoCriarExterno { get; set; }
 
     public Resultado<BackupRegistro> CriarBackupGerenciado()
     {
@@ -37,6 +39,10 @@ public class FakeBackupService : IBackupService
     public Resultado<BackupRegistro> CriarBackupExterno(string pastaExterna)
     {
         ChamadasCriarBackupExterno++;
+        if (LancarExcecaoAoCriarExterno)
+        {
+            throw new InvalidOperationException("Falha simulada.");
+        }
         return ProximaCriacaoFalha || ProximaCriacaoExternaFalha
             ? Resultado<BackupRegistro>.Falha("Falha simulada ao criar backup externo.")
             : Resultado<BackupRegistro>.Ok(NovoRegistro(pastaExterna));
@@ -47,6 +53,10 @@ public class FakeBackupService : IBackupService
     public Resultado<BackupRegistro> RestaurarPara(string caminhoArquivo)
     {
         ChamadasRestaurarPara++;
+        if (LancarExcecaoAoRestaurar)
+        {
+            throw new InvalidOperationException("Falha simulada.");
+        }
         return ProximaRestauracaoFalha
             ? Resultado<BackupRegistro>.Falha("Falha simulada ao restaurar.")
             : Resultado<BackupRegistro>.Ok(NovoRegistro("C:\\backups"));

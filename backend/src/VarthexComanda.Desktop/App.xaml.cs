@@ -162,7 +162,7 @@ public partial class App : System.Windows.Application
                 return;
             }
 
-            _logger.Information("Banco pronto em {Caminho}", paths.DatabasePath);
+            _logger.Information("Banco pronto");
 
             _serviceProvider.GetRequiredService<CriarBackupAutomatico>().Executar();
 
@@ -200,21 +200,30 @@ public partial class App : System.Windows.Application
         _guard?.Release();
         _guard?.Dispose();
         _serviceProvider?.Dispose();
-        (_logger as IDisposable)?.Dispose();
 
+        // o logger so e descartado depois da tentativa, para registrar uma falha ao reiniciar
+        var reiniciou = false;
         try
         {
             var caminhoExecutavel = Environment.ProcessPath
                 ?? throw new InvalidOperationException("Não foi possível determinar o caminho do executável.");
             Process.Start(caminhoExecutavel);
+            reiniciou = true;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger?.Warning(ex, "Falha em {Operacao}", "ReiniciarAplicativo");
+            (_logger as IDisposable)?.Dispose();
             MessageBox.Show(
                 "A restauração foi concluída, mas não foi possível reiniciar automaticamente. Feche e abra o Varthex Comanda manualmente.",
                 "Varthex Comanda",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
+        }
+
+        if (reiniciou)
+        {
+            (_logger as IDisposable)?.Dispose();
         }
 
         Environment.Exit(0);

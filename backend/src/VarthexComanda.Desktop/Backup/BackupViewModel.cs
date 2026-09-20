@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Serilog;
 using VarthexComanda.Application.Backup;
 using VarthexComanda.Desktop.Atendimento;
 using VarthexComanda.Domain;
@@ -15,6 +16,7 @@ public partial class BackupViewModel : ObservableObject
     private readonly RestaurarBackup _restaurarBackup;
     private readonly ListarBackupsRecentes _listarBackupsRecentes;
     private readonly IConfirmador _confirmador;
+    private readonly ILogger? _logger;
 
     public event EventHandler? SolicitouReinicio;
 
@@ -22,12 +24,14 @@ public partial class BackupViewModel : ObservableObject
         CriarBackupManual criarBackupManual,
         RestaurarBackup restaurarBackup,
         ListarBackupsRecentes listarBackupsRecentes,
-        IConfirmador confirmador)
+        IConfirmador confirmador,
+        ILogger? logger = null)
     {
         _criarBackupManual = criarBackupManual;
         _restaurarBackup = restaurarBackup;
         _listarBackupsRecentes = listarBackupsRecentes;
         _confirmador = confirmador;
+        _logger = logger;
 
         Backups = new ObservableCollection<BackupRegistro>();
         AtualizarLista();
@@ -62,8 +66,9 @@ public partial class BackupViewModel : ObservableObject
                 : string.Join(" ", resultado.Erros);
             AtualizarLista();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "CriarBackup");
             Mensagem = "Não foi possível criar o backup. Tente novamente.";
         }
     }
@@ -107,8 +112,9 @@ public partial class BackupViewModel : ObservableObject
             Mensagem = string.Empty;
             SolicitouReinicio?.Invoke(this, EventArgs.Empty);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "RestaurarBackup");
             Mensagem = "Não foi possível restaurar o backup. Tente novamente.";
         }
     }

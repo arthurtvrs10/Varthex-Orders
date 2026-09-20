@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Serilog;
 using VarthexComanda.Application.Abstractions;
 using VarthexComanda.Application.Atendimento;
 using VarthexComanda.Application.Catalogo;
@@ -23,6 +24,7 @@ public partial class AtendimentoViewModel : ObservableObject
     private readonly IEncerramentoDialog _encerramentoDialog;
     private readonly ObterConfiguracao _obterConfiguracao;
     private readonly IClock _relogio;
+    private readonly ILogger? _logger;
 
     public AtendimentoViewModel(
         AbrirComanda abrirComanda,
@@ -36,7 +38,8 @@ public partial class AtendimentoViewModel : ObservableObject
         IConfirmador confirmador,
         IEncerramentoDialog encerramentoDialog,
         ObterConfiguracao obterConfiguracao,
-        IClock relogio)
+        IClock relogio,
+        ILogger? logger = null)
     {
         _abrirComanda = abrirComanda;
         _adicionarItem = adicionarItem;
@@ -50,6 +53,7 @@ public partial class AtendimentoViewModel : ObservableObject
         _encerramentoDialog = encerramentoDialog;
         _obterConfiguracao = obterConfiguracao;
         _relogio = relogio;
+        _logger = logger;
 
         ComandasAbertas = new ObservableCollection<Comanda>();
         Categorias = new ObservableCollection<Categoria>();
@@ -129,8 +133,9 @@ public partial class AtendimentoViewModel : ObservableObject
             AtualizarComandasAbertas();
             AbrirParaEdicao(resultado.Valor!.Id);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "AbrirComanda");
             Mensagem = "Não foi possível abrir a comanda. Tente novamente.";
         }
     }
@@ -210,8 +215,9 @@ public partial class AtendimentoViewModel : ObservableObject
         {
             AplicarResultado(_adicionarItem.Executar(ComandaAtual.Id, produto.Id, 1));
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "AdicionarItem");
             Mensagem = "Não foi possível adicionar o produto à comanda. Tente novamente.";
         }
     }
@@ -223,8 +229,9 @@ public partial class AtendimentoViewModel : ObservableObject
         {
             AplicarResultado(_alterarQuantidade.Executar(item.Id, item.Quantidade + 1));
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "AumentarQuantidade");
             Mensagem = "Não foi possível atualizar a quantidade do item. Tente novamente.";
         }
     }
@@ -247,8 +254,9 @@ public partial class AtendimentoViewModel : ObservableObject
 
             AplicarResultado(_alterarQuantidade.Executar(item.Id, item.Quantidade - 1));
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "DiminuirQuantidade");
             Mensagem = "Não foi possível atualizar a quantidade do item. Tente novamente.";
         }
     }
@@ -265,8 +273,9 @@ public partial class AtendimentoViewModel : ObservableObject
         {
             AplicarResultado(_removerItem.Executar(item.Id));
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "RemoverItem");
             Mensagem = "Não foi possível remover o item. Tente novamente.";
         }
     }
@@ -305,8 +314,9 @@ public partial class AtendimentoViewModel : ObservableObject
             FecharEdicao();
             AtualizarComandasAbertas();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "CancelarComanda");
             Mensagem = "Não foi possível cancelar a comanda. Tente novamente.";
         }
     }

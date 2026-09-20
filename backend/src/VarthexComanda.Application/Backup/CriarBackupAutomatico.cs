@@ -53,9 +53,10 @@ public class CriarBackupAutomatico
                 }
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // backup automático nunca deve interromper o app
+            // backup automático nunca deve interromper o app, mas a falha fica registrada
+            _logger.Warning(ex, "Backup automatico falhou");
         }
     }
 }

@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Serilog;
 using VarthexComanda.Application.Configuracao;
 
 namespace VarthexComanda.Desktop.Configuracao;
@@ -8,11 +9,13 @@ public partial class ConfiguracaoViewModel : ObservableObject
 {
     private readonly ObterConfiguracao _obterConfiguracao;
     private readonly SalvarConfiguracao _salvarConfiguracao;
+    private readonly ILogger? _logger;
 
-    public ConfiguracaoViewModel(ObterConfiguracao obterConfiguracao, SalvarConfiguracao salvarConfiguracao)
+    public ConfiguracaoViewModel(ObterConfiguracao obterConfiguracao, SalvarConfiguracao salvarConfiguracao, ILogger? logger = null)
     {
         _obterConfiguracao = obterConfiguracao;
         _salvarConfiguracao = salvarConfiguracao;
+        _logger = logger;
 
         Carregar();
     }
@@ -70,8 +73,9 @@ public partial class ConfiguracaoViewModel : ObservableObject
                 ? "Configurações salvas com sucesso."
                 : string.Join(" ", resultado.Erros);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "SalvarConfiguracao");
             Mensagem = "Não foi possível salvar as configurações. Tente novamente.";
         }
     }
