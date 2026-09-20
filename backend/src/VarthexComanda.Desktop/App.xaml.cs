@@ -52,7 +52,11 @@ public partial class App : System.Windows.Application
         paths.EnsureCreated();
         VarthexComanda.Desktop.Catalogo.FotoArquivoParaImagemConverter.DiretorioFotos = paths.FotosDirectory;
 
-        _logger = LoggingConfigurator.CreateLogger(paths.LogsDirectory);
+        // RF26: o log mascara o perfil do usuario, a pasta de dados fora do perfil (%DADOS%) e a pasta de
+        // backup externo (registrada pelo EfBackupService quando a usa)
+        var pastasMascaradas = new PastasMascaradas();
+        pastasMascaradas.AdicionarDados(paths.Root);
+        _logger = LoggingConfigurator.CreateLogger(paths.LogsDirectory, pastas: pastasMascaradas);
         _logger.Information("Iniciando Varthex Comanda");
 
         DispatcherUnhandledException += (sender, args) =>
@@ -68,6 +72,7 @@ public partial class App : System.Windows.Application
 
         var services = new ServiceCollection();
         services.AddSingleton(paths);
+        services.AddSingleton(pastasMascaradas);
         services.AddSingleton(_logger);
         services.AddSingleton<IClock, SystemClock>();
         services.AddDbContextFactory<VarthexComandaDbContext>(options =>
@@ -140,19 +145,20 @@ public partial class App : System.Windows.Application
                 .ToList();
             if (linhas.Count != 1 || linhas[0] != "ok")
             {
-                _logger.Error("PRAGMA integrity_check retornou {Linhas}", string.Join("; ", linhas));
+                // uma base muito corrompida pode devolver milhares de linhas: registra so as 5 primeiras e o total
+                _logger.Error("PRAGMA integrity_check retornou {Total} linha(s); primeiras: {Linhas}", linhas.Count, string.Join("; ", linhas.Take(5)));
                 bancoCorrompido = true;
             }
             else
             {
-                var pendentes = dbContext.Database.GetPendingMigrations().ToList();
-                if (pendentes.Count > 0)
+                // instalação nova (nenhuma migração aplicada) não tem dados a preservar: sem backup preventivo
+                if (MigracaoDoBanco.ExigeBackupPreventivo(dbContext.Database, out var pendentes))
                 {
                     var backupService = _serviceProvider.GetRequiredService<IBackupService>();
                     var resultadoPreventivo = backupService.CriarBackupGerenciado();
                     if (resultadoPreventivo.Sucesso)
                     {
-                        _logger.Information("Backup preventivo criado antes de aplicar {Quantidade} migração(ões) pendente(s)", pendentes.Count);
+                        _logger.Information("Backup preventivo criado antes de aplicar {Quantidade} migração(ões) pendente(s)", pendentes);
                     }
                     else
                     {

@@ -123,8 +123,11 @@ public class CriarBackupAutomaticoTests
 
         var evento = Assert.Single(captura.Eventos);
         Assert.Equal(LogEventLevel.Warning, evento.Level);
-        Assert.DoesNotContain("D:\\backups", evento.RenderMessage());
+        // o caso de uso so repassa a mensagem do servico e nao acrescenta a pasta como propriedade;
+        // a mascara do caminho dentro de mensagens de erro do servico e testada de ponta a ponta em
+        // Infrastructure.Tests (PastasMascaradasTests.BackupAutomaticoComFalhaNaPastaExterna_...)
         Assert.DoesNotContain("Pasta", evento.Properties.Keys);
+        Assert.DoesNotContain("PastaBackupExterna", evento.Properties.Keys);
         Assert.Contains("Falha simulada ao criar backup externo.", evento.RenderMessage());
     }
 

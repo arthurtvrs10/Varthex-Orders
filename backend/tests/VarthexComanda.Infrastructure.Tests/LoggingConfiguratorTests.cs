@@ -10,9 +10,10 @@ public class LoggingConfiguratorTests
     {
         var logsDir = Path.Combine(Path.GetTempPath(), "VarthexComandaTests_" + Guid.NewGuid());
         Directory.CreateDirectory(logsDir);
+        Serilog.ILogger? logger = null;
         try
         {
-            var logger = LoggingConfigurator.CreateLogger(logsDir);
+            logger = LoggingConfigurator.CreateLogger(logsDir);
 
             logger.Information("mensagem de teste {Marcador}", "abc123");
             (logger as IDisposable)?.Dispose();
@@ -23,7 +24,8 @@ public class LoggingConfiguratorTests
         }
         finally
         {
-            Directory.Delete(logsDir, recursive: true);
+            (logger as IDisposable)?.Dispose();
+            LimparPasta(logsDir);
         }
     }
 
@@ -32,9 +34,10 @@ public class LoggingConfiguratorTests
     public void CreateLogger_RolaPorTamanho()
     {
         var logsDir = NovaPasta();
+        Serilog.ILogger? logger = null;
         try
         {
-            var logger = LoggingConfigurator.CreateLogger(logsDir, new LogOptions(TamanhoMaximoArquivoBytes: 2048, QuantidadeMaximaArquivos: 30));
+            logger = LoggingConfigurator.CreateLogger(logsDir, new LogOptions(TamanhoMaximoArquivoBytes: 2048, QuantidadeMaximaArquivos: 30));
 
             for (var i = 0; i < 200; i++)
                 logger.Information("{Linha}", new string('x', 100));
@@ -47,7 +50,8 @@ public class LoggingConfiguratorTests
         }
         finally
         {
-            Directory.Delete(logsDir, recursive: true);
+            (logger as IDisposable)?.Dispose();
+            LimparPasta(logsDir);
         }
     }
 
@@ -56,9 +60,10 @@ public class LoggingConfiguratorTests
     public void CreateLogger_RetemNoMaximoNArquivos()
     {
         var logsDir = NovaPasta();
+        Serilog.ILogger? logger = null;
         try
         {
-            var logger = LoggingConfigurator.CreateLogger(logsDir, new LogOptions(1024, 3));
+            logger = LoggingConfigurator.CreateLogger(logsDir, new LogOptions(1024, 3));
 
             for (var i = 0; i < 100; i++)
                 logger.Information("{Linha}", new string('x', 100));
@@ -71,7 +76,8 @@ public class LoggingConfiguratorTests
         }
         finally
         {
-            Directory.Delete(logsDir, recursive: true);
+            (logger as IDisposable)?.Dispose();
+            LimparPasta(logsDir);
         }
     }
 
@@ -82,6 +88,7 @@ public class LoggingConfiguratorTests
     public void CreateLogger_OpcoesInvalidas_Lancam(long tamanho, int quantidade)
     {
         var logsDir = NovaPasta();
+        Serilog.ILogger? logger = null;
         try
         {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
@@ -89,8 +96,15 @@ public class LoggingConfiguratorTests
         }
         finally
         {
-            Directory.Delete(logsDir, recursive: true);
+            (logger as IDisposable)?.Dispose();
+            LimparPasta(logsDir);
         }
+    }
+
+    private static void LimparPasta(string pasta)
+    {
+        // limpeza best-effort: nunca mascara o resultado do teste
+        try { Directory.Delete(pasta, recursive: true); } catch { }
     }
 
     private static string NovaPasta()

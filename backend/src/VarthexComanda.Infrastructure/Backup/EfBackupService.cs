@@ -6,6 +6,7 @@ using VarthexComanda.Application.Abstractions;
 using VarthexComanda.Application.Backup;
 using VarthexComanda.Application.Catalogo;
 using VarthexComanda.Domain;
+using VarthexComanda.Infrastructure.Logging;
 using VarthexComanda.Infrastructure.Persistence;
 using VarthexComanda.Infrastructure.Storage;
 
@@ -18,21 +19,28 @@ public class EfBackupService : IBackupService
     private readonly IClock _relogio;
     private readonly int _retencaoMaxima;
     private readonly ILogger? _logger;
+    private readonly PastasMascaradas? _pastasMascaradas;
 
-    public EfBackupService(AppPaths paths, IBackupRegistroRepository registros, IClock relogio, int retencaoMaxima = 30, ILogger? logger = null)
+    public EfBackupService(AppPaths paths, IBackupRegistroRepository registros, IClock relogio, int retencaoMaxima = 30, ILogger? logger = null, PastasMascaradas? pastasMascaradas = null)
     {
         _paths = paths;
         _registros = registros;
         _relogio = relogio;
         _retencaoMaxima = retencaoMaxima;
         _logger = logger;
+        _pastasMascaradas = pastasMascaradas;
     }
 
     public Resultado<BackupRegistro> CriarBackupGerenciado() =>
         CriarBackupInterno(_paths.BackupsDirectory, aplicarRetencao: true);
 
-    public Resultado<BackupRegistro> CriarBackupExterno(string pastaExterna) =>
-        CriarBackupInterno(pastaExterna, aplicarRetencao: false);
+    public Resultado<BackupRegistro> CriarBackupExterno(string pastaExterna)
+    {
+        // RF26: a pasta externa e conhecida so em tempo de execucao; registra-se ANTES de usa-la para
+        // que mensagens de erro contendo o caminho sejam mascaradas no log.
+        _pastasMascaradas?.Adicionar(PastasMascaradas.TokenPastaBackupExterna, pastaExterna);
+        return CriarBackupInterno(pastaExterna, aplicarRetencao: false);
+    }
 
     private Resultado<BackupRegistro> CriarBackupInterno(string pastaDestino, bool aplicarRetencao)
     {
@@ -97,7 +105,16 @@ public class EfBackupService : IBackupService
                 Checksum = checksum,
                 Mensagem = null
             };
-            _registros.Registrar(registro);
+            try
+            {
+                _registros.Registrar(registro);
+            }
+            catch (Exception exRegistro)
+            {
+                // o arquivo ja esta no lugar e e valido: falhar aqui nao pode virar Falha nem deixar o
+                // arquivo fora da retencao; segue com o registro em memoria
+                _logger?.Warning(exRegistro, "Falha em {Operacao}", "RegistrarBackup");
+            }
 
             if (aplicarRetencao)
             {
@@ -289,6 +306,25 @@ public class EfBackupService : IBackupService
         };
     }
 
+    private void RemoverArquivosAuxiliaresDoBanco()
+    {
+        foreach (var sufixo in new[] { "-wal", "-shm", "-journal" })
+        {
+            var caminho = _paths.DatabasePath + sufixo;
+            try
+            {
+                if (File.Exists(caminho))
+                {
+                    File.Delete(caminho);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.Warning(ex, "Falha em {Operacao}", "RemoverArquivoAuxiliarDoBanco");
+            }
+        }
+    }
+
     private enum EstadoDoBancoAtivo
     {
         Saudavel,
@@ -421,7 +457,10 @@ public class EfBackupService : IBackupService
             }
 
             SqliteConnection.ClearAllPools();
+            // arquivos auxiliares do banco antigo (WAL/SHM/journal) nao podem ser aplicados ao restaurado
+            RemoverArquivosAuxiliaresDoBanco();
             File.Copy(temporario, _paths.DatabasePath, overwrite: true);
+            RemoverArquivosAuxiliaresDoBanco();
             File.Delete(temporario);
 
             return preventivo;

@@ -16,10 +16,10 @@ public sealed class MascaraCaminhosSink : ILogEventSink, IDisposable
     private readonly ILogEventSink _interno;
     private readonly Func<string, string> _mascara;
 
-    public MascaraCaminhosSink(ILogEventSink interno, string? perfilUsuario = null)
+    public MascaraCaminhosSink(ILogEventSink interno, string? perfilUsuario = null, PastasMascaradas? pastas = null)
     {
         _interno = interno;
-        _mascara = LogMascara.CriarMascara(perfilUsuario);
+        _mascara = LogMascara.CriarMascara(perfilUsuario, pastas);
     }
 
     public void Emit(LogEvent logEvent)

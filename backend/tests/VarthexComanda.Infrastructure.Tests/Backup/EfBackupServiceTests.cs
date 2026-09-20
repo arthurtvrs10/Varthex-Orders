@@ -538,6 +538,76 @@ public class EfBackupServiceTests : IDisposable
         Assert.Equal("RestaurarBackup", ((ScalarValue)evento.Properties["Operacao"]).Value);
     }
 
+    private sealed class RegistrosQueFalhamAoRegistrar : IBackupRegistroRepository
+    {
+        public void Registrar(BackupRegistro registro) => throw new InvalidOperationException("registro indisponivel");
+
+        public IReadOnlyList<BackupRegistro> ListarRecentes(int quantidade) => [];
+
+        public bool ExisteBackupHoje(DateTime inicioUtc, DateTime fimUtc) => false;
+    }
+
+    // A falha ao registrar (que vive no banco) depois do arquivo no lugar nao invalida o backup.
+    [Fact]
+    public void CriarBackupGerenciado_FalhaAoRegistrarDepoisDeMoverOArquivo_ContinuaSucessoELogaAviso()
+    {
+        var coletor = new ColetorDeLog();
+        var servico = new EfBackupService(_paths, new RegistrosQueFalhamAoRegistrar(), new FakeClockDeIntegracao(), logger: coletor.Logger);
+
+        var resultado = servico.CriarBackupGerenciado();
+
+        Assert.True(resultado.Sucesso);
+        var caminho = Path.Combine(resultado.Valor!.Destino, resultado.Valor.Arquivo);
+        Assert.True(File.Exists(caminho));
+        Assert.True(File.Exists(caminho + ".sha256"));
+        Assert.Equal(StatusBackup.Sucesso, resultado.Valor.Status);
+        var evento = Assert.Single(coletor.Eventos);
+        Assert.Equal(LogEventLevel.Warning, evento.Level);
+        Assert.Equal("RegistrarBackup", ((ScalarValue)evento.Properties["Operacao"]).Value);
+    }
+
+    [Fact]
+    public void CriarBackupGerenciado_FalhaAoRegistrar_RetencaoAindaRemoveOsMaisAntigos()
+    {
+        var relogio = new FakeClockDeIntegracao();
+        var servico = new EfBackupService(_paths, new RegistrosQueFalhamAoRegistrar(), relogio, retencaoMaxima: 2);
+
+        for (var i = 0; i < 4; i++)
+        {
+            relogio.UtcNow = relogio.UtcNow.AddSeconds(1);
+            Assert.True(servico.CriarBackupGerenciado().Sucesso);
+        }
+
+        Assert.Equal(2, Directory.GetFiles(_paths.BackupsDirectory, "varthex-comanda-*.db").Length);
+    }
+
+    // Arquivos auxiliares do banco antigo nao podem ser aplicados ao banco restaurado.
+    [Fact]
+    public void RestaurarPara_RemoveArquivosWalShmEJournalDoBancoAntigo()
+    {
+        var relogio = new FakeClockDeIntegracao();
+        var servico = new EfBackupService(_paths, _registros, relogio);
+        var backupValido = servico.CriarBackupGerenciado();
+        var caminhoBackup = Path.Combine(backupValido.Valor!.Destino, backupValido.Valor.Arquivo);
+        SqliteConnection.ClearAllPools();
+        var auxiliares = new[] { "-wal", "-shm", "-journal" }.Select(s => _paths.DatabasePath + s).ToArray();
+        foreach (var auxiliar in auxiliares)
+        {
+            File.WriteAllText(auxiliar, "lixo do banco antigo");
+        }
+        relogio.UtcNow = relogio.UtcNow.AddSeconds(5);
+
+        var resultado = servico.RestaurarPara(caminhoBackup);
+
+        Assert.True(resultado.Sucesso);
+        Assert.All(auxiliares, auxiliar => Assert.False(File.Exists(auxiliar), auxiliar));
+        using var conexao = new SqliteConnection($"Data Source={_paths.DatabasePath};Pooling=False");
+        conexao.Open();
+        using var comando = conexao.CreateCommand();
+        comando.CommandText = "PRAGMA integrity_check";
+        Assert.Equal("ok", (string?)comando.ExecuteScalar());
+    }
+
     private class FakeClockDeIntegracao : VarthexComanda.Application.Abstractions.IClock
     {
         public DateTime UtcNow { get; set; } = new DateTime(2026, 9, 18, 12, 0, 0, DateTimeKind.Utc);
