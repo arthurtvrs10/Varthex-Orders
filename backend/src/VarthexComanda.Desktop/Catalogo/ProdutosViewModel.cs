@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Serilog;
 using VarthexComanda.Application.Catalogo;
 using VarthexComanda.Domain;
 
@@ -19,6 +20,7 @@ public partial class ProdutosViewModel : ObservableObject
     private readonly DesativarProduto _desativarProduto;
     private readonly DefinirFotoProduto _definirFotoProduto;
     private readonly RemoverFotoProduto _removerFotoProduto;
+    private readonly ILogger? _logger;
 
     public ProdutosViewModel(
         ListarCategoriasAtivas listarCategoriasAtivas,
@@ -28,7 +30,8 @@ public partial class ProdutosViewModel : ObservableObject
         AlterarProduto alterarProduto,
         DesativarProduto desativarProduto,
         DefinirFotoProduto definirFotoProduto,
-        RemoverFotoProduto removerFotoProduto)
+        RemoverFotoProduto removerFotoProduto,
+        ILogger? logger = null)
     {
         _listarCategoriasAtivas = listarCategoriasAtivas;
         _cadastrarCategoria = cadastrarCategoria;
@@ -38,12 +41,24 @@ public partial class ProdutosViewModel : ObservableObject
         _desativarProduto = desativarProduto;
         _definirFotoProduto = definirFotoProduto;
         _removerFotoProduto = removerFotoProduto;
+        _logger = logger;
 
         Categorias = new ObservableCollection<Categoria>();
         Produtos = new ObservableCollection<Produto>();
 
-        CarregarCategorias();
-        Pesquisar();
+        // Com o banco corrompido (modo de restauração) estas leituras lançam; a construção
+        // não pode falhar, senão a MainWindow nem abre. Segue com listas vazias.
+        try
+        {
+            CarregarCategorias();
+            Pesquisar();
+        }
+        catch (Exception ex)
+        {
+            _logger?.Error(ex, "Falha em {Operacao}", "CarregarProdutos");
+            Categorias.Clear();
+            Produtos.Clear();
+        }
     }
 
     public ObservableCollection<Categoria> Categorias { get; }
@@ -186,8 +201,9 @@ public partial class ProdutosViewModel : ObservableObject
                         falhaFoto = "Produto cadastrado, mas a foto não foi adicionada: " + string.Join(" ", resultadoFoto.Erros);
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    _logger?.Error(ex, "Falha em {Operacao}", "SalvarFotoDoProduto");
                     falhaFoto = "Produto cadastrado, mas não foi possível salvar a foto. Tente novamente.";
                 }
 
@@ -216,8 +232,9 @@ public partial class ProdutosViewModel : ObservableObject
             Novo();
             Pesquisar();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "SalvarProduto");
             Mensagem = "Não foi possível salvar o produto. Tente novamente.";
         }
     }
@@ -243,8 +260,9 @@ public partial class ProdutosViewModel : ObservableObject
             Novo();
             Pesquisar();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "DesativarProduto");
             Mensagem = "Não foi possível desativar o produto. Tente novamente.";
         }
     }
@@ -271,8 +289,9 @@ public partial class ProdutosViewModel : ObservableObject
             FotoArquivoAtual = resultado.Valor.FotoArquivo;
             Mensagem = string.Empty;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "DefinirFoto");
             Mensagem = "Não foi possível salvar a foto. Tente novamente.";
         }
     }
@@ -299,8 +318,9 @@ public partial class ProdutosViewModel : ObservableObject
             FotoArquivoAtual = null;
             Mensagem = string.Empty;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "RemoverFoto");
             Mensagem = "Não foi possível remover a foto. Tente novamente.";
         }
     }
@@ -323,8 +343,9 @@ public partial class ProdutosViewModel : ObservableObject
             Mensagem = string.Empty;
             CarregarCategorias();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "AdicionarCategoria");
             Mensagem = "Não foi possível adicionar a categoria. Tente novamente.";
         }
     }

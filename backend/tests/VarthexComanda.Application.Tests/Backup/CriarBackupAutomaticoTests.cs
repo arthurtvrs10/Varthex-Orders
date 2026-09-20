@@ -5,6 +5,7 @@ using VarthexComanda.Application.Backup;
 using VarthexComanda.Application.Configuracao;
 using VarthexComanda.Application.Tests.Catalogo;
 using VarthexComanda.Application.Tests.Configuracao;
+using VarthexComanda.Application.Tests.Suporte;
 using Xunit;
 
 namespace VarthexComanda.Application.Tests.Backup;
@@ -122,7 +123,29 @@ public class CriarBackupAutomaticoTests
 
         var evento = Assert.Single(captura.Eventos);
         Assert.Equal(LogEventLevel.Warning, evento.Level);
-        Assert.Contains("D:\\backups", evento.RenderMessage());
+        // o caso de uso so repassa a mensagem do servico e nao acrescenta a pasta como propriedade;
+        // a mascara do caminho dentro de mensagens de erro do servico e testada de ponta a ponta em
+        // Infrastructure.Tests (PastasMascaradasTests.BackupAutomaticoComFalhaNaPastaExterna_...)
+        Assert.DoesNotContain("Pasta", evento.Properties.Keys);
+        Assert.DoesNotContain("PastaBackupExterna", evento.Properties.Keys);
         Assert.Contains("Falha simulada ao criar backup externo.", evento.RenderMessage());
+    }
+
+    // RNF16: falha tecnica do backup automatico nao interrompe o app, mas fica no log como Warning
+    [Fact]
+    public void Executar_BackupServiceLancaExcecao_RegistraAvisoComExcecaoSemPropagar()
+    {
+        var registros = new FakeBackupRegistroRepository { ExisteBackupHojeRetorno = false };
+        var backupService = new FakeBackupService { LancarExcecaoAoCriar = true };
+        var coletor = new ColetorDeLog();
+        var caso = new CriarBackupAutomatico(backupService, registros, new FakeClock(), new ObterConfiguracao(new FakeConfiguracaoRepository()), coletor.Logger);
+
+        var excecao = Record.Exception(() => caso.Executar());
+
+        Assert.Null(excecao);
+        var evento = Assert.Single(coletor.Eventos);
+        Assert.Equal(LogEventLevel.Warning, evento.Level);
+        Assert.IsType<InvalidOperationException>(evento.Exception);
+        Assert.Equal("Backup automatico falhou", evento.RenderMessage());
     }
 }

@@ -1,10 +1,12 @@
 using System.Security.Cryptography;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using VarthexComanda.Application.Abstractions;
 using VarthexComanda.Application.Backup;
 using VarthexComanda.Application.Catalogo;
 using VarthexComanda.Domain;
+using VarthexComanda.Infrastructure.Logging;
 using VarthexComanda.Infrastructure.Persistence;
 using VarthexComanda.Infrastructure.Storage;
 
@@ -16,20 +18,29 @@ public class EfBackupService : IBackupService
     private readonly IBackupRegistroRepository _registros;
     private readonly IClock _relogio;
     private readonly int _retencaoMaxima;
+    private readonly ILogger? _logger;
+    private readonly PastasMascaradas? _pastasMascaradas;
 
-    public EfBackupService(AppPaths paths, IBackupRegistroRepository registros, IClock relogio, int retencaoMaxima = 30)
+    public EfBackupService(AppPaths paths, IBackupRegistroRepository registros, IClock relogio, int retencaoMaxima = 30, ILogger? logger = null, PastasMascaradas? pastasMascaradas = null)
     {
         _paths = paths;
         _registros = registros;
         _relogio = relogio;
         _retencaoMaxima = retencaoMaxima;
+        _logger = logger;
+        _pastasMascaradas = pastasMascaradas;
     }
 
     public Resultado<BackupRegistro> CriarBackupGerenciado() =>
         CriarBackupInterno(_paths.BackupsDirectory, aplicarRetencao: true);
 
-    public Resultado<BackupRegistro> CriarBackupExterno(string pastaExterna) =>
-        CriarBackupInterno(pastaExterna, aplicarRetencao: false);
+    public Resultado<BackupRegistro> CriarBackupExterno(string pastaExterna)
+    {
+        // RF26: a pasta externa e conhecida so em tempo de execucao; registra-se ANTES de usa-la para
+        // que mensagens de erro contendo o caminho sejam mascaradas no log.
+        _pastasMascaradas?.Adicionar(PastasMascaradas.TokenPastaBackupExterna, pastaExterna);
+        return CriarBackupInterno(pastaExterna, aplicarRetencao: false);
+    }
 
     private Resultado<BackupRegistro> CriarBackupInterno(string pastaDestino, bool aplicarRetencao)
     {
@@ -94,7 +105,16 @@ public class EfBackupService : IBackupService
                 Checksum = checksum,
                 Mensagem = null
             };
-            _registros.Registrar(registro);
+            try
+            {
+                _registros.Registrar(registro);
+            }
+            catch (Exception exRegistro)
+            {
+                // o arquivo ja esta no lugar e e valido: falhar aqui nao pode virar Falha nem deixar o
+                // arquivo fora da retencao; segue com o registro em memoria
+                _logger?.Warning(exRegistro, "Falha em {Operacao}", "RegistrarBackup");
+            }
 
             if (aplicarRetencao)
             {
@@ -105,6 +125,7 @@ public class EfBackupService : IBackupService
         }
         catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "CriarBackup");
             if (File.Exists(destinoTemporario))
             {
                 File.Delete(destinoTemporario);
@@ -120,7 +141,15 @@ public class EfBackupService : IBackupService
                 Checksum = null,
                 Mensagem = ex.Message
             };
-            try { _registros.Registrar(registroFalha); } catch { /* nao mascarar a falha original */ }
+            try
+            {
+                _registros.Registrar(registroFalha);
+            }
+            catch (Exception exRegistro)
+            {
+                // nao mascarar a falha original
+                _logger?.Warning(exRegistro, "Falha em {Operacao}", "RegistrarFalhaDeBackup");
+            }
             return Resultado<BackupRegistro>.Falha(ex.Message);
         }
     }
@@ -277,6 +306,102 @@ public class EfBackupService : IBackupService
         };
     }
 
+    private void RemoverArquivosAuxiliaresDoBanco()
+    {
+        foreach (var sufixo in new[] { "-wal", "-shm", "-journal" })
+        {
+            var caminho = _paths.DatabasePath + sufixo;
+            try
+            {
+                if (File.Exists(caminho))
+                {
+                    File.Delete(caminho);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.Warning(ex, "Falha em {Operacao}", "RemoverArquivoAuxiliarDoBanco");
+            }
+        }
+    }
+
+    private enum EstadoDoBancoAtivo
+    {
+        Saudavel,
+        Corrompido,
+        Indeterminado
+    }
+
+    /// <summary>
+    /// Verifica o banco ativo sem escrever nada. Só é "Corrompido" quando o PRAGMA devolve algo
+    /// diferente de "ok" ou o SQLite reporta CORRUPT/NOTADB; qualquer outra falha (banco ocupado,
+    /// travado, I/O) é "Indeterminado" e nunca deve ser tratada como corrupção.
+    /// </summary>
+    private EstadoDoBancoAtivo ClassificarBancoAtivo()
+    {
+        try
+        {
+            using var conexao = new SqliteConnection($"Data Source={_paths.DatabasePath};Pooling=False;Default Timeout=2");
+            conexao.Open();
+            using var comando = conexao.CreateCommand();
+            comando.CommandText = "PRAGMA integrity_check";
+            return (string?)comando.ExecuteScalar() == "ok" ? EstadoDoBancoAtivo.Saudavel : EstadoDoBancoAtivo.Corrompido;
+        }
+        catch (Exception ex) when (CorrupcaoDeBanco.EhErroDeCorrupcao(ex))
+        {
+            return EstadoDoBancoAtivo.Corrompido;
+        }
+        catch (Exception ex)
+        {
+            _logger?.Warning(ex, "Falha em {Operacao}", "VerificarBancoAtivo");
+            return EstadoDoBancoAtivo.Indeterminado;
+        }
+    }
+
+    private Resultado<BackupRegistro> GuardarCopiaBrutaDoBancoCorrompido()
+    {
+        const string mensagemFalha = "Não foi possível guardar uma cópia do banco atual; restauração cancelada.";
+        var agora = _relogio.UtcNow;
+        try
+        {
+            // solta os handles em pool para o arquivo poder ser lido/copiado por inteiro
+            SqliteConnection.ClearAllPools();
+            Directory.CreateDirectory(_paths.BackupsDirectory);
+
+            // fora da retenção: o nome não casa com varthex-comanda-*.db
+            var nomeArquivo = $"corrompido-{agora:yyyy-MM-dd-HHmmss}.db.bak";
+            var destino = Path.Combine(_paths.BackupsDirectory, nomeArquivo);
+            var sufixo = 1;
+            while (File.Exists(destino))
+            {
+                nomeArquivo = $"corrompido-{agora:yyyy-MM-dd-HHmmss}-{sufixo}.db.bak";
+                destino = Path.Combine(_paths.BackupsDirectory, nomeArquivo);
+                sufixo++;
+            }
+
+            File.Copy(_paths.DatabasePath, destino, overwrite: false);
+            _logger?.Warning("Banco ativo corrompido; cópia bruta guardada antes da restauração");
+
+            // StatusBackup só tem Sucesso/Falha; a cópia bruta foi guardada com sucesso.
+            // Não é registrada no repositório: ele vive no próprio banco corrompido.
+            return Resultado<BackupRegistro>.Ok(new BackupRegistro
+            {
+                Id = 0,
+                Arquivo = nomeArquivo,
+                Destino = _paths.BackupsDirectory,
+                CriadoEm = agora,
+                Status = StatusBackup.Sucesso,
+                Checksum = CalcularChecksumSha256(destino),
+                Mensagem = "Cópia bruta do banco corrompido, guardada antes da restauração."
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger?.Error(ex, "Falha em {Operacao}", "GuardarCopiaBrutaDoBancoCorrompido");
+            return Resultado<BackupRegistro>.Falha(mensagemFalha);
+        }
+    }
+
     public Resultado<BackupRegistro> RestaurarPara(string caminhoArquivo)
     {
         if (!File.Exists(caminhoArquivo))
@@ -286,10 +411,34 @@ public class EfBackupService : IBackupService
 
         try
         {
-            var preventivo = CriarBackupGerenciado();
-            if (!preventivo.Sucesso)
+            Resultado<BackupRegistro> preventivo;
+            switch (ClassificarBancoAtivo())
             {
-                return Resultado<BackupRegistro>.Falha("Não foi possível criar a cópia preventiva; restauração cancelada.");
+                case EstadoDoBancoAtivo.Corrompido:
+                    // Banco corrompido: a cópia bruta vem ANTES de qualquer outra coisa. Nada é
+                    // escrito no arquivo corrompido (CriarBackupGerenciado tenta registrar a falha
+                    // no próprio banco) e o SHA-256 da cópia bate com o do arquivo original.
+                    preventivo = GuardarCopiaBrutaDoBancoCorrompido();
+                    if (!preventivo.Sucesso)
+                    {
+                        return preventivo;
+                    }
+
+                    break;
+
+                case EstadoDoBancoAtivo.Indeterminado:
+                    // Não foi possível verificar (ex.: banco ocupado/travado): não é corrupção.
+                    // Cancela sem alterar nada.
+                    return Resultado<BackupRegistro>.Falha("Não foi possível verificar o banco atual; restauração cancelada.");
+
+                default:
+                    preventivo = CriarBackupGerenciado();
+                    if (!preventivo.Sucesso)
+                    {
+                        return Resultado<BackupRegistro>.Falha("Não foi possível criar a cópia preventiva; restauração cancelada.");
+                    }
+
+                    break;
             }
 
             var temporario = _paths.DatabasePath + ".restaurando";
@@ -308,13 +457,17 @@ public class EfBackupService : IBackupService
             }
 
             SqliteConnection.ClearAllPools();
+            // arquivos auxiliares do banco antigo (WAL/SHM/journal) nao podem ser aplicados ao restaurado
+            RemoverArquivosAuxiliaresDoBanco();
             File.Copy(temporario, _paths.DatabasePath, overwrite: true);
+            RemoverArquivosAuxiliaresDoBanco();
             File.Delete(temporario);
 
             return preventivo;
         }
         catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "RestaurarBackup");
             return Resultado<BackupRegistro>.Falha(ex.Message);
         }
     }

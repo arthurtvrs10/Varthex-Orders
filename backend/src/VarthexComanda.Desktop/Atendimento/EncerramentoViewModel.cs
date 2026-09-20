@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Serilog;
 using VarthexComanda.Application.Atendimento;
 using VarthexComanda.Domain;
 
@@ -11,11 +12,13 @@ public partial class EncerramentoViewModel : ObservableObject
     private readonly EncerrarComanda _encerrarComanda;
     private readonly IComandaRepository _comandas;
     private int _comandaId;
+    private readonly ILogger? _logger;
 
-    public EncerramentoViewModel(EncerrarComanda encerrarComanda, IComandaRepository comandas)
+    public EncerramentoViewModel(EncerrarComanda encerrarComanda, IComandaRepository comandas, ILogger? logger = null)
     {
         _encerrarComanda = encerrarComanda;
         _comandas = comandas;
+        _logger = logger;
         Itens = new ObservableCollection<ItemComanda>();
     }
 
@@ -78,8 +81,9 @@ public partial class EncerramentoViewModel : ObservableObject
             Mensagem = string.Empty;
             Concluido?.Invoke(this, true);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "EncerrarComanda");
             Mensagem = "A venda não foi registrada e a comanda continua aberta.";
         }
     }

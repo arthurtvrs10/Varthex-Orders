@@ -52,7 +52,11 @@ public partial class App : System.Windows.Application
         paths.EnsureCreated();
         VarthexComanda.Desktop.Catalogo.FotoArquivoParaImagemConverter.DiretorioFotos = paths.FotosDirectory;
 
-        _logger = LoggingConfigurator.CreateLogger(paths.LogsDirectory);
+        // RF26: o log mascara o perfil do usuario, a pasta de dados fora do perfil (%DADOS%) e a pasta de
+        // backup externo (registrada pelo EfBackupService quando a usa)
+        var pastasMascaradas = new PastasMascaradas();
+        pastasMascaradas.AdicionarDados(paths.Root);
+        _logger = LoggingConfigurator.CreateLogger(paths.LogsDirectory, pastas: pastasMascaradas);
         _logger.Information("Iniciando Varthex Comanda");
 
         DispatcherUnhandledException += (sender, args) =>
@@ -68,6 +72,7 @@ public partial class App : System.Windows.Application
 
         var services = new ServiceCollection();
         services.AddSingleton(paths);
+        services.AddSingleton(pastasMascaradas);
         services.AddSingleton(_logger);
         services.AddSingleton<IClock, SystemClock>();
         services.AddDbContextFactory<VarthexComandaDbContext>(options =>
@@ -124,50 +129,63 @@ public partial class App : System.Windows.Application
 
         _serviceProvider = services.BuildServiceProvider();
 
+        var bancoCorrompido = false;
+        var janelaPrincipalExibida = false;
         try
         {
             var factory = _serviceProvider.GetRequiredService<IDbContextFactory<VarthexComandaDbContext>>();
             using var dbContext = factory.CreateDbContext();
 
-            var pendentes = dbContext.Database.GetPendingMigrations().ToList();
-            if (pendentes.Count > 0)
-            {
-                var backupService = _serviceProvider.GetRequiredService<IBackupService>();
-                var resultadoPreventivo = backupService.CriarBackupGerenciado();
-                if (resultadoPreventivo.Sucesso)
-                {
-                    _logger.Information("Backup preventivo criado antes de aplicar {Quantidade} migração(ões) pendente(s)", pendentes.Count);
-                }
-                else
-                {
-                    _logger.Warning("Backup preventivo antes da migração falhou: {Mensagem}", string.Join(" ", resultadoPreventivo.Erros));
-                }
-            }
-
-            dbContext.Database.Migrate();
-
+            // A integridade é verificada ANTES de migrar: nunca aplicamos migrações (escritas) num
+            // arquivo corrompido, e um arquivo que nem é SQLite também cai aqui (o PRAGMA lança
+            // SQLITE_NOTADB/SQLITE_CORRUPT), em vez de virar "falha ao preparar o banco".
             var linhas = dbContext.Database
                 .SqlQueryRaw<string>("PRAGMA integrity_check")
                 .AsEnumerable()
                 .ToList();
             if (linhas.Count != 1 || linhas[0] != "ok")
             {
-                _logger.Error("PRAGMA integrity_check retornou {Linhas}", string.Join("; ", linhas));
-                MessageBox.Show(
-                    "O banco de dados do Varthex Comanda está corrompido. Restaure um backup antes de continuar.",
-                    "Varthex Comanda",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-                Shutdown();
-                return;
+                // uma base muito corrompida pode devolver milhares de linhas: registra so as 5 primeiras e o total
+                _logger.Error("PRAGMA integrity_check retornou {Total} linha(s); primeiras: {Linhas}", linhas.Count, string.Join("; ", linhas.Take(5)));
+                bancoCorrompido = true;
             }
+            else
+            {
+                // instalação nova (nenhuma migração aplicada) não tem dados a preservar: sem backup preventivo
+                if (MigracaoDoBanco.ExigeBackupPreventivo(dbContext.Database, out var pendentes))
+                {
+                    var backupService = _serviceProvider.GetRequiredService<IBackupService>();
+                    var resultadoPreventivo = backupService.CriarBackupGerenciado();
+                    if (resultadoPreventivo.Sucesso)
+                    {
+                        _logger.Information("Backup preventivo criado antes de aplicar {Quantidade} migração(ões) pendente(s)", pendentes);
+                    }
+                    else
+                    {
+                        _logger.Warning("Backup preventivo antes da migração falhou: {Mensagem}", string.Join(" ", resultadoPreventivo.Erros));
+                    }
+                }
 
-            _logger.Information("Banco pronto em {Caminho}", paths.DatabasePath);
+                dbContext.Database.Migrate();
 
-            _serviceProvider.GetRequiredService<CriarBackupAutomatico>().Executar();
+                _logger.Information("Banco pronto");
 
-            _serviceProvider.GetRequiredService<MainWindow>().Show();
-            _startupConcluido = true;
+                var abertas = _serviceProvider.GetRequiredService<IComandaRepository>().ListarAbertas().Count;
+                _logger.Information("Comandas abertas recuperadas: {Quantidade}", abertas);
+
+                _serviceProvider.GetRequiredService<CriarBackupAutomatico>().Executar();
+
+                _serviceProvider.GetRequiredService<MainWindow>().Show();
+                janelaPrincipalExibida = true;
+                _startupConcluido = true;
+            }
+        }
+        // só entra em modo de restauração se a corrupção apareceu antes de a MainWindow existir na tela;
+        // depois disso resolver uma segunda MainWindow seria errado (cai no tratamento genérico)
+        catch (Exception ex) when (!janelaPrincipalExibida && CorrupcaoDeBanco.EhErroDeCorrupcao(ex))
+        {
+            _logger.Error(ex, "Banco de dados corrompido ou inválido");
+            bancoCorrompido = true;
         }
         catch (Exception ex)
         {
@@ -179,6 +197,35 @@ public partial class App : System.Windows.Application
                 MessageBoxImage.Error);
             Shutdown();
             return;
+        }
+
+        if (bancoCorrompido)
+        {
+            AbrirModoRestauracao();
+        }
+    }
+
+    // Banco corrompido: abre a janela só com a aba Backup habilitada e a faixa de aviso.
+    // Nada de backup automático ao sair (_startupConcluido continua false) e nada de Shutdown:
+    // a restauração é sempre uma ação explícita do operador (BackupViewModel confirma e reinicia).
+    private void AbrirModoRestauracao()
+    {
+        try
+        {
+            _startupConcluido = false;
+            var janela = _serviceProvider!.GetRequiredService<MainWindow>();
+            janela.EntrarModoRestauracao();
+            janela.Show();
+        }
+        catch (Exception ex)
+        {
+            _logger!.Error(ex, "Falha em {Operacao}", "AbrirModoRestauracao");
+            MessageBox.Show(
+                "O banco de dados está corrompido e não foi possível abrir a tela de restauração. Consulte os logs.",
+                "Varthex Comanda",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            Shutdown();
         }
     }
 
@@ -200,21 +247,26 @@ public partial class App : System.Windows.Application
         _guard?.Release();
         _guard?.Dispose();
         _serviceProvider?.Dispose();
-        (_logger as IDisposable)?.Dispose();
 
+        // o logger so e descartado depois da tentativa, para registrar uma falha ao reiniciar
         try
         {
             var caminhoExecutavel = Environment.ProcessPath
                 ?? throw new InvalidOperationException("Não foi possível determinar o caminho do executável.");
             Process.Start(caminhoExecutavel);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger?.Warning(ex, "Falha em {Operacao}", "ReiniciarAplicativo");
             MessageBox.Show(
                 "A restauração foi concluída, mas não foi possível reiniciar automaticamente. Feche e abra o Varthex Comanda manualmente.",
                 "Varthex Comanda",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
+        }
+        finally
+        {
+            (_logger as IDisposable)?.Dispose();
         }
 
         Environment.Exit(0);

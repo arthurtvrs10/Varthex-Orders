@@ -47,15 +47,16 @@ public class CriarBackupAutomatico
                     var resultadoExterno = _backupService.CriarBackupExterno(configuracao.PastaBackupExterna);
                     if (!resultadoExterno.Sucesso)
                     {
-                        _logger.Warning("Cópia externa automática falhou em {Pasta}: {Mensagem}",
-                            configuracao.PastaBackupExterna, string.Join(" ", resultadoExterno.Erros));
+                        _logger.Warning("Cópia externa automática falhou: {Mensagem}",
+                            string.Join(" ", resultadoExterno.Erros));
                     }
                 }
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // backup automático nunca deve interromper o app
+            // backup automático nunca deve interromper o app, mas a falha fica registrada
+            _logger.Warning(ex, "Backup automatico falhou");
         }
     }
 }

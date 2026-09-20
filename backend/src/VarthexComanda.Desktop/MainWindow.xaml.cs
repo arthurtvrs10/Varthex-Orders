@@ -25,6 +25,23 @@ public partial class MainWindow : Window
         ConteudoPrincipal.Content = _atendimentoView;
     }
 
+    /// <summary>
+    /// Modo de restauração (banco corrompido): só a aba Backup fica disponível, com a faixa de
+    /// aviso no topo. As demais abas ficam desabilitadas para que nada leia ou escreva no banco.
+    /// </summary>
+    public void EntrarModoRestauracao()
+    {
+        BotaoAtendimento.IsEnabled = false;
+        BotaoProdutos.IsEnabled = false;
+        BotaoHistorico.IsEnabled = false;
+        BotaoConfiguracoes.IsEnabled = false;
+        FaixaRestauracao.Visibility = Visibility.Visible;
+
+        _backupView.ViewModel.ModoRestauracao = true;
+        _backupView.ViewModel.AtualizarLista();
+        ConteudoPrincipal.Content = _backupView;
+    }
+
     private void MostrarAtendimento_Click(object sender, RoutedEventArgs e)
     {
         _atendimentoView.ViewModel.AtualizarCategorias();

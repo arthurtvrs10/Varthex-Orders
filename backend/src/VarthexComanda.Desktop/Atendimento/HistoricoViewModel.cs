@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Serilog;
 using VarthexComanda.Application.Abstractions;
 using VarthexComanda.Application.Atendimento;
 using VarthexComanda.Domain;
@@ -10,13 +11,15 @@ public partial class HistoricoViewModel : ObservableObject
 {
     private readonly ListarVendasPorData _listarVendasPorData;
     private readonly BuscarItensDaVenda _buscarItensDaVenda;
+    private readonly ILogger? _logger;
 
     private IReadOnlyList<VendaResumo> _vendasCarregadas = Array.Empty<VendaResumo>();
 
-    public HistoricoViewModel(ListarVendasPorData listarVendasPorData, BuscarItensDaVenda buscarItensDaVenda, IClock relogio)
+    public HistoricoViewModel(ListarVendasPorData listarVendasPorData, BuscarItensDaVenda buscarItensDaVenda, IClock relogio, ILogger? logger = null)
     {
         _listarVendasPorData = listarVendasPorData;
         _buscarItensDaVenda = buscarItensDaVenda;
+        _logger = logger;
 
         Vendas = new ObservableCollection<VendaResumo>();
         ItensDaVendaSelecionada = new ObservableCollection<ItemComanda>();
@@ -80,8 +83,9 @@ public partial class HistoricoViewModel : ObservableObject
                 ItensDaVendaSelecionada.Add(item);
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "CarregarItensDaVenda");
             Mensagem = "Não foi possível carregar os itens da venda. Tente novamente.";
         }
     }
@@ -93,8 +97,9 @@ public partial class HistoricoViewModel : ObservableObject
             _vendasCarregadas = _listarVendasPorData.Executar(DataSelecionada);
             Mensagem = string.Empty;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger?.Error(ex, "Falha em {Operacao}", "CarregarVendas");
             _vendasCarregadas = Array.Empty<VendaResumo>();
             Mensagem = "Não foi possível carregar as vendas. Tente novamente.";
         }
