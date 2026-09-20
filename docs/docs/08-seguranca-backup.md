@@ -33,15 +33,15 @@ Em produção, derive a pasta com `Environment.SpecialFolder.LocalApplicationDat
 - manter a restrição única do banco como segunda linha de defesa;
 - confirmar cada gravação antes de apresentar sucesso na interface;
 - ao iniciar, validar migrações e carregar comandas `ABERTA` sem alterar seu estado;
-- se a integridade falhar, bloquear novas gravações e orientar a restauração;
+- se a integridade falhar, bloquear novas gravações e orientar a restauração: o aplicativo abre em modo de restauração (só a aba Backup, com faixa de aviso; a lista vem dos arquivos da pasta de backups) e, ao restaurar, guarda uma cópia bruta do banco corrompido em `backups\corrompido-*.db.bak`, fora da retenção;
 - não tentar restaurar automaticamente um backup sem confirmação humana.
 
 ## Logs
 
 - gravar arquivos locais estruturados por data;
 - aplicar rotação diária e limite total configurado;
-- conservar 30 dias por padrão;
-- mascarar caminhos ou conteúdos que revelem dados desnecessários;
+- conservar 30 arquivos por padrão (equivale a cerca de 30 dias em uso normal; a contagem de arquivos é o que garante o teto de disco), com arquivos de no máximo 5 MB e teto total de cerca de 150 MB (`LogOptions`);
+- mascarar caminhos ou conteúdos que revelem dados desnecessários: o perfil do usuário do Windows vira `%USERPROFILE%`, a pasta de backup externa e a pasta de dados fora do perfil também são mascaradas; falhas técnicas registram só o nome da operação e a exceção, nunca produto, valor ou número de comanda;
 - nunca registrar itens como dados de cartão, senha, token ou autorização.
 
 ## Política de backup
