@@ -1,5 +1,14 @@
 # Histórico de alterações
 
+## 1.15 - 2026-09-21 - Acabamento (Etapa 7, fatia 3)
+
+- As janelas nativas de aviso (segunda instância, erro inesperado, falha ao preparar o banco, restauração concluída) foram trocadas por uma janela de aviso grande, no mesmo padrão de toque da confirmação.
+- A coluna "Ativo" da lista de Produtos mostra "Sim/Não".
+- Fotos entram no backup: um `.db.fotos.zip` ao lado do banco, criado só quando as fotos mudam (evita duplicar a biblioteca a cada cópia), com os 3 mais recentes por pasta (local e externa). A restauração devolve as fotos sem apagar nenhuma existente. Resolve a limitação declarada em 1.12.
+- Na inicialização o log registra quantas fotos não pertencem a nenhum produto (só a contagem); nada é apagado automaticamente.
+- Documentação: correspondência entre os contratos de `docs/15` e o código.
+- Limitações conhecidas: o zip de fotos é gerado no thread da interface (só quando as fotos mudam); `corrompido-*.db.bak` continua sem poda.
+
 ## 1.14 - 2026-09-21 - Navegação por teclado e foco visível (Etapa 7, fatia 2)
 
 - Foco visível de alto contraste (contorno azul de 3 px) em botões, campos, caixas de seleção e datas — RNF18.
@@ -33,7 +42,7 @@
   JPG/PNG/BMP, até 10 MB); o banco guarda só o nome do arquivo. Trocar ou
   remover apaga o arquivo antigo.
 - Limitação conhecida: o backup ainda copia só o banco de dados — as fotos
-  não vão junto (fatia futura).
+  não vão junto (resolvido em 1.15).
 
 ## 1.11 - 2026-09-18 - Redesign da tela de Atendimento
 

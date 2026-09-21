@@ -2,6 +2,12 @@
 
 Os nomes são sugestões. A implementação pode adaptá-los sem alterar comportamento.
 
+> **Correspondência com o código (2026-09-21).** O comportamento dos contratos abaixo foi mantido, mas as interfaces foram organizadas assim:
+> - `VendaRepository.salvar`/`ComandaRepository.salvar` não existem como tais: as escritas são métodos por verbo em `IComandaRepository` (`AbrirComanda`, `AdicionarItem`, `AlterarQuantidade`, `RemoverItem`, `CancelarComanda`, `EncerrarComanda`), cada um com uma transação própria; `IVendaRepository` é somente leitura (`ListarPorData`, `BuscarItensDaVenda`).
+> - O encerramento transacional (carregar, exigir `ABERTA`, exigir ao menos um item, recalcular, criar a venda e fechar a comanda) acontece dentro de `IComandaRepository.EncerrarComanda`, não em `VendaRepository.salvar` nem numa `UnidadeTrabalho` separada.
+> - `RecuperarAtendimento` é `IComandaRepository.ListarAbertas` (mais `BuscarComItens`); `InstanciaAplicacao` é `SingleInstanceGuard`; `ConsultarHistorico` é `ListarVendasPorData`.
+> - As operações são síncronas (sem `CancellationToken`) e as datas são guardadas em UTC.
+
 ## Tipos de valor
 
 ### Dinheiro
