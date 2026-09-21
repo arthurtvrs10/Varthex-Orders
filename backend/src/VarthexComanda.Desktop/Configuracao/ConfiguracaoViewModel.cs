@@ -29,6 +29,8 @@ public partial class ConfiguracaoViewModel : ObservableObject
         }
     }
 
+    public string VersaoTexto => $"Versão {VersaoDoAplicativo.Atual}";
+
     [ObservableProperty]
     private string nomeEstabelecimento = string.Empty;
 

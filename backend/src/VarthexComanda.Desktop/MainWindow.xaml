@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VarthexComanda.Desktop"
         mc:Ignorable="d"
-        Title="Varthex Comanda" Height="700" Width="1200">
+        Title="Varthex Comanda" Icon="pack://application:,,,/VarthexComanda;component/Assets/VarthexComanda.ico" Height="700" Width="1200">
     <Window.InputBindings>
         <KeyBinding Key="D1" Modifiers="Control" Command="{x:Static local:MainWindow.IrParaAtendimentoCommand}" />
         <KeyBinding Key="NumPad1" Modifiers="Control" Command="{x:Static local:MainWindow.IrParaAtendimentoCommand}" />

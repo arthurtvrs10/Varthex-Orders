@@ -11,6 +11,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
@@ -33,5 +34,7 @@
         <Button x:Name="BotaoSalvar" Grid.Row="3" Content="Salvar" IsDefault="True" Padding="28,0" Height="56" FontSize="16" HorizontalAlignment="Left" Command="{Binding SalvarCommand}" Margin="0,8,0,12" />
 
         <TextBlock Grid.Row="4" Text="{Binding Mensagem}" Foreground="Red" TextWrapping="Wrap" />
+
+        <TextBlock Grid.Row="5" Text="{Binding VersaoTexto}" Foreground="#666666" FontSize="12" Margin="0,24,0,0" />
     </Grid>
 </UserControl>
