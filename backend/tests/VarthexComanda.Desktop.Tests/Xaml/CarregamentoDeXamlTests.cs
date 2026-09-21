@@ -95,7 +95,7 @@ public class CarregamentoDeXamlTests
         return (viewModel, comanda);
     }
 
-    private static ProdutosViewModel CriarProdutos()
+    internal static ProdutosViewModel CriarProdutos()
     {
         var relogio = new FakeClock();
         var categorias = new FakeCategoriaRepository();
@@ -116,7 +116,7 @@ public class CarregamentoDeXamlTests
             new RemoverFotoProduto(produtos, fotos, relogio));
     }
 
-    private static HistoricoViewModel CriarHistorico()
+    internal static HistoricoViewModel CriarHistorico()
     {
         var relogio = new FakeClock();
         var vendas = new FakeVendaRepository();
@@ -148,7 +148,7 @@ public class CarregamentoDeXamlTests
             new FakeConfirmadorDeBackup());
     }
 
-    private static ConfiguracaoViewModel CriarConfiguracao()
+    internal static ConfiguracaoViewModel CriarConfiguracao()
     {
         var repositorio = new FakeConfiguracaoRepository();
         return new ConfiguracaoViewModel(new ObterConfiguracao(repositorio), new SalvarConfiguracao(repositorio, new FakeClock()));

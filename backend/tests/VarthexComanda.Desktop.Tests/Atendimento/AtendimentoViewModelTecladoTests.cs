@@ -61,6 +61,41 @@ public class AtendimentoViewModelTecladoTests
     // ---- (d) fluxo por numero ----
 
     [Fact]
+    public void Abrir_NumeroDeComandaJaAberta_SelecionaEmVezDeMostrarErro()
+    {
+        var (viewModel, _) = CriarViewModel();
+        viewModel.NovoNumero = "7";
+        viewModel.AbrirCommand.Execute(null);
+        var idDaComanda = viewModel.ComandaAtual!.Id;
+        viewModel.FecharEdicaoCommand.Execute(null);
+        Assert.Null(viewModel.ComandaAtual);
+
+        viewModel.NovoNumero = "7";
+        viewModel.AbrirCommand.Execute(null);
+
+        Assert.Equal(idDaComanda, viewModel.ComandaAtual!.Id);
+        Assert.Equal(string.Empty, viewModel.NovoNumero);
+        Assert.Equal(string.Empty, viewModel.Mensagem);
+        Assert.Single(viewModel.ComandasAbertas);
+    }
+
+    [Theory]
+    [InlineData("0")]
+    [InlineData("-3")]
+    [InlineData("abc")]
+    public void Abrir_NumeroInvalidoOuForaDaFaixa_MantemAsMensagensAtuais(string texto)
+    {
+        var (viewModel, _) = CriarViewModel();
+        viewModel.NovoNumero = texto;
+
+        viewModel.AbrirCommand.Execute(null);
+
+        Assert.Null(viewModel.ComandaAtual);
+        Assert.NotEqual(string.Empty, viewModel.Mensagem);
+        Assert.Empty(viewModel.ComandasAbertas);
+    }
+
+    [Fact]
     public void Abrir_ComNovoNumero7_AbreComandaEZeraOCampo()
     {
         var (viewModel, _) = CriarViewModel();

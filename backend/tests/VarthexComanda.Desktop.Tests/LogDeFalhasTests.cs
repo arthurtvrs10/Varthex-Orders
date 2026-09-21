@@ -142,11 +142,12 @@ public class LogDeFalhasTests
         var coletor = new ColetorDeLog();
         var cenario = CriarAtendimento(coletor);
 
-        // numero de comanda ja aberto: Resultado.Falha, nao excecao
-        cenario.ViewModel.NovoNumero = "10";
+        // numero invalido para o caso de uso: Resultado.Falha, nao excecao
+        // (numero de comanda ja aberta agora seleciona a comanda, sem passar pelo caso de uso)
+        cenario.ViewModel.NovoNumero = "0";
         cenario.ViewModel.AbrirCommand.Execute(null);
 
-        Assert.Equal("Já existe uma comanda aberta com esse número.", cenario.ViewModel.Mensagem);
+        Assert.Equal("Informe um número de comanda válido.", cenario.ViewModel.Mensagem);
         Assert.Empty(coletor.Eventos);
     }
 

@@ -144,6 +144,15 @@ public partial class AtendimentoViewModel : ObservableObject
             return;
         }
 
+        var jaAberta = ComandasAbertas.FirstOrDefault(c => c.Numero == numero);
+        if (jaAberta is not null)
+        {
+            NovoNumero = string.Empty;
+            Mensagem = string.Empty;
+            AbrirParaEdicao(jaAberta.Id);
+            return;
+        }
+
         try
         {
             var resultado = _abrirComanda.Executar(numero);

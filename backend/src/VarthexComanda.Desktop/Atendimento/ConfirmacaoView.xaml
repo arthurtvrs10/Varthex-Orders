@@ -12,9 +12,9 @@
         <TextBlock x:Name="TextoMensagem" Grid.Row="0" FontSize="20" TextWrapping="Wrap"
                    Foreground="#23252A" Margin="0,4,0,28" />
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button x:Name="BotaoNao" Content="Não" Width="150" Height="60" FontSize="18"
+            <Button x:Name="BotaoNao" Content="_Não" Width="150" Height="60" FontSize="18"
                     IsDefault="True" IsCancel="True" Margin="0,0,12,0" Click="Nao_Click" />
-            <Button x:Name="BotaoSim" Content="Sim" Width="150" Height="60" FontSize="18" FontWeight="Bold"
+            <Button x:Name="BotaoSim" Content="_Sim" Width="150" Height="60" FontSize="18" FontWeight="Bold"
                     Background="#B23B32" Foreground="White" Click="Sim_Click" />
         </StackPanel>
     </Grid>
