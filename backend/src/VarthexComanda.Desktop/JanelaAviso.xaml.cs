@@ -29,9 +29,11 @@ public static class JanelaAviso
 {
     public static void Mostrar(string titulo, string mensagem, TipoAviso tipo = TipoAviso.Informacao)
     {
-        var janela = new JanelaAvisoView(titulo, mensagem, tipo);
         // Qualificado: dentro de VarthexComanda.Desktop, "Application" solto resolve para o namespace VarthexComanda.Application.
+        // Lido ANTES de construir a janela: o WPF promove a primeira Window criada a MainWindow quando ainda
+        // nao ha uma, e o aviso viraria dono de si mesmo.
         var dono = System.Windows.Application.Current?.MainWindow;
+        var janela = new JanelaAvisoView(titulo, mensagem, tipo);
         if (dono is not null && dono.IsLoaded && dono.IsVisible)
         {
             janela.Owner = dono;

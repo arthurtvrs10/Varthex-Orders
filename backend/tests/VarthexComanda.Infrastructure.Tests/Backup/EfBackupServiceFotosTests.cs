@@ -44,8 +44,24 @@ public class EfBackupServiceFotosTests : IDisposable
         if (Directory.Exists(_raizTeste)) Directory.Delete(_raizTeste, recursive: true);
     }
 
-    private EfBackupService NovoServico(int retencao = 30, ColetorDeLog? coletor = null) =>
-        new(_paths, _registros, _relogio, retencao, coletor?.Logger);
+    private EfBackupService NovoServico(int retencao = 30, ColetorDeLog? coletor = null, long limiteRestauracao = 2L * 1024 * 1024 * 1024) =>
+        new(_paths, _registros, _relogio, retencao, coletor?.Logger, null, limiteRestauracao);
+
+    private static string[] NomesDasFotosNoZip(string caminhoZip)
+    {
+        using var zip = ZipFile.OpenRead(caminhoZip);
+        return zip.Entries.Select(e => e.FullName).Where(n => n != "_manifest.txt").OrderBy(n => n).ToArray();
+    }
+
+    private string[] ZipsDaPasta(string pasta) =>
+        Directory.GetFiles(pasta).Where(f => f.EndsWith(".fotos.zip")).OrderBy(f => f).ToArray();
+
+    /// <summary>Muda o conjunto de fotos: o nome e o instante de escrita mudam a impressao digital.</summary>
+    private void AvancarBiblioteca(string nome)
+    {
+        var caminho = CriarFoto(nome, nome);
+        File.SetLastWriteTimeUtc(caminho, DateTime.UtcNow.AddMinutes(-Random.Shared.Next(1, 100000)));
+    }
 
     private string CriarFoto(string nome, string conteudo = "conteudo")
     {
@@ -95,8 +111,12 @@ public class EfBackupServiceFotosTests : IDisposable
         Assert.True(resultado.Sucesso);
         var caminhoZip = CaminhoDb(resultado) + ".fotos.zip";
         Assert.True(File.Exists(caminhoZip));
-        using var zip = ZipFile.OpenRead(caminhoZip);
-        Assert.Equal(new[] { "a.png", "b.jpg", "c.bmp" }, zip.Entries.Select(e => e.FullName).OrderBy(n => n).ToArray());
+        Assert.Equal(new[] { "a.png", "b.jpg", "c.bmp" }, NomesDasFotosNoZip(caminhoZip));
+        using (var zip = ZipFile.OpenRead(caminhoZip))
+        {
+            Assert.NotNull(zip.GetEntry("_manifest.txt"));
+        }
+
         Assert.Empty(Directory.GetFiles(_paths.BackupsDirectory, "*.tmp"));
     }
 
@@ -127,8 +147,7 @@ public class EfBackupServiceFotosTests : IDisposable
 
         var resultado = NovoServico().CriarBackupGerenciado();
 
-        using var zip = ZipFile.OpenRead(CaminhoDb(resultado) + ".fotos.zip");
-        Assert.Equal("a.png", Assert.Single(zip.Entries).FullName);
+        Assert.Equal(new[] { "a.png" }, NomesDasFotosNoZip(CaminhoDb(resultado) + ".fotos.zip"));
     }
 
     [Fact]
@@ -144,22 +163,128 @@ public class EfBackupServiceFotosTests : IDisposable
 
     [Fact]
     [Trait("Requisito", "RF21")]
-    public void Retencao_RemoveTambemOsZipsDosRemovidosEMantemOsDosMantidos()
+    public void Retencao_ZipsAlemDosTresMaisRecentesSaoPodadosEARetencaoDoDbNaoMuda()
     {
-        CriarFoto("a.png");
         var servico = NovoServico(retencao: 2);
         var criados = new List<string>();
-        for (var i = 0; i < 4; i++)
+        for (var i = 0; i < 5; i++)
         {
+            AvancarBiblioteca($"f{i}.png"); // biblioteca muda a cada backup: um zip novo por backup
             _relogio.UtcNow = _relogio.UtcNow.AddSeconds(1);
             criados.Add(CaminhoDb(servico.CriarBackupGerenciado()));
         }
 
-        Assert.Equal(criados.Skip(2).OrderBy(x => x), Directory.GetFiles(_paths.BackupsDirectory, "varthex-comanda-*.db").OrderBy(x => x));
-        Assert.Equal(
-            criados.Skip(2).Select(c => c + ".fotos.zip").OrderBy(x => x),
-            Directory.GetFiles(_paths.BackupsDirectory, "*.fotos.zip").OrderBy(x => x));
+        Assert.Equal(criados.Skip(3).OrderBy(x => x), Directory.GetFiles(_paths.BackupsDirectory, "varthex-comanda-*.db").OrderBy(x => x));
         Assert.Equal(2, Directory.GetFiles(_paths.BackupsDirectory, "*.sha256").Length);
+        // os 3 zips mais recentes ficam, mesmo o do backup 3 cujo .db ja foi removido pela retencao de 2
+        Assert.Equal(criados.Skip(2).Select(c => c + ".fotos.zip").OrderBy(x => x), ZipsDaPasta(_paths.BackupsDirectory));
+    }
+
+    [Fact]
+    [Trait("Requisito", "RF21")]
+    public void CriarBackup_BibliotecaInalterada_NaoCriaNovoZip()
+    {
+        CriarFoto("a.png");
+        var servico = NovoServico();
+
+        var primeiro = servico.CriarBackupGerenciado();
+        _relogio.UtcNow = _relogio.UtcNow.AddSeconds(1);
+        var segundo = servico.CriarBackupGerenciado();
+        _relogio.UtcNow = _relogio.UtcNow.AddSeconds(1);
+        var terceiro = servico.CriarBackupExterno(Path.Combine(_raizTeste, "externa"));
+
+        Assert.True(segundo.Sucesso);
+        Assert.Equal(new[] { CaminhoDb(primeiro) + ".fotos.zip" }, ZipsDaPasta(_paths.BackupsDirectory));
+        Assert.False(File.Exists(CaminhoDb(segundo) + ".fotos.zip"));
+        // a comparacao e por pasta de destino: a externa ainda nao tinha zip
+        Assert.True(File.Exists(CaminhoDb(terceiro) + ".fotos.zip"));
+    }
+
+    [Fact]
+    [Trait("Requisito", "RF21")]
+    public void CriarBackup_FotoAdicionadaOuSubstituida_CriaNovoZip()
+    {
+        CriarFoto("a.png", "um");
+        File.SetLastWriteTimeUtc(Path.Combine(_paths.FotosDirectory, "a.png"), new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+        var servico = NovoServico();
+        servico.CriarBackupGerenciado();
+
+        _relogio.UtcNow = _relogio.UtcNow.AddSeconds(1);
+        CriarFoto("b.png");
+        var aposAdicionar = servico.CriarBackupGerenciado();
+
+        _relogio.UtcNow = _relogio.UtcNow.AddSeconds(1);
+        File.WriteAllText(Path.Combine(_paths.FotosDirectory, "b.png"), "conteudo-bem-maior");
+        var aposSubstituir = servico.CriarBackupGerenciado();
+
+        _relogio.UtcNow = _relogio.UtcNow.AddSeconds(1);
+        var semMudanca = servico.CriarBackupGerenciado();
+
+        Assert.True(File.Exists(CaminhoDb(aposAdicionar) + ".fotos.zip"));
+        Assert.True(File.Exists(CaminhoDb(aposSubstituir) + ".fotos.zip"));
+        Assert.False(File.Exists(CaminhoDb(semMudanca) + ".fotos.zip"));
+        Assert.Equal(3, ZipsDaPasta(_paths.BackupsDirectory).Length);
+    }
+
+    [Fact]
+    [Trait("Requisito", "RF22")]
+    public void PastaExterna_PodaSoZipsEMantemDbsEArquivosDoUsuario()
+    {
+        var externa = Path.Combine(_raizTeste, "externa");
+        Directory.CreateDirectory(externa);
+        File.WriteAllText(Path.Combine(externa, "notas.zip"), "do usuario");
+        File.WriteAllText(Path.Combine(externa, "leia-me.txt"), "do usuario");
+        var servico = NovoServico(retencao: 1);
+        var dbs = new List<string>();
+        for (var i = 0; i < 5; i++)
+        {
+            AvancarBiblioteca($"f{i}.png");
+            _relogio.UtcNow = _relogio.UtcNow.AddSeconds(1);
+            dbs.Add(CaminhoDb(servico.CriarBackupExterno(externa)));
+        }
+
+        Assert.Equal(dbs.OrderBy(x => x), Directory.GetFiles(externa, "varthex-comanda-*.db").OrderBy(x => x));
+        Assert.Equal(5, Directory.GetFiles(externa, "*.sha256").Length);
+        Assert.Equal(dbs.Skip(2).Select(d => d + ".fotos.zip").OrderBy(x => x), ZipsDaPasta(externa).Where(z => !z.EndsWith("notas.zip")));
+        Assert.True(File.Exists(Path.Combine(externa, "notas.zip")));
+        Assert.True(File.Exists(Path.Combine(externa, "leia-me.txt")));
+    }
+
+    [Fact]
+    [Trait("Requisito", "RF21")]
+    public void CriarBackup_ZipTemporarioAbandonado_SoOsComMaisDeUmaHoraSaem()
+    {
+        var antigo = Path.Combine(_paths.BackupsDirectory, "varthex-comanda-2020-01-01-000000.db.fotos.zip.tmp");
+        var recente = Path.Combine(_paths.BackupsDirectory, "varthex-comanda-2020-01-02-000000.db.fotos.zip.tmp");
+        var alheio = Path.Combine(_paths.BackupsDirectory, "outro.tmp");
+        File.WriteAllText(antigo, "x"); File.WriteAllText(recente, "x"); File.WriteAllText(alheio, "x");
+        File.SetLastWriteTimeUtc(antigo, DateTime.UtcNow.AddHours(-2));
+        File.SetLastWriteTimeUtc(alheio, DateTime.UtcNow.AddHours(-2));
+
+        var resultado = NovoServico().CriarBackupGerenciado();
+
+        Assert.True(resultado.Sucesso);
+        Assert.False(File.Exists(antigo));
+        Assert.True(File.Exists(recente));
+        Assert.True(File.Exists(alheio));
+    }
+
+    [Fact]
+    [Trait("Requisito", "RF21")]
+    public void CriarBackupGerenciado_FalhaNaRetencao_ContinuaSucessoComWarning()
+    {
+        var coletor = new ColetorDeLog();
+        var servico = NovoServico(retencao: 1, coletor: coletor);
+        var primeiro = servico.CriarBackupGerenciado();
+        _relogio.UtcNow = _relogio.UtcNow.AddSeconds(1);
+        // o .db mais antigo seria apagado pela retencao, mas esta travado
+        using var trava = new FileStream(CaminhoDb(primeiro), FileMode.Open, FileAccess.Read, FileShare.None);
+
+        var segundo = servico.CriarBackupGerenciado();
+
+        Assert.True(segundo.Sucesso);
+        Assert.True(File.Exists(CaminhoDb(segundo)));
+        Assert.Single(coletor.Eventos, e => e.Level == LogEventLevel.Warning && ((ScalarValue)e.Properties["Operacao"]).Value as string == "AplicarRetencao");
     }
 
     [Fact]
@@ -184,7 +309,7 @@ public class EfBackupServiceFotosTests : IDisposable
 
     [Fact]
     [Trait("Requisito", "RF21")]
-    public void CriarBackupGerenciado_FalhaAoZipar_BackupDoDbOkSemZipParcialEComWarning()
+    public void CriarBackupGerenciado_FotoTravada_ZipTemAsDemaisSemNomeNoLogEBackupOk()
     {
         var bloqueada = CriarFoto("a.png");
         CriarFoto("b.png");
@@ -196,11 +321,44 @@ public class EfBackupServiceFotosTests : IDisposable
         Assert.True(resultado.Sucesso);
         Assert.Equal(StatusBackup.Sucesso, resultado.Valor!.Status);
         Assert.True(File.Exists(CaminhoDb(resultado)));
-        Assert.Empty(Directory.GetFiles(_paths.BackupsDirectory, "*.zip*"));
-        var evento = Assert.Single(coletor.Eventos);
+        Assert.Equal(new[] { "b.png" }, NomesDasFotosNoZip(CaminhoDb(resultado) + ".fotos.zip"));
+        Assert.Empty(Directory.GetFiles(_paths.BackupsDirectory, "*.tmp"));
+        var evento = Assert.Single(coletor.Eventos, e => e.Properties.TryGetValue("Operacao", out var o) && ((ScalarValue)o).Value as string == "ZiparFotosDoBackup");
         Assert.Equal(LogEventLevel.Warning, evento.Level);
-        Assert.Equal("ZiparFotosDoBackup", ((ScalarValue)evento.Properties["Operacao"]).Value);
+        Assert.DoesNotContain("a.png", evento.RenderMessage());
         Assert.Equal(StatusBackup.Sucesso, Assert.Single(_registros.ListarRecentes(5)).Status);
+    }
+
+    [Fact]
+    [Trait("Requisito", "RF21")]
+    public void CriarBackupGerenciado_TodasAsFotosTravadas_NaoCriaZipNemTemporario()
+    {
+        var a = CriarFoto("a.png");
+        var b = CriarFoto("b.png");
+        using var t1 = new FileStream(a, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+        using var t2 = new FileStream(b, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+
+        var resultado = NovoServico().CriarBackupGerenciado();
+
+        Assert.True(resultado.Sucesso);
+        Assert.Empty(Directory.GetFiles(_paths.BackupsDirectory, "*.zip*"));
+    }
+
+    [Fact]
+    [Trait("Requisito", "RF21")]
+    public void CriarBackupGerenciado_FotoTravada_ProximoBackupTentaDeNovo()
+    {
+        var bloqueada = CriarFoto("a.png");
+        CriarFoto("b.png");
+        var servico = NovoServico();
+        FileStream? trava = new FileStream(bloqueada, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+        servico.CriarBackupGerenciado();
+        trava.Dispose();
+        _relogio.UtcNow = _relogio.UtcNow.AddSeconds(1);
+
+        var segundo = servico.CriarBackupGerenciado();
+
+        Assert.Equal(new[] { "a.png", "b.png" }, NomesDasFotosNoZip(CaminhoDb(segundo) + ".fotos.zip"));
     }
 
     [Fact]
@@ -216,8 +374,7 @@ public class EfBackupServiceFotosTests : IDisposable
         var db = CaminhoDb(resultado);
         Assert.StartsWith(pasta, db);
         Assert.True(File.Exists(db + ".fotos.zip"));
-        using var zip = ZipFile.OpenRead(db + ".fotos.zip");
-        Assert.Equal("a.png", Assert.Single(zip.Entries).FullName);
+        Assert.Equal(new[] { "a.png" }, NomesDasFotosNoZip(db + ".fotos.zip"));
     }
 
     [Fact]
@@ -280,7 +437,7 @@ public class EfBackupServiceFotosTests : IDisposable
 
     [Fact]
     [Trait("Requisito", "RF24")]
-    public void RestaurarPara_ZipBomba_IgnoraEntradaAcimaDe10MbECortaEm5000Entradas()
+    public void RestaurarPara_EntradaAcimaDe10MbEIgnoradaEIgualA10MbEExtraida()
     {
         var db = CriarBackupComZip(zip =>
         {
@@ -295,7 +452,21 @@ public class EfBackupServiceFotosTests : IDisposable
             {
                 s.Write(new byte[10 * 1024 * 1024]);
             }
+        });
 
+        var resultado = NovoServico().RestaurarPara(db);
+
+        Assert.True(resultado.Sucesso);
+        Assert.False(File.Exists(Path.Combine(_paths.FotosDirectory, "grande.png")));
+        Assert.True(File.Exists(Path.Combine(_paths.FotosDirectory, "limite.png")));
+    }
+
+    [Fact]
+    [Trait("Requisito", "RF24")]
+    public void RestaurarPara_ZipComMaisDe5000Entradas_ExtraiNoMaximo5000()
+    {
+        var db = CriarBackupComZip(zip =>
+        {
             for (var i = 0; i < 5100; i++)
             {
                 AdicionarEntrada(zip, $"p{i:D4}.png", "x");
@@ -305,10 +476,53 @@ public class EfBackupServiceFotosTests : IDisposable
         var resultado = NovoServico().RestaurarPara(db);
 
         Assert.True(resultado.Sucesso);
-        Assert.False(File.Exists(Path.Combine(_paths.FotosDirectory, "grande.png")));
-        Assert.True(File.Exists(Path.Combine(_paths.FotosDirectory, "limite.png")));
-        // no maximo 5000 entradas lidas: "grande" (ignorada) + "limite" + 4998 pequenas
-        Assert.Equal(4999, Directory.GetFiles(_paths.FotosDirectory).Length);
+        var extraidas = Directory.GetFiles(_paths.FotosDirectory).Length;
+        Assert.InRange(extraidas, 1, 5000);
+    }
+
+    [Fact]
+    [Trait("Requisito", "RF24")]
+    public void RestaurarPara_LimiteTotalDeBytes_ParaDeExtrairEAvisa()
+    {
+        var db = CriarBackupComZip(zip =>
+        {
+            for (var i = 0; i < 6; i++)
+            {
+                AdicionarEntrada(zip, $"p{i}.png", "0123456789"); // 10 bytes cada
+            }
+        });
+        var coletor = new ColetorDeLog();
+
+        var resultado = NovoServico(coletor: coletor, limiteRestauracao: 25).RestaurarPara(db);
+
+        Assert.True(resultado.Sucesso);
+        var arquivos = Directory.GetFiles(_paths.FotosDirectory);
+        Assert.Equal(2, arquivos.Length);
+        Assert.True(arquivos.Sum(a => new FileInfo(a).Length) <= 25);
+        Assert.Empty(Directory.GetFiles(_paths.FotosDirectory, "*.restaurando"));
+        Assert.Contains(coletor.Eventos, e => e.Level == LogEventLevel.Warning
+            && ((ScalarValue)e.Properties["Operacao"]).Value as string == "RestaurarFotosDoBackup");
+    }
+
+    [Fact]
+    [Trait("Requisito", "RF24")]
+    public void RestaurarPara_DbSemZipProprio_UsaOZipMaisRecenteDaMesmaPasta()
+    {
+        CriarFoto("a.png", "A");
+        var servico = NovoServico();
+        var primeiro = servico.CriarBackupGerenciado(); // cria o zip
+        _relogio.UtcNow = _relogio.UtcNow.AddSeconds(1);
+        var segundo = servico.CriarBackupGerenciado();   // biblioteca inalterada: sem zip proprio
+        Assert.False(File.Exists(CaminhoDb(segundo) + ".fotos.zip"));
+        File.Delete(Path.Combine(_paths.FotosDirectory, "a.png"));
+        _relogio.UtcNow = _relogio.UtcNow.AddSeconds(5);
+
+        var resultado = NovoServico().RestaurarPara(CaminhoDb(segundo));
+
+        Assert.True(resultado.Sucesso);
+        Assert.Equal("A", File.ReadAllText(Path.Combine(_paths.FotosDirectory, "a.png")));
+        Assert.True(File.Exists(CaminhoDb(primeiro) + ".fotos.zip"));
+        Assert.False(File.Exists(Path.Combine(_paths.FotosDirectory, "_manifest.txt")));
     }
 
     [Fact]

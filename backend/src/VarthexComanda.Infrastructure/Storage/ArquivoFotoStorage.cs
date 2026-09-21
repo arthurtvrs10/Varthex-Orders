@@ -11,6 +11,10 @@ public class ArquivoFotoStorage : IFotoStorage
     private static readonly HashSet<string> ExtensoesPermitidas =
         new(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".bmp" };
 
+    /// <summary>Whitelist de imagens (.jpg .jpeg .png .bmp) usada por importacao, backup e contagem de orfas.</summary>
+    public static bool ExtensaoPermitida(string? nomeOuCaminho) =>
+        !string.IsNullOrEmpty(nomeOuCaminho) && ExtensoesPermitidas.Contains(Path.GetExtension(nomeOuCaminho));
+
     private readonly AppPaths _paths;
     private readonly ILogger _logger;
     private readonly long _tamanhoMaximoBytes;

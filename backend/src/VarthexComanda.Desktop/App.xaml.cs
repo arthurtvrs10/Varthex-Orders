@@ -220,7 +220,7 @@ public partial class App : System.Windows.Application
                 .ListarNomesDeFotos()
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
             var semProduto = Directory.GetFiles(paths.FotosDirectory)
-                .Count(f => !referenciadas.Contains(Path.GetFileName(f)));
+                .Count(f => ArquivoFotoStorage.ExtensaoPermitida(f) && !referenciadas.Contains(Path.GetFileName(f)));
             _logger!.Information("Fotos sem produto: {Quantidade}", semProduto);
         }
         catch (Exception ex)
