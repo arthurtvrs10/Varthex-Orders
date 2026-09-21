@@ -246,7 +246,7 @@
             </Grid>
 
             <Grid Grid.Column="2" x:Name="PainelComanda" Focusable="True" KeyboardNavigation.IsTabStop="False"
-                  FocusVisualStyle="{x:Null}" Margin="14,0,0,0">
+                  FocusVisualStyle="{StaticResource FocoVisivel}" Margin="14,0,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />

@@ -361,6 +361,12 @@ public partial class AtendimentoViewModel : ObservableObject
     [RelayCommand]
     private void AdicionarPrimeiroDaBusca()
     {
+        // Enter com a busca vazia (ou so espacos) nao adiciona o "primeiro do catalogo" por acidente
+        if (string.IsNullOrWhiteSpace(TextoBuscaCatalogo))
+        {
+            return;
+        }
+
         var primeiro = ProdutosCatalogo.FirstOrDefault();
         if (primeiro is null)
         {

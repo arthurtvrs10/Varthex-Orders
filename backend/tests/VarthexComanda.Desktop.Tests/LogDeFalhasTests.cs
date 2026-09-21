@@ -142,12 +142,14 @@ public class LogDeFalhasTests
         var coletor = new ColetorDeLog();
         var cenario = CriarAtendimento(coletor);
 
-        // numero invalido para o caso de uso: Resultado.Falha, nao excecao
-        // (numero de comanda ja aberta agora seleciona a comanda, sem passar pelo caso de uso)
-        cenario.ViewModel.NovoNumero = "0";
+        // comanda 20 aberta direto no repositorio: a lista da VM esta defasada e nao a conhece, entao o caso de uso
+        // recebe NumeroComandaOcupadoException e devolve Resultado.Falha (falha de dominio, nao tecnica)
+        cenario.Comandas.AbrirComanda(20, DateTime.UtcNow);
+        Assert.DoesNotContain(cenario.ViewModel.ComandasAbertas, c => c.Numero == 20);
+        cenario.ViewModel.NovoNumero = "20";
         cenario.ViewModel.AbrirCommand.Execute(null);
 
-        Assert.Equal("Informe um número de comanda válido.", cenario.ViewModel.Mensagem);
+        Assert.Equal("Já existe uma comanda aberta com esse número.", cenario.ViewModel.Mensagem);
         Assert.Empty(coletor.Eventos);
     }
 

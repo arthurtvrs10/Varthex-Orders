@@ -133,6 +133,7 @@ public class AtendimentoViewModelTecladoTests
         viewModel.NovoNumero = "7";
         viewModel.AbrirCommand.Execute(null);
         viewModel.CategoriaCatalogo = viewModel.Categorias.Single(c => c.Nome == "Lanches");
+        viewModel.TextoBuscaCatalogo = "past";
 
         viewModel.AdicionarPrimeiroDaBuscaCommand.Execute(null);
 
@@ -143,6 +144,35 @@ public class AtendimentoViewModelTecladoTests
         viewModel.AdicionarPrimeiroDaBuscaCommand.Execute(null);
 
         Assert.Equal(new[] { "Pastel", "Suco" }, viewModel.Itens.Select(i => i.NomeProduto).OrderBy(n => n));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void AdicionarPrimeiroDaBusca_SemTexto_NaoAdicionaNada(string texto)
+    {
+        var (viewModel, _) = CriarViewModel();
+        viewModel.NovoNumero = "7";
+        viewModel.AbrirCommand.Execute(null);
+        viewModel.TextoBuscaCatalogo = texto;
+
+        viewModel.AdicionarPrimeiroDaBuscaCommand.Execute(null);
+
+        Assert.Empty(viewModel.Itens);
+        Assert.Null(viewModel.ItemSelecionadoId);
+    }
+
+    [Fact]
+    public void AdicionarPrimeiroDaBusca_SemTextoMasComCategoria_NaoAdicionaNada()
+    {
+        var (viewModel, _) = CriarViewModel();
+        viewModel.NovoNumero = "7";
+        viewModel.AbrirCommand.Execute(null);
+        viewModel.CategoriaCatalogo = viewModel.Categorias.Single(c => c.Nome == "Lanches");
+
+        viewModel.AdicionarPrimeiroDaBuscaCommand.Execute(null);
+
+        Assert.Empty(viewModel.Itens);
     }
 
     [Fact]

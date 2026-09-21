@@ -248,6 +248,57 @@ public class AtendimentoTecladoXamlTests
         });
     }
 
+    [Theory]
+    [InlineData(Key.Add)]
+    [InlineData(Key.OemPlus)]
+    [InlineData(Key.Subtract)]
+    [InlineData(Key.OemMinus)]
+    [InlineData(Key.Delete)]
+    [InlineData(Key.Down)]
+    [InlineData(Key.Up)]
+    public void Teclas_ComFocoNoMenu_NaoAgemSobreOsItens(Key tecla)
+    {
+        ThreadingHelper.EmSta(() =>
+        {
+            CarregamentoDeXamlTests.GarantirApp();
+            var (viewModel, _) = CarregamentoDeXamlTests.CriarAtendimento();
+            var view = new AtendimentoView(viewModel);
+            CarregamentoDeXamlTests.MedirEOrganizar(view);
+            var menu = (DependencyObject)view.FindName("PainelMenu");
+            var botaoDoMenu = Descendentes(menu).OfType<Button>().First();
+            viewModel.ItemSelecionadoId = viewModel.Itens[0].Id;
+
+            var tratada = Pressionar(view, tecla, botaoDoMenu);
+
+            Assert.False(tratada);
+            Assert.Single(viewModel.Itens);
+            Assert.Equal(2, viewModel.Itens[0].Quantidade);
+            Assert.Equal(viewModel.Itens[0].Id, viewModel.ItemSelecionadoId);
+        });
+    }
+
+    [Fact]
+    public void AtendimentoView_SemComandaSelecionada_InstanciaOsSlotsComFocoVisivel()
+    {
+        ThreadingHelper.EmSta(() =>
+        {
+            CarregamentoDeXamlTests.GarantirApp();
+            var (viewModel, _) = CarregamentoDeXamlTests.CriarAtendimento();
+            viewModel.FecharEdicaoCommand.Execute(null);
+            var view = new AtendimentoView(viewModel);
+
+            CarregamentoDeXamlTests.MedirEOrganizar(view);
+
+            var grade = (DependencyObject)view.FindName("PainelGrade");
+            var slots = Descendentes(grade).OfType<Button>()
+                .Where(b => ReferenceEquals(b.Command, viewModel.AbrirOuSelecionarSlotCommand))
+                .ToList();
+            Assert.NotEmpty(slots);
+            var foco = System.Windows.Application.Current.FindResource("FocoVisivel");
+            Assert.All(slots, b => Assert.Same(foco, b.FocusVisualStyle));
+        });
+    }
+
     [Fact]
     public void Enter_NaBusca_AdicionaOPrimeiroEMantemOTexto()
     {
@@ -266,6 +317,24 @@ public class AtendimentoTecladoXamlTests
             Assert.Equal("refri", busca.Text);
             Assert.Equal(0, busca.SelectionStart);
             Assert.Equal(5, busca.SelectionLength);
+        });
+    }
+
+    [Fact]
+    public void Enter_NaBuscaVazia_NaoAdicionaNada()
+    {
+        ThreadingHelper.EmSta(() =>
+        {
+            CarregamentoDeXamlTests.GarantirApp();
+            var (viewModel, _) = CarregamentoDeXamlTests.CriarAtendimento();
+            var view = new AtendimentoView(viewModel);
+            CarregamentoDeXamlTests.MedirEOrganizar(view);
+            var busca = (TextBox)view.FindName("CampoBusca");
+            viewModel.TextoBuscaCatalogo = string.Empty;
+
+            Pressionar(view, Key.Enter, busca);
+
+            Assert.Equal(2, viewModel.Itens.Single().Quantidade);
         });
     }
 

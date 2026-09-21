@@ -17,6 +17,8 @@ public partial class AtendimentoView : UserControl
         ViewModel = viewModel;
         DataContext = viewModel;
         DataObject.AddPastingHandler(CampoNumeroComanda, CampoNumero_Colar);
+        // as linhas sao recriadas a cada alteracao; garante que o teclado continue chegando (F4/Esc)
+        viewModel.Itens.CollectionChanged += (_, _) => RestaurarFocoSePerdido();
     }
 
     // ---- foco inicial: so depois que o elemento esta de fato visivel (focar antes falha em silencio) ----
@@ -80,6 +82,12 @@ public partial class AtendimentoView : UserControl
 
         if (ctrl && !modificadores.HasFlag(ModifierKeys.Alt))
         {
+            // somente Ctrl puro: Ctrl+Shift+N/F nao sao atalhos nossos
+            if (modificadores != ModifierKeys.Control)
+            {
+                return;
+            }
+
             if (e.Key == Key.N && ViewModel.ComandaAtual is null)
             {
                 CampoNumeroComanda.Focus();
@@ -104,8 +112,12 @@ public partial class AtendimentoView : UserControl
 
         if (e.Key == Key.Enter && emBusca)
         {
-            ViewModel.AdicionarPrimeiroDaBuscaCommand.Execute(null);
-            CampoBusca.SelectAll();
+            // Enter mantido pressionado repete o KeyDown: so a primeira pressao adiciona
+            if (!e.IsRepeat)
+            {
+                ViewModel.AdicionarPrimeiroDaBuscaCommand.Execute(null);
+                CampoBusca.SelectAll();
+            }
             e.Handled = true;
             return;
         }
@@ -130,24 +142,32 @@ public partial class AtendimentoView : UserControl
             return;
         }
 
+        // Teclas de item: nunca no menu (cards/categorias mantem o foco proprio) nem com modificadores.
+        // O "+" da linha principal e digitado com Shift em varios layouts, entao OemPlus tolera Shift.
+        var semModificador = modificadores == ModifierKeys.None;
+        var teclaMaisComShift = e.Key == Key.OemPlus && modificadores == ModifierKeys.Shift;
+        if (EstaNoMenu(e) || !(semModificador || teclaMaisComShift))
+        {
+            return;
+        }
+
         switch (e.Key)
         {
-            case Key.Up or Key.Down when !EstaNoMenu(e):
-                // no menu, as setas continuam movendo o foco entre os cards e categorias
+            case Key.Up or Key.Down when semModificador:
                 (e.Key == Key.Up ? ViewModel.SelecionarItemAnteriorCommand : ViewModel.SelecionarProximoItemCommand).Execute(null);
                 e.Handled = true;
                 break;
-            case Key.OemPlus or Key.Add:
+            case Key.OemPlus or Key.Add when semModificador || teclaMaisComShift:
                 ViewModel.AumentarSelecionadoCommand.Execute(null);
                 e.Handled = true;
                 RestaurarFocoSePerdido();
                 break;
-            case Key.OemMinus or Key.Subtract:
+            case Key.OemMinus or Key.Subtract when semModificador:
                 ViewModel.DiminuirSelecionadoCommand.Execute(null);
                 e.Handled = true;
                 RestaurarFocoSePerdido();
                 break;
-            case Key.Delete:
+            case Key.Delete when semModificador:
                 ViewModel.RemoverSelecionadoCommand.Execute(null);
                 e.Handled = true;
                 RestaurarFocoSePerdido();
@@ -163,11 +183,26 @@ public partial class AtendimentoView : UserControl
 
     // As linhas sao recriadas a cada alteracao; se o foco estava num botao da linha ele some junto e o
     // teclado (inclusive o F4) deixaria de chegar aqui. Recolhe o foco no painel da comanda.
+    private bool _restauracaoDeFocoPendente;
+
     private void RestaurarFocoSePerdido()
     {
+        if (_restauracaoDeFocoPendente)
+        {
+            return;
+        }
+
+        _restauracaoDeFocoPendente = true;
         Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() =>
         {
-            if (ViewModel.ComandaAtual is not null && !IsKeyboardFocusWithin)
+            _restauracaoDeFocoPendente = false;
+
+            // so quando o foco ficou "solto" (nulo ou na propria janela): nunca rouba foco de outra janela
+            // (ex.: dialogo de encerramento) nem de um controle que o usuario escolheu
+            var foco = Keyboard.FocusedElement;
+            var perdido = foco is null || foco is Window;
+            if (ViewModel.ComandaAtual is not null && perdido && !IsKeyboardFocusWithin
+                && Window.GetWindow(this)?.IsActive == true)
             {
                 PainelComanda.Focus();
             }

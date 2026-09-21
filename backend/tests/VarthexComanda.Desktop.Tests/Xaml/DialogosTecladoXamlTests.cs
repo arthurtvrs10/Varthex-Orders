@@ -105,6 +105,12 @@ public class DialogosTecladoXamlTests
             Assert.False(salvar.IsDefault);
             Assert.Same(viewModel.SalvarCommand, cadastrar.Command);
 
+            // o estilo herda o de Button do App (foco visivel e tamanho de toque)
+            var foco = System.Windows.Application.Current.FindResource("FocoVisivel");
+            Assert.Same(foco, cadastrar.FocusVisualStyle);
+            Assert.Same(foco, salvar.FocusVisualStyle);
+            Assert.True(cadastrar.MinHeight >= 46);
+
             // modo "edicao": so o Salvar e padrao
             viewModel.ProdutoSelecionado = viewModel.Produtos[0];
             CarregamentoDeXamlTests.MedirEOrganizar(view);
