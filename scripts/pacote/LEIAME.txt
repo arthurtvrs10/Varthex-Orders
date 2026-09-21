@@ -1,0 +1,61 @@
+﻿VARTHEX COMANDA - Instalação
+=============================
+
+Este pacote já inclui tudo o que o aplicativo precisa. NÃO é preciso instalar
+o .NET nem qualquer outro programa. Não exige conta de administrador.
+
+1) COMO INSTALAR
+   - Extraia o arquivo .zip inteiro numa pasta (clique com o botão direito >
+     "Extrair tudo"). Não execute de dentro do .zip.
+   - Dê dois cliques em "Instalar.cmd".
+   - O aplicativo é instalado em:
+         %LOCALAPPDATA%\Programs\VarthexComanda
+     e são criados atalhos "Varthex Comanda" na Área de Trabalho e no
+     Menu Iniciar.
+   - Para instalar em outra pasta ou sem atalhos, use o PowerShell:
+         .\Instalar.ps1 -Destino "C:\Pasta\Outra" -SemAtalhos
+
+2) ONDE FICAM OS DADOS
+   Comandas, produtos, vendas, fotos e backups ficam em:
+         %LOCALAPPDATA%\VarthexComanda
+   Essa pasta é separada do programa. Atualizar ou desinstalar NÃO a apaga.
+   (Para apagar os dados é preciso excluir essa pasta manualmente, e só faça
+   isso se tiver certeza de que possui um backup.)
+
+3) COMO ATUALIZAR
+   - Feche o Varthex Comanda.
+   - Extraia o pacote da versão nova e dê dois cliques em "Instalar.cmd".
+   - O instalador mostra "Atualizando de X para Y", troca só os arquivos do
+     programa e mantém os seus dados.
+   - A versão anterior fica guardada em uma pasta ao lado, com o nome
+     "VarthexComanda.anterior" (só a última versão é mantida; ela é
+     substituída a cada atualização).
+   - A versão instalada fica registrada em "versao-instalada.txt" na pasta do
+     programa e aparece no rodapé da tela Configurações.
+
+4) COMO DESINSTALAR
+   - Feche o Varthex Comanda.
+   - Na pasta do programa (%LOCALAPPDATA%\Programs\VarthexComanda) ou neste
+     pacote, execute no PowerShell:
+         .\Desinstalar.ps1
+     (ou, se instalou em outra pasta: .\Desinstalar.ps1 -Destino "C:\Pasta\Outra")
+   - São removidos o programa, a cópia ".anterior" e os atalhos. Os dados
+     em %LOCALAPPDATA%\VarthexComanda continuam intactos.
+
+5) COMO VOLTAR PARA A VERSÃO ANTERIOR (retorno)
+   Se a versão nova apresentar problema:
+   - Feche o Varthex Comanda.
+   - Renomeie a pasta "VarthexComanda" (em %LOCALAPPDATA%\Programs) para
+     "VarthexComanda.defeituosa".
+   - Renomeie "VarthexComanda.anterior" para "VarthexComanda".
+   - Abra o aplicativo pelo atalho. Os dados não foram alterados pela
+     atualização do programa. Caso a versão nova tenha migrado o banco de
+     dados, restaure um backup feito antes da atualização (pela tela de
+     Configurações).
+   Recomenda-se fazer um backup manual antes de atualizar.
+
+6) SE O INSTALADOR RECUSAR
+   - "Feche o Varthex Comanda e tente de novo.": o aplicativo está aberto.
+   - "Destino recusado": a pasta escolhida é perigosa (raiz do disco, sua
+     pasta de usuário, a pasta de dados etc.) ou não parece uma instalação do
+     Varthex Comanda. Escolha uma pasta dedicada e vazia.
