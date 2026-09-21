@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Ferramenta de desenvolvimento/homologacao (Etapa 8): gera a "massa minima" de dados numa pasta
+    descartavel. NAO faz parte do aplicativo: nao e referenciada pelo Desktop e nao entra no pacote
+    (scripts/publicar.ps1 publica somente o VarthexComanda.Desktop).
+    net10.0 basta: usa so Infrastructure/Application (sem WPF) e um codificador PNG proprio (sem System.Drawing).
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsPublishable>false</IsPublishable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\VarthexComanda.Infrastructure\VarthexComanda.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

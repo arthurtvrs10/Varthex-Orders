@@ -26,6 +26,7 @@ public class EncerramentoViewModelTests
     }
 
     [Fact]
+    [Trait("Caso", "CT08")]
     public void Carregar_ComandaComItens_PreencheNumeroTotalEItens()
     {
         var (viewModel, _, _) = CriarViewModel();
@@ -36,6 +37,7 @@ public class EncerramentoViewModelTests
     }
 
     [Fact]
+    [Trait("Caso", "CT09")]
     public void ConfirmarEncerrar_SemCobrancaAprovada_ComandoDesabilitado()
     {
         var (viewModel, _, _) = CriarViewModel();
@@ -45,6 +47,7 @@ public class EncerramentoViewModelTests
 
     [Fact]
     [Trait("Requisito", "RNF18")]
+    [Trait("Caso", "CT09")]
     public void ConfirmarEncerrar_ExecutadoDiretamenteSemCobrancaAprovada_NuncaCriaVenda()
     {
         var (viewModel, comandas, _) = CriarViewModel();
@@ -78,6 +81,7 @@ public class EncerramentoViewModelTests
     }
 
     [Fact]
+    [Trait("Caso", "CT10")]
     public void ConfirmarEncerrar_CobrancaAprovada_FechaComandaEDisparaConcluidoTrue()
     {
         var (viewModel, comandas, comandaId) = CriarViewModel();
@@ -92,6 +96,7 @@ public class EncerramentoViewModelTests
     }
 
     [Fact]
+    [Trait("Caso", "CT07")]
     public void ConfirmarEncerrar_ComandaVazia_MostraMensagemENaoDisparaConcluido()
     {
         var (viewModel, comandas, comandaId) = CriarViewModel(comItem: false);
@@ -124,6 +129,7 @@ public class EncerramentoViewModelTests
     }
 
     [Fact]
+    [Trait("Caso", "CT09")]
     public void Voltar_DisparaConcluidoFalseSemAlterarComanda()
     {
         var (viewModel, comandas, comandaId) = CriarViewModel();

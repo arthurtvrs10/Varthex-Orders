@@ -40,6 +40,7 @@ public class MigracaoDoBancoTests : IDisposable
     }
 
     [Fact]
+    [Trait("Caso", "CT16")]
     public void BancoComAlgumasMigracoesAplicadasEOutrasPendentes_ExigeBackupPreventivo()
     {
         using var contexto = CriarContexto();

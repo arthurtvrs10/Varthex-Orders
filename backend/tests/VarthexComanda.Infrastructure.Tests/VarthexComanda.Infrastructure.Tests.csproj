@@ -21,6 +21,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\VarthexComanda.Infrastructure\VarthexComanda.Infrastructure.csproj" />
+    <!-- gerador da massa minima de homologacao (ferramenta, fora do app) -->
+    <ProjectReference Include="..\..\tools\VarthexComanda.MassaMinima\VarthexComanda.MassaMinima.csproj" />
   </ItemGroup>
 
 </Project>

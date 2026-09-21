@@ -6,6 +6,7 @@ namespace VarthexComanda.Infrastructure.Tests;
 public class SingleInstanceGuardTests
 {
     [Fact]
+    [Trait("Caso", "CT19")]
     public void TryAcquire_SegundaGuardaComMesmoNome_FalhaAteAPrimeiraLiberar()
     {
         // Nota: Mutex do Windows é afim à thread que o adquiriu — ReleaseMutex só é válido

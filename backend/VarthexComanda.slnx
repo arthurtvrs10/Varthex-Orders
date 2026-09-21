@@ -5,6 +5,9 @@
     <Project Path="src/VarthexComanda.Domain/VarthexComanda.Domain.csproj" />
     <Project Path="src/VarthexComanda.Infrastructure/VarthexComanda.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/VarthexComanda.MassaMinima/VarthexComanda.MassaMinima.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/VarthexComanda.Application.Tests/VarthexComanda.Application.Tests.csproj" />
     <Project Path="tests/VarthexComanda.Desktop.Tests/VarthexComanda.Desktop.Tests.csproj" />

@@ -10,6 +10,7 @@ namespace VarthexComanda.Application.Tests.Atendimento;
 public class AbrirComandaTests
 {
     [Fact]
+    [Trait("Caso", "CT01")]
     public void Executar_NumeroValido_AbreComanda()
     {
         var caso = new AbrirComanda(new FakeComandaRepository(), new FakeClock(), new ObterConfiguracao(new FakeConfiguracaoRepository()));
@@ -33,6 +34,7 @@ public class AbrirComandaTests
     }
 
     [Fact]
+    [Trait("Caso", "CT02")]
     public void Executar_NumeroJaAberto_Falha()
     {
         var repositorio = new FakeComandaRepository();

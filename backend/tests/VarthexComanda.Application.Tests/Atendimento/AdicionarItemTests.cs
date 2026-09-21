@@ -41,6 +41,7 @@ public class AdicionarItemTests
     }
 
     [Fact]
+    [Trait("Caso", "CT03")]
     public void Executar_DuasVezesMesmoProduto_IncrementaQuantidadeEmVezDeDuplicar()
     {
         var (comandas, produtos, comandaId, produtoId, _) = Preparar();
@@ -55,6 +56,7 @@ public class AdicionarItemTests
     }
 
     [Fact]
+    [Trait("Caso", "CT06")]
     public void Executar_QuantidadeZeroOuNegativa_Falha()
     {
         var (comandas, produtos, comandaId, produtoId, _) = Preparar();

@@ -8,6 +8,7 @@ namespace VarthexComanda.Application.Tests.Atendimento;
 public class EncerrarComandaTests
 {
     [Fact]
+    [Trait("Caso", "CT10")]
     public void Executar_ComandaComItens_RetornaVendaEFechaComanda()
     {
         var comandas = new FakeComandaRepository();
@@ -25,6 +26,7 @@ public class EncerrarComandaTests
     }
 
     [Fact]
+    [Trait("Caso", "CT07")]
     public void Executar_ComandaVazia_Falha()
     {
         var comandas = new FakeComandaRepository();

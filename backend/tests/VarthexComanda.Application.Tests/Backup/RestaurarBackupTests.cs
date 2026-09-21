@@ -17,6 +17,7 @@ public class RestaurarBackupTests
     }
 
     [Fact]
+    [Trait("Caso", "CT15")]
     public void Executar_RelatorioReprovado_NaoChamaRestaurarParaERetornaFalha()
     {
         var backupService = new FakeBackupService

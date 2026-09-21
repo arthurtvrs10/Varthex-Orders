@@ -21,6 +21,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\VarthexComanda.Desktop\VarthexComanda.Desktop.csproj" />
     <ProjectReference Include="..\VarthexComanda.Application.Tests\VarthexComanda.Application.Tests.csproj" />
+    <!-- Domain.Tests e Infrastructure.Tests entram so para a rastreabilidade dos casos (CT01-CT22) enxergar
+         todos os assemblies de teste; Infrastructure.Tests tambem cede o BancoDeHomologacao ao teste do CT09. -->
+    <ProjectReference Include="..\VarthexComanda.Domain.Tests\VarthexComanda.Domain.Tests.csproj" />
+    <ProjectReference Include="..\VarthexComanda.Infrastructure.Tests\VarthexComanda.Infrastructure.Tests.csproj" />
   </ItemGroup>
 
 </Project>

@@ -146,6 +146,7 @@ public sealed class BackupViewModelModoRestauracaoTests : IDisposable
     }
 
     [Fact]
+    [Trait("Caso", "CT15")]
     public void ModoRestauracao_ArquivoNaoValidado_MostraMotivoSemRestaurar()
     {
         CriarArquivo("varthex-comanda-2026-09-12-090000.db");

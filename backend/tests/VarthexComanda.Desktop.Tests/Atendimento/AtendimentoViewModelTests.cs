@@ -40,6 +40,7 @@ public class AtendimentoViewModelTests
     }
 
     [Fact]
+    [Trait("Caso", "CT01")]
     public void Abrir_NumeroValido_CriaComandaEMostraNaGrade()
     {
         var (viewModel, _, _, _) = CriarViewModel();
@@ -53,6 +54,7 @@ public class AtendimentoViewModelTests
     }
 
     [Fact]
+    [Trait("Caso", "CT02")]
     public void Abrir_MesmoNumeroDuasVezes_SegundaSelecionaAComandaSemDuplicarNaGrade()
     {
         var (viewModel, _, _, _) = CriarViewModel();
@@ -69,6 +71,7 @@ public class AtendimentoViewModelTests
     }
 
     [Fact]
+    [Trait("Caso", "CT03")]
     public void AdicionarProdutoDuasVezes_IncrementaQuantidadeEmVezDeDuplicar()
     {
         var (viewModel, produtos, _, _) = CriarViewModel();
@@ -162,6 +165,7 @@ public class AtendimentoViewModelTests
     }
 
     [Fact]
+    [Trait("Caso", "CT07")]
     public void VerTotal_ComandaSemItens_ComandoDesabilitado()
     {
         var (viewModel, _, _, _) = CriarViewModel();
@@ -190,6 +194,7 @@ public class AtendimentoViewModelTests
     }
 
     [Fact]
+    [Trait("Caso", "CT09")]
     public void VerTotal_DialogoCancela_ComandaPermaneceAberta()
     {
         var (viewModel, produtos, _, encerramentoDialog) = CriarViewModel();
@@ -296,6 +301,7 @@ public class AtendimentoViewModelTests
     }
 
     [Fact]
+    [Trait("Caso", "CT08")]
     public void AtualizarSlots_ComandaAbertaMostraTotalETempoFormatados()
     {
         var categorias = new FakeCategoriaRepository();
