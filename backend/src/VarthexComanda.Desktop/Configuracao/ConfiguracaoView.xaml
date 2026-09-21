@@ -30,7 +30,7 @@
             <Button Content="Limpar" Padding="16,8" Click="LimparPasta_Click" />
         </StackPanel>
 
-        <Button Grid.Row="3" Content="Salvar" Padding="28,0" Height="56" FontSize="16" HorizontalAlignment="Left" Command="{Binding SalvarCommand}" Margin="0,8,0,12" />
+        <Button x:Name="BotaoSalvar" Grid.Row="3" Content="Salvar" IsDefault="True" Padding="28,0" Height="56" FontSize="16" HorizontalAlignment="Left" Command="{Binding SalvarCommand}" Margin="0,8,0,12" />
 
         <TextBlock Grid.Row="4" Text="{Binding Mensagem}" Foreground="Red" TextWrapping="Wrap" />
     </Grid>

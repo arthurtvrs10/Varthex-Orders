@@ -107,6 +107,10 @@ public partial class AtendimentoViewModel : ObservableObject
     [ObservableProperty]
     private string mensagem = string.Empty;
 
+    /// <summary>Item da comanda destacado para operar por teclado (Up/Down, +, -, Delete).</summary>
+    [ObservableProperty]
+    private int? itemSelecionadoId;
+
     partial void OnCategoriaCatalogoChanged(Categoria? value) => PesquisarCatalogo();
 
     partial void OnTextoBuscaCatalogoChanged(string value) => PesquisarCatalogo();
@@ -137,6 +141,15 @@ public partial class AtendimentoViewModel : ObservableObject
         if (!int.TryParse(NovoNumero, out var numero))
         {
             Mensagem = "Informe um número de comanda válido.";
+            return;
+        }
+
+        var jaAberta = ComandasAbertas.FirstOrDefault(c => c.Numero == numero);
+        if (jaAberta is not null)
+        {
+            NovoNumero = string.Empty;
+            Mensagem = string.Empty;
+            AbrirParaEdicao(jaAberta.Id);
             return;
         }
 
@@ -190,11 +203,8 @@ public partial class AtendimentoViewModel : ObservableObject
         }
 
         ComandaAtual = detalhe.Comanda;
-        Itens.Clear();
-        foreach (var item in detalhe.Itens)
-        {
-            Itens.Add(item);
-        }
+        ItemSelecionadoId = null;
+        SubstituirItens(detalhe.Itens, null);
         VerTotalCommand.NotifyCanExecuteChanged();
     }
 
@@ -202,6 +212,8 @@ public partial class AtendimentoViewModel : ObservableObject
     private void FecharEdicao()
     {
         ComandaAtual = null;
+        ItemSelecionadoId = null;
+        TextoBuscaCatalogo = string.Empty;
         Itens.Clear();
         VerTotalCommand.NotifyCanExecuteChanged();
     }
@@ -234,7 +246,7 @@ public partial class AtendimentoViewModel : ObservableObject
 
         try
         {
-            AplicarResultado(_adicionarItem.Executar(ComandaAtual.Id, produto.Id, 1));
+            AplicarResultado(_adicionarItem.Executar(ComandaAtual.Id, produto.Id, 1), produto.Id);
         }
         catch (Exception ex)
         {
@@ -342,7 +354,132 @@ public partial class AtendimentoViewModel : ObservableObject
         }
     }
 
-    private void AplicarResultado(Resultado<ComandaComItens> resultado)
+    /// <summary>
+    /// Enter na busca: adiciona o primeiro produto listado (respeita categoria e filtro atuais).
+    /// O texto da busca permanece; a view o seleciona para o proximo item.
+    /// </summary>
+    [RelayCommand]
+    private void AdicionarPrimeiroDaBusca()
+    {
+        // Enter com a busca vazia (ou so espacos) nao adiciona o "primeiro do catalogo" por acidente
+        if (string.IsNullOrWhiteSpace(TextoBuscaCatalogo))
+        {
+            return;
+        }
+
+        var primeiro = ProdutosCatalogo.FirstOrDefault();
+        if (primeiro is null)
+        {
+            Mensagem = "Nenhum produto encontrado.";
+            return;
+        }
+
+        AdicionarProdutoAoItem(primeiro);
+    }
+
+    [RelayCommand]
+    private void SelecionarProximoItem()
+    {
+        if (Itens.Count == 0)
+        {
+            return;
+        }
+
+        var indice = IndiceDoSelecionado();
+        ItemSelecionadoId = Itens[indice < 0 ? 0 : Math.Min(indice + 1, Itens.Count - 1)].Id;
+    }
+
+    [RelayCommand]
+    private void SelecionarItemAnterior()
+    {
+        if (Itens.Count == 0)
+        {
+            return;
+        }
+
+        var indice = IndiceDoSelecionado();
+        ItemSelecionadoId = Itens[indice < 0 ? Itens.Count - 1 : Math.Max(indice - 1, 0)].Id;
+    }
+
+    [RelayCommand]
+    private void AumentarSelecionado()
+    {
+        if (ObterSelecionado() is { } item)
+        {
+            AumentarQuantidade(item);
+        }
+    }
+
+    [RelayCommand]
+    private void DiminuirSelecionado()
+    {
+        if (ObterSelecionado() is { } item)
+        {
+            DiminuirQuantidade(item);
+        }
+    }
+
+    [RelayCommand]
+    private void RemoverSelecionado()
+    {
+        if (ObterSelecionado() is { } item)
+        {
+            Remover(item);
+        }
+    }
+
+    private ItemComanda? ObterSelecionado() =>
+        ItemSelecionadoId is int id ? Itens.FirstOrDefault(i => i.Id == id) : null;
+
+    private int IndiceDoSelecionado()
+    {
+        if (ItemSelecionadoId is not int id)
+        {
+            return -1;
+        }
+
+        for (var i = 0; i < Itens.Count; i++)
+        {
+            if (Itens[i].Id == id)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    // Recarrega a lista mantendo a selecao coerente: o item pedido (se existir), senao o mesmo item,
+    // senao o vizinho na posicao em que o selecionado estava (ou nada, se a lista esvaziou).
+    private void SubstituirItens(IEnumerable<ItemComanda> novos, int? selecionar)
+    {
+        var indiceAnterior = IndiceDoSelecionado();
+        var idAtual = ItemSelecionadoId;
+
+        Itens.Clear();
+        foreach (var item in novos)
+        {
+            Itens.Add(item);
+        }
+
+        if (selecionar is int pedido && Itens.Any(i => i.Id == pedido))
+        {
+            ItemSelecionadoId = pedido;
+        }
+        else if (idAtual is int atual && Itens.Any(i => i.Id == atual))
+        {
+            ItemSelecionadoId = atual;
+        }
+        else if (indiceAnterior < 0 || Itens.Count == 0)
+        {
+            ItemSelecionadoId = null;
+        }
+        else
+        {
+            ItemSelecionadoId = Itens[Math.Min(indiceAnterior, Itens.Count - 1)].Id;
+        }
+    }
+
+    private void AplicarResultado(Resultado<ComandaComItens> resultado, int? produtoIdASelecionar = null)
     {
         if (!resultado.Sucesso)
         {
@@ -352,11 +489,10 @@ public partial class AtendimentoViewModel : ObservableObject
 
         Mensagem = string.Empty;
         ComandaAtual = resultado.Valor!.Comanda;
-        Itens.Clear();
-        foreach (var item in resultado.Valor.Itens)
-        {
-            Itens.Add(item);
-        }
+        var selecionar = produtoIdASelecionar is int produtoId
+            ? resultado.Valor.Itens.FirstOrDefault(i => i.ProdutoId == produtoId)?.Id
+            : null;
+        SubstituirItens(resultado.Valor.Itens, selecionar);
         AtualizarComandasAbertas();
         VerTotalCommand.NotifyCanExecuteChanged();
     }

@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:VarthexComanda.Desktop.Atendimento"
         mc:Ignorable="d"
         Title="Encerrar comanda" Width="560" SizeToContent="Height"
-        WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        FocusManager.FocusedElement="{Binding ElementName=CaixaCobrancaAprovada}">
     <Window.Resources>
         <local:CentavosParaMoedaConverter x:Key="Moeda" />
     </Window.Resources>
@@ -30,13 +31,13 @@
         </StackPanel>
         <TextBlock Text="Digite este valor na maquininha." Margin="0,4,0,16" TextWrapping="Wrap" FontSize="14" />
 
-        <CheckBox Content="A cobrança foi aprovada fora do sistema?" IsChecked="{Binding CobrancaAprovada}" FontSize="16" Margin="0,0,0,16" />
+        <CheckBox x:Name="CaixaCobrancaAprovada" Content="A cobrança foi aprovada fora do sistema?" IsChecked="{Binding CobrancaAprovada}" FontSize="16" Margin="0,0,0,16" />
 
         <TextBlock Text="{Binding Mensagem}" Foreground="Red" TextWrapping="Wrap" Margin="0,0,0,12" />
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Voltar para a comanda" Command="{Binding VoltarCommand}" Height="56" FontSize="16" Padding="18,0" Margin="0,0,8,0" />
-            <Button Content="Confirmar e encerrar" Command="{Binding ConfirmarEncerrarCommand}" Height="56" FontSize="16" Padding="18,0"
+            <Button x:Name="BotaoVoltar" Content="Voltar para a comanda" IsCancel="True" Command="{Binding VoltarCommand}" Height="56" FontSize="16" Padding="18,0" Margin="0,0,8,0" />
+            <Button x:Name="BotaoConfirmarEncerrar" Content="Confirmar e encerrar" IsDefault="True" Command="{Binding ConfirmarEncerrarCommand}" Height="56" FontSize="16" Padding="18,0"
                     Background="#3F8F5F" Foreground="White" FontWeight="Bold" />
         </StackPanel>
     </StackPanel>

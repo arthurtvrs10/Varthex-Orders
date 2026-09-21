@@ -44,6 +44,40 @@ public class EncerramentoViewModelTests
     }
 
     [Fact]
+    [Trait("Requisito", "RNF18")]
+    public void ConfirmarEncerrar_ExecutadoDiretamenteSemCobrancaAprovada_NuncaCriaVenda()
+    {
+        var (viewModel, comandas, _) = CriarViewModel();
+        bool eventoDisparado = false;
+        viewModel.Concluido += (_, __) => eventoDisparado = true;
+
+        // Execute do comando respeita CanExecute; o metodo privado (invocacao direta) tem a propria guarda.
+        viewModel.ConfirmarEncerrarCommand.Execute(null);
+        typeof(EncerramentoViewModel)
+            .GetMethod("ConfirmarEncerrar", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+            .Invoke(viewModel, null);
+
+        Assert.False(eventoDisparado);
+        Assert.Single(comandas.ListarAbertas());
+    }
+
+    [Fact]
+    [Trait("Requisito", "RNF18")]
+    public void ConfirmarEncerrar_HabilitaAoMarcarEDesabilitaAoDesmarcar()
+    {
+        var (viewModel, _, _) = CriarViewModel();
+        var mudancas = 0;
+        viewModel.ConfirmarEncerrarCommand.CanExecuteChanged += (_, __) => mudancas++;
+
+        viewModel.CobrancaAprovada = true;
+        Assert.True(viewModel.ConfirmarEncerrarCommand.CanExecute(null));
+        viewModel.CobrancaAprovada = false;
+        Assert.False(viewModel.ConfirmarEncerrarCommand.CanExecute(null));
+
+        Assert.Equal(2, mudancas);
+    }
+
+    [Fact]
     public void ConfirmarEncerrar_CobrancaAprovada_FechaComandaEDisparaConcluidoTrue()
     {
         var (viewModel, comandas, comandaId) = CriarViewModel();

@@ -35,7 +35,7 @@
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,8">
             <TextBlock Text="Buscar comanda nº:" VerticalAlignment="Center" Margin="0,0,4,0" />
-            <TextBox Width="120" Text="{Binding TextoBuscaNumero, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,16,0" />
+            <TextBox x:Name="CampoBuscaNumero" Width="120" ToolTip="Buscar comanda (Ctrl+F)" Text="{Binding TextoBuscaNumero, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,16,0" />
             <TextBlock Text="{Binding Mensagem}" Foreground="Red" VerticalAlignment="Center" />
         </StackPanel>
 

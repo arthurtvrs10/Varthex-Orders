@@ -12,6 +12,14 @@
         <atendimento:CentavosParaMoedaConverter x:Key="Moeda" />
         <atendimento:NuloParaVisibilidadeConverter x:Key="VisivelSeEdicao" />
         <atendimento:NuloParaVisibilidadeInversoConverter x:Key="VisivelSeNovo" />
+        <!-- Enter grava: so o botao de gravar visivel (Cadastrar ou Salvar) e o padrao; o colapsado nunca compete -->
+        <Style x:Key="BotaoGravarPadrao" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Style.Triggers>
+                <Trigger Property="Visibility" Value="Visible">
+                    <Setter Property="IsDefault" Value="True" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
     <Grid Margin="12">
         <Grid.RowDefinitions>
@@ -30,7 +38,8 @@
                       SelectedItem="{Binding CategoriaFiltro}" Margin="0,0,12,0" />
             <Button Content="Limpar filtro" Command="{Binding LimparFiltroCommand}" Margin="0,0,12,0" />
             <TextBlock Text="Buscar:" VerticalAlignment="Center" Margin="0,0,4,0" />
-            <TextBox Width="190" Text="{Binding TextoBusca, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox x:Name="CampoBuscaProduto" Width="190" ToolTip="Buscar produto (Ctrl+F)"
+                     Text="{Binding TextoBusca, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
 
         <ListView Grid.Row="1" Grid.Column="0"
@@ -94,7 +103,11 @@
 
                         <Expander Header="Nova categoria">
                             <StackPanel Margin="0,8,0,0">
-                                <TextBox Text="{Binding NovaCategoriaNome, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8" />
+                                <TextBox Text="{Binding NovaCategoriaNome, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Enter" Command="{Binding AdicionarCategoriaCommand}" />
+                                    </TextBox.InputBindings>
+                                </TextBox>
                                 <Button Content="Adicionar categoria" Command="{Binding AdicionarCategoriaCommand}" HorizontalAlignment="Left" />
                             </StackPanel>
                         </Expander>
@@ -104,11 +117,11 @@
                 <TextBlock Grid.Row="2" Text="{Binding Mensagem}" Foreground="#B23B32" TextWrapping="Wrap" Margin="0,8,0,0" />
 
                 <DockPanel Grid.Row="3" Margin="0,12,0,0">
-                    <Button DockPanel.Dock="Right" Content="Cadastrar produto" Padding="20,0" Height="60" FontSize="16"
+                    <Button x:Name="BotaoCadastrar" Style="{StaticResource BotaoGravarPadrao}" DockPanel.Dock="Right" Content="Cadastrar produto" Padding="20,0" Height="60" FontSize="16"
                             Background="#3F8F5F" Foreground="White" FontWeight="Bold"
                             Command="{Binding SalvarCommand}"
                             Visibility="{Binding ProdutoSelecionado, Converter={StaticResource VisivelSeNovo}}" />
-                    <Button DockPanel.Dock="Right" Content="Salvar" Padding="20,0" Height="60" FontSize="16"
+                    <Button x:Name="BotaoSalvar" Style="{StaticResource BotaoGravarPadrao}" DockPanel.Dock="Right" Content="Salvar" Padding="20,0" Height="60" FontSize="16"
                             Background="#3F8F5F" Foreground="White" FontWeight="Bold"
                             Command="{Binding SalvarCommand}"
                             Visibility="{Binding ProdutoSelecionado, Converter={StaticResource VisivelSeEdicao}}" />

@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Microsoft.Win32;
 
 namespace VarthexComanda.Desktop.Catalogo;
@@ -10,6 +11,19 @@ public partial class ProdutosView : UserControl
     {
         InitializeComponent();
         DataContext = viewModel;
+    }
+
+    protected override void OnPreviewKeyDown(KeyEventArgs e)
+    {
+        base.OnPreviewKeyDown(e);
+        if (!e.Handled && e.Key == Key.F
+            && e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control)
+            && !e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Alt))
+        {
+            CampoBuscaProduto.Focus();
+            CampoBuscaProduto.SelectAll();
+            e.Handled = true;
+        }
     }
 
     private void EscolherFoto_Click(object sender, RoutedEventArgs e)

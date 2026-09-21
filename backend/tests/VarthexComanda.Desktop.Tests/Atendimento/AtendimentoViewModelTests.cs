@@ -53,7 +53,7 @@ public class AtendimentoViewModelTests
     }
 
     [Fact]
-    public void Abrir_MesmoNumeroDuasVezes_SegundaFalhaSemDuplicarNaGrade()
+    public void Abrir_MesmoNumeroDuasVezes_SegundaSelecionaAComandaSemDuplicarNaGrade()
     {
         var (viewModel, _, _, _) = CriarViewModel();
         viewModel.NovoNumero = "10";
@@ -62,7 +62,9 @@ public class AtendimentoViewModelTests
         viewModel.NovoNumero = "10";
         viewModel.AbrirCommand.Execute(null);
 
-        Assert.Equal("Já existe uma comanda aberta com esse número.", viewModel.Mensagem);
+        Assert.Equal(string.Empty, viewModel.Mensagem);
+        Assert.Equal(string.Empty, viewModel.NovoNumero);
+        Assert.Equal(10, viewModel.ComandaAtual!.Numero);
         Assert.Single(viewModel.ComandasAbertas);
     }
 

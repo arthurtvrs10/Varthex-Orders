@@ -13,14 +13,39 @@
         <local:CentavosParaMoedaConverter x:Key="Moeda" />
         <local:CategoriaSelecionadaParaCorConverter x:Key="CorCategoria" />
         <catalogo:FotoArquivoParaImagemConverter x:Key="FotoImagem" />
+        <local:ItemSelecionadoParaCorConverter x:Key="CorItemSelecionado" />
+        <Style x:Key="PlaceholderBusca" TargetType="TextBlock">
+            <Setter Property="IsHitTestVisible" Value="False" />
+            <Setter Property="Foreground" Value="#8A8A86" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Margin" Value="12,0,0,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Visibility" Value="Collapsed" />
+        </Style>
+        <Style x:Key="PlaceholderNumero" TargetType="TextBlock" BasedOn="{StaticResource PlaceholderBusca}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding NovoNumero}" Value="">
+                    <Setter Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="PlaceholderProduto" TargetType="TextBlock" BasedOn="{StaticResource PlaceholderBusca}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding TextoBuscaCatalogo}" Value="">
+                    <Setter Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
     <UserControl.InputBindings>
         <KeyBinding Key="F4" Command="{Binding VerTotalCommand}" />
     </UserControl.InputBindings>
     <Grid Margin="16">
 
-        <Grid Visibility="{Binding ComandaAtual, Converter={StaticResource VisivelSeGrade}}">
+        <Grid x:Name="PainelGrade" IsVisibleChanged="PainelGrade_IsVisibleChanged"
+              Visibility="{Binding ComandaAtual, Converter={StaticResource VisivelSeGrade}}">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
@@ -28,7 +53,21 @@
 
             <TextBlock Grid.Row="0" Text="COMANDAS" FontWeight="Bold" FontSize="12" Foreground="#4A4A47" Margin="0,0,0,10" />
 
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Grid Grid.Row="1" Margin="0,0,0,12" Width="260" HorizontalAlignment="Left">
+                <TextBox x:Name="CampoNumeroComanda" ToolTip="Nº da comanda (Ctrl+N). Enter abre a comanda."
+                         AutomationProperties.Name="Nº da comanda"
+                         InputMethod.IsInputMethodEnabled="False"
+                         Text="{Binding NovoNumero, UpdateSourceTrigger=PropertyChanged}"
+                         PreviewTextInput="CampoNumero_PreviewTextInput"
+                         PreviewKeyDown="CampoNumero_PreviewKeyDown">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding AbrirCommand}" />
+                    </TextBox.InputBindings>
+                </TextBox>
+                <TextBlock Text="Nº da comanda (Ctrl+N)" Style="{StaticResource PlaceholderNumero}" />
+            </Grid>
+
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
                 <ItemsControl ItemsSource="{Binding Slots}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -42,6 +81,7 @@
                                     CommandParameter="{Binding}">
                                 <Button.Style>
                                     <Style TargetType="Button">
+                                        <Setter Property="FocusVisualStyle" Value="{StaticResource FocoVisivel}" />
                                         <Setter Property="Background" Value="White" />
                                         <Setter Property="BorderBrush" Value="#C4C4C4" />
                                         <Setter Property="BorderThickness" Value="1" />
@@ -87,10 +127,11 @@
                 </ItemsControl>
             </ScrollViewer>
 
-            <TextBlock Grid.Row="2" Text="{Binding Mensagem}" Foreground="#B23B32" Margin="0,12,0,0" />
+            <TextBlock Grid.Row="3" Text="{Binding Mensagem}" Foreground="#B23B32" Margin="0,12,0,0" />
         </Grid>
 
-        <Grid Visibility="{Binding ComandaAtual, Converter={StaticResource VisivelSeComandaAberta}}">
+        <Grid x:Name="PainelEdicao" IsVisibleChanged="PainelEdicao_IsVisibleChanged"
+              Visibility="{Binding ComandaAtual, Converter={StaticResource VisivelSeComandaAberta}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="1" />
@@ -99,8 +140,9 @@
 
             <Border Grid.Column="1" Background="#C4C4C4" />
 
-            <Grid Grid.Column="0" Margin="0,0,14,0">
+            <Grid x:Name="PainelMenu" Grid.Column="0" Margin="0,0,14,0">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
@@ -108,7 +150,15 @@
 
                 <TextBlock Grid.Row="0" Text="MENU" FontWeight="Bold" FontSize="12" Foreground="#4A4A47" Margin="0,0,0,8" />
 
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <!-- Ordem de Tab da tela: busca (0) > categorias (1) > cards do menu (2) > itens da comanda > Voltar > Cancelar > Finalizar -->
+                <Grid Grid.Row="1" Margin="0,0,0,8" KeyboardNavigation.TabIndex="0">
+                    <TextBox x:Name="CampoBusca" ToolTip="Buscar produto (Ctrl+F). Enter adiciona o primeiro resultado."
+                             AutomationProperties.Name="Buscar produto"
+                             Text="{Binding TextoBuscaCatalogo, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Text="Buscar produto (Ctrl+F)" Style="{StaticResource PlaceholderProduto}" />
+                </Grid>
+
+                <ScrollViewer Grid.Row="2" KeyboardNavigation.TabIndex="2" VerticalScrollBarVisibility="Auto">
                     <ItemsControl ItemsSource="{Binding ProdutosCatalogo}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -145,11 +195,12 @@
                     </ItemsControl>
                 </ScrollViewer>
 
-                <DockPanel Grid.Row="2" Margin="0,8,0,0">
+                <DockPanel Grid.Row="3" Margin="0,8,0,0" KeyboardNavigation.TabIndex="1">
                     <Button DockPanel.Dock="Left" Content="Todas" Width="76" Height="48" Margin="0,0,6,0" Padding="4" FontSize="13"
                             Command="{Binding LimparFiltroCommand}">
                         <Button.Style>
                             <Style TargetType="Button">
+                                <Setter Property="FocusVisualStyle" Value="{StaticResource FocoVisivel}" />
                                 <Setter Property="Background" Value="White" />
                                 <Setter Property="BorderBrush" Value="#C4C4C4" />
                                 <Setter Property="BorderThickness" Value="1" />
@@ -180,6 +231,7 @@
                                     </Button.Background>
                                     <Button.Style>
                                         <Style TargetType="Button">
+                                            <Setter Property="FocusVisualStyle" Value="{StaticResource FocoVisivel}" />
                                             <Setter Property="BorderBrush" Value="#C4C4C4" />
                                             <Setter Property="BorderThickness" Value="1" />
                                             <Setter Property="Content" Value="{Binding Nome}" />
@@ -193,7 +245,8 @@
                 </DockPanel>
             </Grid>
 
-            <Grid Grid.Column="2" x:Name="PainelComanda" Focusable="True" Margin="14,0,0,0">
+            <Grid Grid.Column="2" x:Name="PainelComanda" Focusable="True" KeyboardNavigation.IsTabStop="False"
+                  FocusVisualStyle="{StaticResource FocoVisivel}" Margin="14,0,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -234,7 +287,15 @@
                             <ItemsControl ItemsSource="{Binding Itens}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border BorderBrush="#E4E4E1" BorderThickness="0,0,0,1" Padding="0,4">
+                                        <Border BorderBrush="#E4E4E1" BorderThickness="0,0,0,1" Padding="0,4"
+                                                GotKeyboardFocus="LinhaItem_GotKeyboardFocus"
+                                                PreviewMouseLeftButtonDown="LinhaItem_PreviewMouseLeftButtonDown">
+                                            <Border.Background>
+                                                <MultiBinding Converter="{StaticResource CorItemSelecionado}">
+                                                    <Binding Path="Id" />
+                                                    <Binding Path="DataContext.ItemSelecionadoId" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+                                                </MultiBinding>
+                                            </Border.Background>
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*" />
@@ -243,6 +304,15 @@
                                                     <ColumnDefinition Width="84" />
                                                     <ColumnDefinition Width="184" />
                                                 </Grid.ColumnDefinitions>
+                                                <Border Grid.Column="0" Grid.ColumnSpan="5" Width="5" HorizontalAlignment="Left"
+                                                        IsHitTestVisible="False" Margin="0,-4">
+                                                    <Border.Background>
+                                                        <MultiBinding Converter="{StaticResource CorItemSelecionado}" ConverterParameter="Marca">
+                                                            <Binding Path="Id" />
+                                                            <Binding Path="DataContext.ItemSelecionadoId" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+                                                        </MultiBinding>
+                                                    </Border.Background>
+                                                </Border>
                                                 <TextBlock Grid.Column="0" Text="{Binding NomeProduto}" FontSize="14"
                                                            TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="8,0" />
                                                 <TextBlock Grid.Column="1" Text="{Binding Quantidade}" FontSize="14" FontWeight="Bold"
@@ -279,12 +349,14 @@
 
                 <DockPanel Grid.Row="3">
                     <Button DockPanel.Dock="Right" Content="Finalizar comanda (F4)" Padding="20,0" Height="60" FontSize="16"
-                            Background="#3F8F5F" Foreground="White" FontWeight="Bold"
+                            Background="#3F8F5F" Foreground="White" FontWeight="Bold" ToolTip="Finalizar comanda (F4)"
+                            KeyboardNavigation.TabIndex="1"
                             Command="{Binding VerTotalCommand}" />
-                    <StackPanel Orientation="Horizontal">
-                        <Button Content="Voltar" Padding="16,0" Height="60" FontSize="16"
+                    <StackPanel Orientation="Horizontal" KeyboardNavigation.TabIndex="0">
+                        <Button Content="Voltar" Padding="16,0" Height="60" FontSize="16" ToolTip="Voltar para as comandas (Esc)"
                                 Command="{Binding FecharEdicaoCommand}" Margin="0,0,8,0" />
                         <Button Content="Cancelar comanda" Padding="16,0" Height="60" FontSize="16" Foreground="#B23B32"
+                                ToolTip="Cancelar comanda (sem atalho; alcance por Tab)"
                                 Command="{Binding CancelarComandaAtualCommand}" />
                     </StackPanel>
                 </DockPanel>
