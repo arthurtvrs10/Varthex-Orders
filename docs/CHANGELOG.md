@@ -1,5 +1,26 @@
 # Histórico de alterações
 
+## 1.14 - 2026-09-21 - Navegação por teclado e foco visível (Etapa 7, fatia 2)
+
+- Foco visível de alto contraste (contorno azul de 3 px) em botões, campos, caixas de seleção e datas — RNF18.
+- Atalhos: `Ctrl+1..5` trocam de tela (respeitando o modo de restauração), `Ctrl+N` foca o número da comanda, `Ctrl+F` foca a busca, `F4` finaliza, `Esc` volta.
+- Atendimento: digitar o número da comanda e `Enter` abre a comanda livre ou seleciona a que já está aberta; caixa de busca de produto com `Enter` adicionando o primeiro resultado (ignorado com busca vazia); `↑/↓` selecionam o item, `+`/`-` ajustam a quantidade e `Delete` remove (só fora de campos de texto e do menu).
+- Encerramento: `Esc` volta para a comanda; `Enter` só confirma depois de marcar que a cobrança foi aprovada.
+- Formulários de Produtos e Configurações têm botão padrão (`Enter`); `Ctrl+F` busca em Produtos e Histórico.
+- Testes que carregam todos os XAML em STA (pegam recurso ausente sem abrir o app).
+- Limitações conhecidas: sem estilo de foco para listas e cabeçalhos de colunas; a cor do foco não acompanha o modo de alto contraste do Windows; nomes de acessibilidade (leitor de tela) só nos campos de número e busca; a tecla `s` (sem Alt) aciona "Sim" nas confirmações; a última rodada de ajustes de foco ainda não foi conferida em execução real.
+
+## 1.13 - 2026-09-20 - Robustez operacional (Etapa 7, fatia 1)
+
+- Logs com rotação diária e por tamanho (5 MB por arquivo, 30 arquivos retidos, teto de cerca de 150 MB) — RNF21.
+- Logs sem dados sensíveis: perfil do usuário, pasta de backup externa e pasta de dados são mascarados — RF26.
+- Falhas técnicas que antes eram engolidas pelas telas agora são registradas no log local (só operação e exceção) — RNF16.
+- Recuperação de comandas abertas após reinício provada por testes (RF27, RN22, RNF20/CT20) e registrada no log de inicialização.
+- Banco corrompido: o aplicativo abre em modo de restauração em vez de fechar; a restauração funciona mesmo com o banco ativo corrompido e guarda uma cópia bruta.
+- Primeira instalação não gera mais backup preventivo nem aviso espúrio; a restauração limpa arquivos `-wal`/`-shm`/`-journal`.
+- Testes de infraestrutura passam a rodar em série (o pool global do SQLite causava falhas intermitentes).
+- Limitações conhecidas: reiniciar após restaurar consome um dos 30 arquivos de log do dia; `corrompido-*.db.bak` não é podado; não há alerta de pouco espaço em disco (R15).
+
 ## 1.12 - 2026-09-19 - Foto do produto
 
 - Produtos passam a ter uma foto opcional: "Escolher foto..." e "Remover
