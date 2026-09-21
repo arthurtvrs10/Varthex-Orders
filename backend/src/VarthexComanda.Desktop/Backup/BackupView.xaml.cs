@@ -40,11 +40,10 @@ public partial class BackupView : UserControl
 
     private void ViewModel_SolicitouReinicio(object? sender, EventArgs e)
     {
-        MessageBox.Show(
-            "Backup restaurado com sucesso. O Varthex Comanda vai reiniciar agora.",
+        JanelaAviso.Mostrar(
             "Varthex Comanda",
-            MessageBoxButton.OK,
-            MessageBoxImage.Information);
+            "Backup restaurado com sucesso. O Varthex Comanda vai reiniciar agora.",
+            TipoAviso.Informacao);
 
         ((App)System.Windows.Application.Current).ReiniciarAplicativo();
     }

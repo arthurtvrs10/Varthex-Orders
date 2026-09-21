@@ -9,6 +9,7 @@
     <UserControl.Resources>
         <local:FotoArquivoParaImagemConverter x:Key="FotoImagem" />
         <local:CaminhoArquivoParaImagemConverter x:Key="CaminhoImagem" />
+        <local:BooleanoParaSimNaoConverter x:Key="SimNao" />
         <atendimento:CentavosParaMoedaConverter x:Key="Moeda" />
         <atendimento:NuloParaVisibilidadeConverter x:Key="VisivelSeEdicao" />
         <atendimento:NuloParaVisibilidadeInversoConverter x:Key="VisivelSeNovo" />
@@ -55,7 +56,7 @@
                 <GridView>
                     <GridViewColumn Header="Nome" DisplayMemberBinding="{Binding Nome}" Width="260" />
                     <GridViewColumn Header="Preço" DisplayMemberBinding="{Binding PrecoCentavos, Converter={StaticResource Moeda}}" Width="110" />
-                    <GridViewColumn Header="Ativo" DisplayMemberBinding="{Binding Ativo}" Width="80" />
+                    <GridViewColumn Header="Ativo" DisplayMemberBinding="{Binding Ativo, Converter={StaticResource SimNao}}" Width="80" />
                 </GridView>
             </ListView.View>
         </ListView>
