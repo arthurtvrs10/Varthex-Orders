@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using System.Security.Cryptography;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,13 @@ public class EfBackupService : IBackupService
     private readonly int _retencaoMaxima;
     private readonly ILogger? _logger;
     private readonly PastasMascaradas? _pastasMascaradas;
+
+    private const string SufixoZipDeFotos = ".fotos.zip";
+    private const long TamanhoMaximoFotoBytes = 10L * 1024 * 1024;
+    private const int MaximoEntradasNoZipDeFotos = 5000;
+
+    private static readonly HashSet<string> ExtensoesDeFoto =
+        new(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".bmp" };
 
     public EfBackupService(AppPaths paths, IBackupRegistroRepository registros, IClock relogio, int retencaoMaxima = 30, ILogger? logger = null, PastasMascaradas? pastasMascaradas = null)
     {
@@ -116,6 +124,10 @@ public class EfBackupService : IBackupService
                 _logger?.Warning(exRegistro, "Falha em {Operacao}", "RegistrarBackup");
             }
 
+            // as fotos entram DEPOIS de o .db estar no lugar e registrado: qualquer falha ao zipar e so
+            // registrada em log e nunca afeta o resultado do backup do banco
+            ZiparFotosDoBackup(destinoFinal + SufixoZipDeFotos);
+
             if (aplicarRetencao)
             {
                 AplicarRetencao(pastaDestino);
@@ -207,10 +219,148 @@ public class EfBackupService : IBackupService
         foreach (var arquivo in arquivos)
         {
             File.Delete(arquivo);
-            var companheiro = arquivo + ".sha256";
-            if (File.Exists(companheiro))
+            foreach (var sufixoCompanheiro in new[] { ".sha256", SufixoZipDeFotos })
             {
-                File.Delete(companheiro);
+                var companheiro = arquivo + sufixoCompanheiro;
+                if (File.Exists(companheiro))
+                {
+                    File.Delete(companheiro);
+                }
+            }
+        }
+    }
+
+    private static bool EhArquivoDeFoto(string nome) =>
+        ExtensoesDeFoto.Contains(Path.GetExtension(nome));
+
+    /// <summary>
+    /// Cria o zip de fotos ao lado do backup (.db.fotos.zip) a partir de <c>fotos\</c>. Só arquivos de imagem
+    /// da raiz da pasta entram, com o nome puro. O zip nasce como .tmp e só recebe o nome final quando
+    /// completo. Nunca lança: falhas viram Warning e o backup do banco segue válido.
+    /// </summary>
+    private void ZiparFotosDoBackup(string caminhoZip)
+    {
+        var temporario = caminhoZip + ".tmp";
+        try
+        {
+            if (!Directory.Exists(_paths.FotosDirectory))
+            {
+                return;
+            }
+
+            var fotos = Directory.GetFiles(_paths.FotosDirectory)
+                .Where(f => EhArquivoDeFoto(f))
+                .ToList();
+            if (fotos.Count == 0)
+            {
+                return;
+            }
+
+            using (var fluxo = new FileStream(temporario, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
+            using (var zip = new ZipArchive(fluxo, ZipArchiveMode.Create))
+            {
+                foreach (var foto in fotos)
+                {
+                    zip.CreateEntryFromFile(foto, Path.GetFileName(foto), CompressionLevel.Fastest);
+                }
+            }
+
+            File.Move(temporario, caminhoZip, overwrite: true);
+        }
+        catch (Exception ex)
+        {
+            _logger?.Warning(ex, "Falha em {Operacao}", "ZiparFotosDoBackup");
+            try
+            {
+                if (File.Exists(temporario))
+                {
+                    File.Delete(temporario);
+                }
+            }
+            catch (Exception exLimpeza)
+            {
+                _logger?.Warning(exLimpeza, "Falha em {Operacao}", "LimparZipTemporarioDeFotos");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Extrai as fotos do zip para <c>fotos\</c> sem apagar nada: mesmo nome sobrescreve, o resto permanece.
+    /// Só o nome puro da entrada é usado (nada de caminhos), só extensões de imagem, entradas com tamanho
+    /// declarado acima de 10 MB são ignoradas e no máximo 5000 entradas são lidas. Nunca lança.
+    /// </summary>
+    private void RestaurarFotosDoBackup(string caminhoZip)
+    {
+        try
+        {
+            if (!File.Exists(caminhoZip))
+            {
+                return;
+            }
+
+            Directory.CreateDirectory(_paths.FotosDirectory);
+            using var zip = ZipFile.OpenRead(caminhoZip);
+            foreach (var entrada in zip.Entries.Take(MaximoEntradasNoZipDeFotos))
+            {
+                try
+                {
+                    ExtrairFoto(entrada);
+                }
+                catch (Exception ex)
+                {
+                    // uma foto ruim nao impede as demais
+                    _logger?.Warning(ex, "Falha em {Operacao}", "RestaurarFotoDoBackup");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger?.Warning(ex, "Falha em {Operacao}", "RestaurarFotosDoBackup");
+        }
+    }
+
+    private void ExtrairFoto(ZipArchiveEntry entrada)
+    {
+        // Path.GetFileName descarta qualquer diretorio ("..\..\x.png" vira "x.png"): sem zip-slip
+        var nome = Path.GetFileName(entrada.FullName);
+        if (string.IsNullOrEmpty(nome)
+            || nome.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0
+            || !EhArquivoDeFoto(nome)
+            || entrada.Length > TamanhoMaximoFotoBytes)
+        {
+            return;
+        }
+
+        var destino = Path.Combine(_paths.FotosDirectory, nome);
+        var temporario = destino + ".restaurando";
+        try
+        {
+            using (var origem = entrada.Open())
+            using (var saida = new FileStream(temporario, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                // o tamanho declarado pode mentir: limita o que realmente e lido
+                var buffer = new byte[81920];
+                long total = 0;
+                int lidos;
+                while ((lidos = origem.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    total += lidos;
+                    if (total > TamanhoMaximoFotoBytes)
+                    {
+                        throw new InvalidDataException("Foto acima do tamanho máximo.");
+                    }
+
+                    saida.Write(buffer, 0, lidos);
+                }
+            }
+
+            File.Move(temporario, destino, overwrite: true);
+        }
+        finally
+        {
+            if (File.Exists(temporario))
+            {
+                File.Delete(temporario);
             }
         }
     }
@@ -462,6 +612,9 @@ public class EfBackupService : IBackupService
             File.Copy(temporario, _paths.DatabasePath, overwrite: true);
             RemoverArquivosAuxiliaresDoBanco();
             File.Delete(temporario);
+
+            // fotos so voltam depois de o banco ter sido trocado; falha aqui nao desfaz nem falha a restauracao
+            RestaurarFotosDoBackup(caminhoArquivo + SufixoZipDeFotos);
 
             return preventivo;
         }

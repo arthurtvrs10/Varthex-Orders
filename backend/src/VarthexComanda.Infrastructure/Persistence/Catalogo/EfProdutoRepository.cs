@@ -38,6 +38,16 @@ public class EfProdutoRepository : IProdutoRepository
         return consulta.OrderBy(p => p.Nome).ToList();
     }
 
+    public IReadOnlyList<string> ListarNomesDeFotos()
+    {
+        using var contexto = _fabricaContexto.CreateDbContext();
+        return contexto.Produtos
+            .AsNoTracking()
+            .Where(p => p.FotoArquivo != null && p.FotoArquivo != "")
+            .Select(p => p.FotoArquivo!)
+            .ToList();
+    }
+
     public Produto Salvar(Produto produto)
     {
         using var contexto = _fabricaContexto.CreateDbContext();

@@ -1,3 +1,4 @@
+using System.IO;
 using System.Diagnostics;
 using System.Windows;
 using Microsoft.EntityFrameworkCore;
@@ -171,6 +172,8 @@ public partial class App : System.Windows.Application
                 var abertas = _serviceProvider.GetRequiredService<IComandaRepository>().ListarAbertas().Count;
                 _logger.Information("Comandas abertas recuperadas: {Quantidade}", abertas);
 
+                RegistrarFotosSemProduto(paths);
+
                 _serviceProvider.GetRequiredService<CriarBackupAutomatico>().Executar();
 
                 _serviceProvider.GetRequiredService<MainWindow>().Show();
@@ -199,6 +202,30 @@ public partial class App : System.Windows.Application
         if (bancoCorrompido)
         {
             AbrirModoRestauracao();
+        }
+    }
+
+    // Só informativo: conta fotos em fotos\ que nenhum produto referencia. Nunca apaga nada (uma
+    // restauração de banco antigo poderia deixar fotos válidas "sem produto") e nunca derruba a inicialização.
+    private void RegistrarFotosSemProduto(AppPaths paths)
+    {
+        try
+        {
+            if (!Directory.Exists(paths.FotosDirectory))
+            {
+                return;
+            }
+
+            var referenciadas = _serviceProvider!.GetRequiredService<IProdutoRepository>()
+                .ListarNomesDeFotos()
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var semProduto = Directory.GetFiles(paths.FotosDirectory)
+                .Count(f => !referenciadas.Contains(Path.GetFileName(f)));
+            _logger!.Information("Fotos sem produto: {Quantidade}", semProduto);
+        }
+        catch (Exception ex)
+        {
+            _logger?.Warning(ex, "Falha em {Operacao}", "ContarFotosSemProduto");
         }
     }
 

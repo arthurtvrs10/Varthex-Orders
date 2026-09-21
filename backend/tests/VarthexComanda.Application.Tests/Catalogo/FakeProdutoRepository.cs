@@ -24,6 +24,9 @@ public class FakeProdutoRepository : IProdutoRepository
         return consulta.ToList();
     }
 
+    public IReadOnlyList<string> ListarNomesDeFotos() =>
+        _produtos.Where(p => !string.IsNullOrEmpty(p.FotoArquivo)).Select(p => p.FotoArquivo!).ToList();
+
     public Produto Salvar(Produto produto)
     {
         if (produto.Id == 0)
