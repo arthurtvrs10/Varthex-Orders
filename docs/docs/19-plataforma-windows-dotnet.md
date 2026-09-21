@@ -122,17 +122,26 @@ Os testes de infraestrutura devem criar bancos temporários. Nunca executar test
 
 ## Publicação para Windows
 
-Enquanto a arquitetura final estiver pendente, usar `win-x64`:
+Enquanto a arquitetura final estiver pendente (QV07), usa-se `win-x64`. O comando oficial é o script do repositório:
 
 ```powershell
-dotnet publish src/VarthexComanda.Desktop/VarthexComanda.Desktop.csproj `
-  --configuration Release `
-  --runtime win-x64 `
-  --self-contained true `
-  --output artifacts/publish/win-x64
+.\scripts\publicar.ps1            # opcional: -Saida <pasta>
 ```
 
-Manter múltiplos arquivos na primeira versão simplifica o diagnóstico das bibliotecas nativas do SQLite. A pasta publicada deve ser testada em um Windows limpo sem SDK do .NET. Depois da homologação, um instalador pode criar atalhos e registrar a versão sem apagar `%LOCALAPPDATA%\VarthexComanda` durante atualização ou desinstalação.
+O script lê a versão do `<Version>` de `VarthexComanda.Desktop.csproj` (fonte única; `AssemblyVersion`, `FileVersion` e `InformationalVersion` ficam no mesmo arquivo), executa `dotnet publish` em `Release`, `win-x64`, `--self-contained true`, sem `PublishSingleFile` e sem trimming, e monta o pacote. Saídas (a pasta `artifacts/` é ignorada pelo Git):
+
+- `artifacts\publish\win-x64\` — pasta publicada, com `VarthexComanda.exe` (`AssemblyName = VarthexComanda`);
+- `artifacts\VarthexComanda-<versão>-win-x64.zip` — a pasta publicada mais `Instalar.cmd`, `Instalar.ps1`, `Desinstalar.ps1` e `LEIAME.txt` (de `scripts\pacote\`) na raiz do zip. Para a versão 1.0.0: cerca de 64 MB e cerca de 430 arquivos.
+
+Manter múltiplos arquivos na primeira versão simplifica o diagnóstico das bibliotecas nativas do SQLite. O pacote deve ser testado em um Windows limpo sem SDK nem runtime do .NET (CT21) — **ainda pendente**; hoje só se verificou, numa máquina de desenvolvimento, que uma cópia instalada abre sem `dotnet` no `PATH`.
+
+### Decisão: sem instalador de terceiros por enquanto
+
+O pacote é um `.zip` com scripts de instalação por usuário (sem administrador), em vez de `.msi`, Inno Setup, WiX ou NSIS. Motivos: cumpre RNF09 (instalação limpa, com o runtime incluso) sem instalar nenhuma ferramenta nem software adicional na máquina do usuário; nenhuma dessas ferramentas está instalada no ambiente de desenvolvimento; e a distribuição ainda não se estabilizou. Os scripts separam binários (`%LOCALAPPDATA%\Programs\VarthexComanda`) e dados (`%LOCALAPPDATA%\VarthexComanda`): atualizar sobrescreve só os binários e desinstalar nunca apaga dados, como exigido nos critérios abaixo.
+
+Próximas opções, todas futuras: MSIX, Inno Setup ou WiX embrulhando a mesma pasta publicada (o roteiro de instalação já está separado dos binários). Assinatura de código só se a distribuição for pública (veja o documento 08); sem ela o Windows pode mostrar aviso de aplicativo desconhecido. Também ficam fora desta etapa: atualização automática, retorno automático (hoje manual, via `.anterior`) e ARM64.
+
+O procedimento de instalação, atualização, retorno e diagnóstico está no documento 12.
 
 ## Critério técnico de pronto
 
