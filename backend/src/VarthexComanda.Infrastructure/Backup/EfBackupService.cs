@@ -240,11 +240,19 @@ public class EfBackupService : IBackupService
 
         foreach (var arquivo in arquivos)
         {
-            File.Delete(arquivo);
-            var companheiro = arquivo + ".sha256";
-            if (File.Exists(companheiro))
+            try
             {
-                File.Delete(companheiro);
+                File.Delete(arquivo);
+                var companheiro = arquivo + ".sha256";
+                if (File.Exists(companheiro))
+                {
+                    File.Delete(companheiro);
+                }
+            }
+            catch (Exception)
+            {
+                // um arquivo travado nao impede a limpeza dos demais; so o nome da operacao vai ao log
+                _logger?.Warning("Falha em {Operacao}", "AplicarRetencao");
             }
             // o .fotos.zip NAO e apagado aqui: quem o poda e a regra "so os 3 mais recentes" (PodarZipsDeFotos);
             // com a biblioteca inalterada o zip mais recente pertence a um backup antigo e ainda e o unico.
@@ -328,7 +336,15 @@ public class EfBackupService : IBackupService
         LimparZipsTemporariosAntigos(pasta);
         foreach (var antigo in ListarZipsDeFotos(pasta).Skip(ZipsDeFotosMantidos))
         {
-            File.Delete(antigo);
+            try
+            {
+                File.Delete(antigo);
+            }
+            catch (Exception)
+            {
+                // um zip travado nao impede a poda dos demais; so o nome da operacao vai ao log
+                _logger?.Warning("Falha em {Operacao}", "PodarZipsDeFotos");
+            }
         }
     }
 
@@ -466,10 +482,17 @@ public class EfBackupService : IBackupService
         }
     }
 
+    private static bool ChaveEhMenorOuIgual((string Instante, int Sequencia) a, (string Instante, int Sequencia) b)
+    {
+        var c = string.CompareOrdinal(a.Instante, b.Instante);
+        return c < 0 || (c == 0 && a.Sequencia <= b.Sequencia);
+    }
+
     /// <summary>
-    /// Zip de fotos da restauracao: o do proprio backup, ou, se aquele backup nao gerou um (biblioteca inalterada),
-    /// o mais recente da mesma pasta. Um zip "a mais" e inofensivo: a extracao nunca apaga nada, so cria/sobrescreve
-    /// por nome.
+    /// Zip de fotos da restauracao: o do proprio backup; se aquele backup nao gerou um (biblioteca inalterada), o
+    /// mais recente feito ATE o instante do backup (representa as fotos daquela epoca); se o backup e anterior a
+    /// todos os zips, o mais antigo. Um zip "a mais" e inofensivo: a extracao nunca apaga nada, so
+    /// cria/sobrescreve por nome. Nome fora do padrao (sem instante): o mais recente da pasta.
     /// </summary>
     private static string? EscolherZipDeFotosParaRestauracao(string caminhoBackup)
     {
@@ -480,7 +503,51 @@ public class EfBackupService : IBackupService
         }
 
         var pasta = Path.GetDirectoryName(Path.GetFullPath(caminhoBackup));
-        return pasta is null ? null : ListarZipsDeFotos(pasta).FirstOrDefault();
+        if (pasta is null)
+        {
+            return null;
+        }
+
+        var zips = ListarZipsDeFotos(pasta); // do mais recente para o mais antigo
+        if (zips.Count == 0)
+        {
+            return null;
+        }
+
+        if (!Path.GetFileName(caminhoBackup).StartsWith("varthex-comanda-", StringComparison.OrdinalIgnoreCase))
+        {
+            return zips[0];
+        }
+
+        var chaveDoBackup = ChaveDoNome(caminhoBackup);
+        return zips.FirstOrDefault(z => ChaveEhMenorOuIgual(ChaveDoNome(z), chaveDoBackup)) ?? zips[^1];
+    }
+
+    /// <summary>
+    /// Escolhe o zip de fotos e o copia para um .tmp ao lado de <c>fotos\</c> (a raiz de dados) ANTES da copia
+    /// preventiva: ela pode criar um zip novo e a poda pode apagar o zip original. Devolve null se nao ha zip ou
+    /// se a copia falhar (Warning; a restauracao do banco segue sem fotos).
+    /// </summary>
+    private string? PrepararZipDeFotosParaRestauracao(string caminhoBackup)
+    {
+        try
+        {
+            var escolhido = EscolherZipDeFotosParaRestauracao(caminhoBackup);
+            if (escolhido is null)
+            {
+                return null;
+            }
+
+            Directory.CreateDirectory(_paths.Root);
+            var copia = Path.Combine(_paths.Root, "restaurando-fotos.tmp");
+            File.Copy(escolhido, copia, overwrite: true);
+            return copia;
+        }
+        catch (Exception ex)
+        {
+            _logger?.Warning(ex, "Falha em {Operacao}", "RestaurarFotosDoBackup");
+            return null;
+        }
     }
 
     /// <summary>
@@ -774,8 +841,12 @@ public class EfBackupService : IBackupService
             return Resultado<BackupRegistro>.Falha("Arquivo de backup não encontrado.");
         }
 
+        string? zipDeFotos = null;
         try
         {
+            // o zip de fotos e escolhido e copiado antes de a copia preventiva mexer na pasta de backups
+            zipDeFotos = PrepararZipDeFotosParaRestauracao(caminhoArquivo);
+
             Resultado<BackupRegistro> preventivo;
             switch (ClassificarBancoAtivo())
             {
@@ -829,7 +900,7 @@ public class EfBackupService : IBackupService
             File.Delete(temporario);
 
             // fotos so voltam depois de o banco ter sido trocado; falha aqui nao desfaz nem falha a restauracao
-            RestaurarFotosDoBackup(EscolherZipDeFotosParaRestauracao(caminhoArquivo));
+            RestaurarFotosDoBackup(zipDeFotos);
 
             return preventivo;
         }
@@ -837,6 +908,20 @@ public class EfBackupService : IBackupService
         {
             _logger?.Error(ex, "Falha em {Operacao}", "RestaurarBackup");
             return Resultado<BackupRegistro>.Falha(ex.Message);
+        }
+        finally
+        {
+            if (zipDeFotos is not null)
+            {
+                try
+                {
+                    File.Delete(zipDeFotos);
+                }
+                catch (Exception exLimpeza)
+                {
+                    _logger?.Warning(exLimpeza, "Falha em {Operacao}", "LimparZipTemporarioDeFotos");
+                }
+            }
         }
     }
 }

@@ -604,6 +604,158 @@ public class EfBackupServiceFotosTests : IDisposable
         Assert.False(relatorio.FormatoValido);
     }
 
+    [Fact]
+    [Trait("Requisito", "RF24")]
+    public void RestaurarPara_DbSemZipProprio_EscolheZipAnteriorAoBackupAntesDaCopiaPreventiva()
+    {
+        CriarFoto("a.png", "A");
+        var servico = NovoServico();
+        servico.CriarBackupGerenciado();                       // zip com a.png
+        _relogio.UtcNow = _relogio.UtcNow.AddSeconds(1);
+        var segundo = servico.CriarBackupGerenciado();         // inalterado: sem zip proprio
+        Assert.False(File.Exists(CaminhoDb(segundo) + ".fotos.zip"));
+        // a biblioteca atual difere do zip mais recente: a copia preventiva criaria um zip NOVO (so com x.png)
+        File.Delete(Path.Combine(_paths.FotosDirectory, "a.png"));
+        CriarFoto("x.png", "X");
+        _relogio.UtcNow = _relogio.UtcNow.AddSeconds(5);
+
+        var resultado = NovoServico().RestaurarPara(CaminhoDb(segundo));
+
+        Assert.True(resultado.Sucesso);
+        Assert.Equal("A", File.ReadAllText(Path.Combine(_paths.FotosDirectory, "a.png")));
+        Assert.True(File.Exists(Path.Combine(_paths.FotosDirectory, "x.png")));
+        Assert.False(File.Exists(Path.Combine(_paths.Root, "restaurando-fotos.tmp")));
+    }
+
+    [Fact]
+    [Trait("Requisito", "RF24")]
+    public void RestaurarPara_ZipProprioEOTerceiroMaisRecente_PodaDaCopiaPreventivaNaoOPerde()
+    {
+        var servico = NovoServico();
+        var criados = new List<string>();
+        for (var i = 0; i < 3; i++)
+        {
+            AvancarBiblioteca($"f{i}.png");
+            _relogio.UtcNow = _relogio.UtcNow.AddSeconds(1);
+            criados.Add(CaminhoDb(servico.CriarBackupGerenciado()));
+        }
+
+        Assert.Equal(3, ZipsDaPasta(_paths.BackupsDirectory).Length);
+        // o zip do primeiro backup (so com f0) e o 3o mais recente; a biblioteca mudou, entao a preventiva cria um 4o e poda o 1o
+        File.Delete(Path.Combine(_paths.FotosDirectory, "f0.png"));
+        AvancarBiblioteca("f9.png");
+        _relogio.UtcNow = _relogio.UtcNow.AddSeconds(5);
+
+        var resultado = NovoServico().RestaurarPara(criados[0]);
+
+        Assert.True(resultado.Sucesso);
+        Assert.False(File.Exists(criados[0] + ".fotos.zip")); // foi mesmo podado pela preventiva
+        Assert.Equal("f0.png", File.ReadAllText(Path.Combine(_paths.FotosDirectory, "f0.png")));
+    }
+
+    [Fact]
+    [Trait("Requisito", "RF24")]
+    public void RestaurarPara_DbAnteriorATodosOsZips_UsaOZipMaisAntigo()
+    {
+        var servico = NovoServico();
+        var semFotos = servico.CriarBackupGerenciado();        // sem zip
+        AvancarBiblioteca("f0.png");
+        _relogio.UtcNow = _relogio.UtcNow.AddSeconds(1);
+        servico.CriarBackupGerenciado();                       // zip mais antigo: f0
+        AvancarBiblioteca("f1.png");
+        _relogio.UtcNow = _relogio.UtcNow.AddSeconds(1);
+        servico.CriarBackupGerenciado();                       // zip mais novo: f0 + f1
+        foreach (var f in Directory.GetFiles(_paths.FotosDirectory)) File.Delete(f);
+        _relogio.UtcNow = _relogio.UtcNow.AddSeconds(5);
+
+        var resultado = NovoServico().RestaurarPara(CaminhoDb(semFotos));
+
+        Assert.True(resultado.Sucesso);
+        Assert.Equal(new[] { "f0.png" }, Directory.GetFiles(_paths.FotosDirectory).Select(f => Path.GetFileName(f)).ToArray());
+    }
+
+    [Fact]
+    [Trait("Requisito", "RF21")]
+    public void CriarBackup_FotoRemovida_CriaNovoZipSoComAsRestantes()
+    {
+        CriarFoto("a.png");
+        CriarFoto("b.png");
+        var servico = NovoServico();
+        servico.CriarBackupGerenciado();
+        File.Delete(Path.Combine(_paths.FotosDirectory, "b.png"));
+        _relogio.UtcNow = _relogio.UtcNow.AddSeconds(1);
+
+        var segundo = servico.CriarBackupGerenciado();
+
+        Assert.Equal(new[] { "a.png" }, NomesDasFotosNoZip(CaminhoDb(segundo) + ".fotos.zip"));
+    }
+
+    [Fact]
+    [Trait("Requisito", "RF22")]
+    public void PastaExterna_NomesParecidosComZipDeFotosNaoSaoTocados()
+    {
+        var externa = Path.Combine(_raizTeste, "externa");
+        Directory.CreateDirectory(externa);
+        var ferias = Path.Combine(externa, "ferias.fotos.zip");
+        var quase = Path.Combine(externa, "varthex-comanda-x.zip");
+        File.WriteAllText(ferias, "do usuario");
+        File.WriteAllText(quase, "do usuario");
+        var servico = NovoServico();
+        for (var i = 0; i < 5; i++)
+        {
+            AvancarBiblioteca($"f{i}.png");
+            _relogio.UtcNow = _relogio.UtcNow.AddSeconds(1);
+            servico.CriarBackupExterno(externa);
+        }
+
+        Assert.True(File.Exists(ferias));
+        Assert.True(File.Exists(quase));
+        Assert.Equal(3, Directory.GetFiles(externa, "varthex-comanda-*.db.fotos.zip").Length);
+    }
+
+    [Fact]
+    [Trait("Requisito", "RF21")]
+    public void PodarZips_ZipTravadoNaoImpedeAPodaDosDemais()
+    {
+        CriarFoto("a.png");
+        var nomes = Enumerable.Range(1, 5).Select(i => Path.Combine(_paths.BackupsDirectory, $"varthex-comanda-2020-01-0{i}-000000.db.fotos.zip")).ToArray();
+        foreach (var n in nomes) File.WriteAllText(n, "falso");
+        var coletor = new ColetorDeLog();
+        // fica: novo + f5 + f4; a poda tenta f3 (travado), f2 e f1
+        using var trava = new FileStream(nomes[2], FileMode.Open, FileAccess.Read, FileShare.None);
+
+        var resultado = NovoServico(coletor: coletor).CriarBackupGerenciado();
+
+        Assert.True(resultado.Sucesso);
+        Assert.True(File.Exists(nomes[2]));
+        Assert.False(File.Exists(nomes[1]));
+        Assert.False(File.Exists(nomes[0]));
+        var aviso = Assert.Single(coletor.Eventos, e => e.Properties.TryGetValue("Operacao", out var o) && ((ScalarValue)o).Value as string == "PodarZipsDeFotos");
+        Assert.Equal(LogEventLevel.Warning, aviso.Level);
+        Assert.Null(aviso.Exception);
+    }
+
+    [Fact]
+    [Trait("Requisito", "RF21")]
+    public void Retencao_DbTravadoNaoImpedeARemocaoDosDemaisAntigos()
+    {
+        var servico = NovoServico();
+        var b0 = servico.CriarBackupGerenciado();
+        _relogio.UtcNow = _relogio.UtcNow.AddSeconds(1);
+        var b1 = servico.CriarBackupGerenciado();
+        _relogio.UtcNow = _relogio.UtcNow.AddSeconds(1);
+        var coletor = new ColetorDeLog();
+        using var trava = new FileStream(CaminhoDb(b1), FileMode.Open, FileAccess.Read, FileShare.None);
+
+        var b2 = NovoServico(retencao: 1, coletor: coletor).CriarBackupGerenciado();
+
+        Assert.True(b2.Sucesso);
+        Assert.True(File.Exists(CaminhoDb(b1)));   // travado: fica
+        Assert.False(File.Exists(CaminhoDb(b0)));  // o mais antigo saiu mesmo assim
+        Assert.False(File.Exists(CaminhoDb(b0) + ".sha256"));
+        Assert.Single(coletor.Eventos, e => e.Properties.TryGetValue("Operacao", out var o) && ((ScalarValue)o).Value as string == "AplicarRetencao");
+    }
+
     private sealed class RelogioFalso : VarthexComanda.Application.Abstractions.IClock
     {
         public DateTime UtcNow { get; set; } = new DateTime(2026, 9, 18, 12, 0, 0, DateTimeKind.Utc);
