@@ -38,7 +38,7 @@ public class CarregamentoDeXamlTests
     private static App? _app;
 
     // Sempre chamado de dentro de EmSta (o App fica preso a thread STA dedicada)
-    private static void GarantirApp()
+    internal static void GarantirApp()
     {
         lock (TravaApp)
         {
@@ -52,7 +52,7 @@ public class CarregamentoDeXamlTests
         }
     }
 
-    private static void MedirEOrganizar(FrameworkElement elemento)
+    internal static void MedirEOrganizar(FrameworkElement elemento)
     {
         elemento.Measure(Tela);
         elemento.Arrange(new Rect(new Point(0, 0), Tela));
@@ -63,7 +63,7 @@ public class CarregamentoDeXamlTests
 
     // ---- dobles cheios o bastante para os DataTemplates serem instanciados ----
 
-    private static (AtendimentoViewModel ViewModel, Comanda Comanda) CriarAtendimento()
+    internal static (AtendimentoViewModel ViewModel, Comanda Comanda) CriarAtendimento()
     {
         var relogio = new FakeClock();
         var comandas = new FakeComandaRepository();
