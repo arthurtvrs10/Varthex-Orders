@@ -2,6 +2,8 @@
 
 Estas decisões devem ser respondidas antes da homologação.
 
+Situação real de cada pendência (decidida no código, comportamento existente sem decisão registrada ou sem rastro), quem responde e o que falta: [homologacao/pendencias.md](../homologacao/pendencias.md).
+
 | Código | Pergunta | Decisor | Prazo |
 | --- | --- | --- | --- |
 | QV01 | Como o cliente será associado ao número: ficha, mesa, pulseira ou outro método? | Responsável | Antes do protótipo |

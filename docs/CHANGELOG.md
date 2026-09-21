@@ -1,5 +1,23 @@
 # Histórico de alterações
 
+## 1.17 - 2026-09-21 - Homologação (Etapa 8)
+
+Entregue (tudo o que uma máquina de desenvolvimento prova sem terceiros; nenhum código de produto foi alterado):
+
+- Rastreabilidade executável: `[Trait("Caso", "CTnn")]` nos testes e o teste `RastreabilidadeDosCasosTests`, que falha se um caso automatizável perder a cobertura e gera `docs/homologacao/rastreabilidade-testes.md` (`VARTHEX_GERAR_RASTREABILIDADE`). Lacunas cobertas: CT11 (falha injetada no encerramento), CT15 (backup corrompido), CT16 (atualização a partir da `InitialCreate`), CT03 a CT08, CT10, CT12 e CT18 com os valores literais do documento 09, CT09 com ViewModel e SQLite reais. CT13 tem prova só estrutural (os assemblies do produto não referenciam APIs de rede).
+- Massa mínima: ferramenta `backend/tools/VarthexComanda.MassaMinima` (`--saida <pasta>`), reproduzível, que recusa a pasta real de dados; teste confere as contagens do documento 09.
+- Ensaios com o aplicativo real (`scripts/homologacao/Executar-Ensaio.ps1`, UI Automation, dados descartáveis): E1 RNF03 (média de 1736 ms em 5 aberturas), E2 CT19, E3 CT20, E4 CT09, E5 restauração de backup, E6 sem conexões de rede (apoio). Todos aprovados; transcrição em `docs/homologacao/evidencias/ensaio-2026-09-21.txt`.
+- Documentos em `docs/homologacao/`: README, checklist da Etapa 8, matriz de compatibilidade (RNF17), resultados por CT, roteiro do ensaio manual, guia do operador e pendências (QV01 a QV14 com a situação real e as pendências técnicas). Documentos 10 e 13 ganharam ponteiros; o CT17 entrou na linha do OBJ01 do documento 10.
+- Suíte: 554 testes verdes (Domain 4, Application 85, Infrastructure 250, Desktop 215).
+
+Pendente (a homologação humana **ainda não aconteceu**):
+
+- CT13 com a rede física desligada e CT21 em Windows limpo, sem .NET (`Pendente – exige pessoa`); CT17 parcial (falta o teclado físico no aplicativo real).
+- Computador da loja (QV07): matriz de compatibilidade, RNF02, RNF03 (o E1 mediu só a máquina de desenvolvimento), RNF07, escalas 100/150/200 %, reinício do PC com comanda aberta, maquininha real e troca de pendrive.
+- A restauração pela caixa "Selecionar arquivo..." **não foi automatizada** (o diálogo de arquivos do Windows não expõe UI Automation); o backup corrompido foi recusado pelo modo de restauração (E5).
+- Treinamento dos operadores (o guia existe) e as respostas do responsável a QV01 a QV14 (só a QV02 tem decisão em código).
+- Limitações conhecidas: sem alerta de pouco espaço em disco (R15); `corrompido-*.db.bak` sem poda; reinício após restaurar consome um arquivo de log; `.fotos.zip` gerado no thread da interface; sem assinatura de código; sem instalador MSI; instalação e dados por conta do Windows (QV12); Enter no número seleciona a comanda já aberta; a tecla `s` responde "Sim" nas confirmações; a última rodada de ajustes de foco do teclado teve só verificação ao vivo parcial; CT06 fracionário coberto só por construção; CT19 com teste unitário só da trava (o comportamento completo é o E2).
+
 ## 1.16 - 2026-09-21 - Publicação autocontida (Etapa 7, fatia 4)
 
 - O executável passou a se chamar `VarthexComanda.exe` (`AssemblyName = VarthexComanda`; namespaces inalterados).
