@@ -1,0 +1,165 @@
+
+========================================================================
+Ensaios de homologacao do Varthex Comanda (app real, UI Automation)
+========================================================================
+Data/hora ........ 2026-09-21 11:45:49 -03:00
+Maquina .......... TAVARES (Microsoft Windows NT 10.0.26200.0)
+PowerShell ....... 5.1.26100.9444
+Ensaios .......... E1, E2, E3, E4, E5, E6
+Raiz descartavel . %USERPROFILE%\AppData\Local\Temp\claude\C--Users-%USERNAME%-Desktop-VComanda\507df320-a4f0-476a-b4ad-873ee84f6d3c\scratchpad\ensaio
+Trava: nenhum VarthexComanda em execucao antes de comecar.
+Pacote ........... VarthexComanda-1.0.0-win-x64.zip (63,5 MB)
+  Instalando a versao 1.0.0
+  Atalhos nao criados (-SemAtalhos).
+  
+  Varthex Comanda 1.0.0 instalado em: %USERPROFILE%\AppData\Local\Temp\claude\C--Users-%USERNAME%-Desktop-VComanda\507df320-a4f0-476a-b4ad-873ee84f6d3c\scratchpad\ensaio\app\VarthexComanda
+  Dados do aplicativo (preservados, nao foram alterados): %USERPROFILE%\AppData\Local\VarthexComanda
+Versao ........... 1.0.0
+Instalacao ....... %USERPROFILE%\AppData\Local\Temp\claude\C--Users-%USERNAME%-Desktop-VComanda\507df320-a4f0-476a-b4ad-873ee84f6d3c\scratchpad\ensaio\app\VarthexComanda
+Massa de referencia gerada em 9,9 s (cada ensaio gera a sua propria pasta):
+  Massa minima gerada.
+    Pasta:               %USERPROFILE%\AppData\Local\Temp\claude\C--Users-%USERNAME%-Desktop-VComanda\507df320-a4f0-476a-b4ad-873ee84f6d3c\scratchpad\ensaio\massa-base
+    Referencia (agora):  21/09/2026 11:45 (Brasilia) = 2026-09-21 14:45:55 UTC
+    Categorias:          5 (1 inativa)
+    Produtos:            30 (1 inativo; 20 com foto sintetica)
+    Numeros de comanda:  20 (configuracao)
+    Comandas abertas:    5
+      - comanda  3: 1 item (1 linha(s), 1 unidade(s), R$ 6,00)
+      - comanda  7: muitos itens (9 linha(s), 15 unidade(s), R$ 180,00)
+      - comanda 12: itens repetidos (somados) (3 linha(s), 6 unidade(s), R$ 118,00)
+      - comanda 15: vazia (0 linha(s), 0 unidade(s), R$ 0,00)
+      - comanda 18: 2 itens (2 linha(s), 2 unidade(s), R$ 19,00)
+    Comandas abandonadas (canceladas): 37
+    Vendas:              744 (1788 linhas de item), total R$ 53.681,00
+    Historico:           90 dias (90 dias com vendas)
+    Backups (pasta backups\):
+      - valido:     varthex-comanda-2026-09-21-144555.db (+ .sha256 e .fotos.zip)
+      - antigo:     varthex-comanda-2026-08-22-144555.db (esquema da InitialCreate)
+      - corrompido: varthex-comanda-2026-09-14-144555.db (bytes invalidos; checksum nao confere)
+  
+  Para usar com o app (ensaios): defina VARTHEX_COMANDA_DADOS com a pasta acima.
+
+========================================================================
+E1 (RNF03) - tempo de abertura ate a janela principal, media de 5 aberturas
+========================================================================
+Massa minima gerada para este ensaio em 7,6 s: %USERPROFILE%\AppData\Local\Temp\claude\C--Users-%USERNAME%-Desktop-VComanda\507df320-a4f0-476a-b4ad-873ee84f6d3c\scratchpad\ensaio\dados-E1
+Cronometro: do Process.Start ate MainWindowHandle visivel com o titulo "Varthex Comanda".
+  abertura 1: 2546 ms (PID 1852)
+  abertura 2: 1691 ms (PID 19144)
+  abertura 3: 1662 ms (PID 20172)
+  abertura 4: 1678 ms (PID 38680)
+  abertura 5: 1619 ms (PID 7884)
+  media: 1839 ms | maior: 2546 ms | meta RNF03: <= 5000 ms
+
+E1: PASSOU -- media 1839 ms em 5 aberturas (maior 2546 ms)
+
+========================================================================
+E2 (CT19) - segunda instancia mostra o aviso e nao abre um segundo banco
+========================================================================
+Massa minima gerada para este ensaio em 7,6 s: %USERPROFILE%\AppData\Local\Temp\claude\C--Users-%USERNAME%-Desktop-VComanda\507df320-a4f0-476a-b4ad-873ee84f6d3c\scratchpad\ensaio\dados-E2
+  1a instancia: PID 26980 com a janela principal aberta
+  2a instancia: PID 19120 iniciada com as mesmas variaveis
+  aviso da 2a instancia: 'O Varthex Comanda já está aberto neste computador.'
+  janelas principais vivas na 1a instancia: 1
+  o aviso e modal (ShowDialog): a 2a instancia so encerra depois do OK
+  apos o OK (InvokePattern): encerrou=True em 168 ms
+  log: 'Iniciando Varthex Comanda' = 1 | 'Banco pronto' = 1
+    2026-09-21 11:46:31.385 [INF] Iniciando Varthex Comanda 1.0.0
+
+E2: PASSOU -- aviso com a mensagem esperada; 1 janela principal; 2a instancia encerrou em 168 ms apos o OK; log com 1 abertura de banco
+
+========================================================================
+E3 (CT20/RNF20) - termino forcado do processo: comanda e total sobrevivem
+========================================================================
+Massa minima gerada para este ensaio em 7,5 s: %USERPROFILE%\AppData\Local\Temp\claude\C--Users-%USERNAME%-Desktop-VComanda\507df320-a4f0-476a-b4ad-873ee84f6d3c\scratchpad\ensaio\dados-E3
+  comanda 01 aberta com 2 itens; total na tela: R$ 24,00
+  comandas abertas antes: 5 | vendas de hoje antes: 0
+  Stop-Process -Force no PID 33964 (termino forcado, sem OnExit)
+  apos reabrir: comanda 01 mostra 'R$ 24,00' | vendas de hoje: 0
+  log: 2026-09-21 11:46:50.806 [INF] Comandas abertas recuperadas: 6  (esperado: 6)
+
+E3: PASSOU -- comanda 01 continua aberta com R$ 24,00; log 'Comandas abertas recuperadas: 6'; vendas de hoje seguem em 0
+
+========================================================================
+E4 (CT09) - erro da maquininha: "Voltar para a comanda" nao gera venda
+========================================================================
+Massa minima gerada para este ensaio em 7,6 s: %USERPROFILE%\AppData\Local\Temp\claude\C--Users-%USERNAME%-Desktop-VComanda\507df320-a4f0-476a-b4ad-873ee84f6d3c\scratchpad\ensaio\dados-E4
+  metodo da verificacao: a massa so tem vendas ate ontem, entao o contador
+  'Vendas:' da tela de Historico (data = hoje) isola o que este ensaio criar.
+  comanda 01 com 2 itens; total: R$ 24,00 | vendas de hoje antes: 0
+  janela 'Encerrar comanda': total a pagar R$ 24,00; caixa 'cobranca aprovada' = Off (nao marcamos)
+  apos 'Voltar para a comanda': janela de encerramento fechada = True
+  total da comanda: R$ 24,00 | slot 01 na grade: R$ 24,00 | vendas de hoje: 0
+
+E4: PASSOU -- comanda 01 continua aberta com R$ 24,00 e as vendas de hoje seguem em 0 (nenhuma venda nova)
+
+========================================================================
+E5 - restaurar o backup valido e recusar o backup corrompido
+========================================================================
+Massa minima gerada para este ensaio em 7,5 s: %USERPROFILE%\AppData\Local\Temp\claude\C--Users-%USERNAME%-Desktop-VComanda\507df320-a4f0-476a-b4ad-873ee84f6d3c\scratchpad\ensaio\dados-E5
+  backup valido:     varthex-comanda-2026-09-21-144719.db
+  backup corrompido: varthex-comanda-2026-09-14-144719.db
+  estado alterado: comanda 01 aberta com R$ 18,00 (a massa tinha 5 comandas abertas)
+  linha selecionada na lista: varthex-comanda-2026-09-21-144719.db | %USERPROFILE%\AppData\Local\Temp\claude\C--Users-%USERNAME%-Desktop-VComanda\507df320-a4f0-476a-b4ad-873ee84f6d3c\scratchpad\ensaio\dados-E5\backups | 21/09/2026 11:47
+  confirmacao: Isso vai substituir todos os dados atuais pelo backup de 21/09/2026 14:47. Uma cópia de segurança da base atual será criada antes.
+  aviso: Backup restaurado com sucesso. O Varthex Comanda vai reiniciar agora.
+  o app reiniciou sozinho: PID 35260
+  o reinicio esta nos dados descartaveis: 'Iniciando Varthex Comanda' passou de 1 para 2 no log de <dados>\logs
+  apos a restauracao: 5 comandas abertas (massa: 5); comanda 01 = LIVRE
+
+  Parte B: o backup corrompido nao e oferecido na lista normal (so backups registrados).
+  Para exercitar a recusa pela interface sem caixa de dialogo de arquivo, o banco ATIVO
+  da pasta descartavel e corrompido de proposito: o app abre no modo de restauracao,
+  que lista os arquivos da pasta backups\ (inclusive o corrompido).
+  banco ativo corrompido de proposito; sha256 = 49cb9a57722009bfd287e6f9eadb6be4bf7f219f8d588a8574708019a313b4ad
+  faixa na tela: O banco de dados está corrompido. Restaure um backup para continuar. Nenhuma outra função está disponível.
+  mensagem de recusa na tela: Arquivo não encontrado ou não é um banco .db.
+  sha256 do banco ativo depois: 49cb9a57722009bfd287e6f9eadb6be4bf7f219f8d588a8574708019a313b4ad (inalterado = True)
+  o app continuou aberto no modo de restauracao: True
+
+E5: PASSOU -- valido restaurado pela tela (o app reiniciou e voltou a 5 comandas abertas); corrompido recusado com o banco ativo intacto (sha256 igual)
+
+========================================================================
+E6 (CT13, apoio) - o processo nao abre conexoes de rede
+========================================================================
+Massa minima gerada para este ensaio em 7,4 s: %USERPROFILE%\AppData\Local\Temp\claude\C--Users-%USERNAME%-Desktop-VComanda\507df320-a4f0-476a-b4ad-873ee84f6d3c\scratchpad\ensaio\dados-E6
+ATENCAO: esta e uma evidencia de APOIO. Nao substitui o ensaio com a rede
+fisica desligada no computador da loja (CT13 fica como teste manual).
+  sessao exercitada (5 telas + comanda 01 com 1 item)
+  Get-NetTCPConnection -OwningProcess 7492: 0 conexao(oes); remotas: 0
+  Get-NetUDPEndpoint -OwningProcess 7492: 0 ponto(s)
+  netstat -ano com o PID 7492: 0 linha(s)
+
+E6: PASSOU -- nenhuma conexao TCP remota e nenhum ponto UDP do PID durante a sessao (evidencia de apoio; nao substitui o teste sem rede fisica)
+
+========================================================================
+Resumo
+========================================================================
+Ensaio O que foi verificado                                 Resultado
+------------------------------------------------------------------------
+E1     RNF03 - abertura <= 5 s                              PASSOU
+E2     CT19 - instancia unica                               PASSOU
+E3     CT20 - nada se perde no termino forcado              PASSOU
+E4     CT09 - cobranca nao aprovada nao encerra a comanda   PASSOU
+E5     Restauracao de backup (valido e corrompido)          PASSOU
+E6     CT13 (apoio) - sem conexoes remotas                  PASSOU
+------------------------------------------------------------------------
+E1: media 1839 ms em 5 aberturas (maior 2546 ms)
+E2: aviso com a mensagem esperada; 1 janela principal; 2a instancia encerrou em 168 ms apos o OK; log com 1 abertura de banco
+E3: comanda 01 continua aberta com R$ 24,00; log 'Comandas abertas recuperadas: 6'; vendas de hoje seguem em 0
+E4: comanda 01 continua aberta com R$ 24,00 e as vendas de hoje seguem em 0 (nenhuma venda nova)
+E5: valido restaurado pela tela (o app reiniciou e voltou a 5 comandas abertas); corrompido recusado com o banco ativo intacto (sha256 igual)
+E6: nenhuma conexao TCP remota e nenhum ponto UDP do PID durante a sessao (evidencia de apoio; nao substitui o teste sem rede fisica)
+
+Nao automatizado neste script (motivo honesto, sem fingir aprovacao):
+  * E5 pela caixa "Selecionar arquivo...": o dialogo de arquivos do Windows expoe os
+    controles (nome do arquivo, botao Abrir) SEM padroes de UI Automation -
+    GetSupportedPatterns() volta vazio -, e preencher/clicar exigiria teclas ou
+    mensagens Win32, proibidas aqui. A recusa do backup corrompido foi verificada
+    pelo modo de restauracao, que lista os arquivos da pasta backups\.
+  * CT13 sem rede fisica, CT21 em Windows limpo e o teste com a maquininha real
+    continuam manuais (ver docs/homologacao).
+
+Limpeza: removendo a instalacao temporaria e as pastas de dados descartaveis.
+
+Codigo de saida: 0

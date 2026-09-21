@@ -93,3 +93,8 @@ Publica em `win-x64`, autocontido, e cria `artifacts\VarthexComanda-1.0.0-win-x6
 - Situação de cada CT: [resultados-ct.md](resultados-ct.md).
 - Situação de cada item da Etapa 8: [checklist-etapa8.md](checklist-etapa8.md).
 - Quando a pessoa executar o [roteiro](roteiro-ensaio-manual.md), o "Resultado obtido / Situação / Evidência" de cada passo deve ser copiado para `resultados-ct.md` e para o checklist. Só então um item pode passar para "Feito".
+
+## Evidências dos ensaios
+
+- `evidencias/ensaio-2026-09-21.txt` — primeira execução completa (E1–E6 passaram; média de abertura 1736 ms), usada como referência nos demais documentos.
+- `evidencias/ensaio-2026-09-21-reexecucao.txt` — reexecução contra o código final da branch, depois dos ajustes da revisão final (E1–E6 passaram de novo; média de abertura 1839 ms). Ambas foram feitas na máquina de desenvolvimento, com dados descartáveis.
