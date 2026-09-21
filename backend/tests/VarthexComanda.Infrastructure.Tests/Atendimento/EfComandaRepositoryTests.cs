@@ -38,6 +38,7 @@ public class EfComandaRepositoryTests : IDisposable
     }
 
     [Fact]
+    [Trait("Caso", "CT01")]
     public void AbrirComanda_NumeroLivre_CriaComandaAberta()
     {
         var repositorio = new EfComandaRepository(_fabrica);
@@ -50,6 +51,7 @@ public class EfComandaRepositoryTests : IDisposable
     }
 
     [Fact]
+    [Trait("Caso", "CT02")]
     public void AbrirComanda_MesmoNumeroDuasVezes_SegundaLancaExcecao()
     {
         var repositorio = new EfComandaRepository(_fabrica);
@@ -119,6 +121,7 @@ public class EfComandaRepositoryTests : IDisposable
     }
 
     [Fact]
+    [Trait("Caso", "CT03")]
     public void AdicionarItem_MesmoProdutoMesmoPreco_IncrementaQuantidadeEmVezDeDuplicar()
     {
         var repositorio = new EfComandaRepository(_fabrica);
@@ -133,6 +136,7 @@ public class EfComandaRepositoryTests : IDisposable
     }
 
     [Fact]
+    [Trait("Caso", "CT04")]
     public void AdicionarItem_MesmoProdutoPrecoDiferente_CriaLinhaNova()
     {
         var repositorio = new EfComandaRepository(_fabrica);
@@ -151,6 +155,7 @@ public class EfComandaRepositoryTests : IDisposable
     }
 
     [Fact]
+    [Trait("Caso", "CT05")]
     public void AlterarQuantidade_ItemExistente_RecalculaSubtotalETotal()
     {
         var repositorio = new EfComandaRepository(_fabrica);
@@ -236,6 +241,7 @@ public class EfComandaRepositoryTests : IDisposable
     }
 
     [Fact]
+    [Trait("Caso", "CT10")]
     public void EncerrarComanda_ComandaAberta_GravaVendaEFechaComanda()
     {
         var repositorio = new EfComandaRepository(_fabrica);

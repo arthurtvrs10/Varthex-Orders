@@ -49,6 +49,7 @@ public class EfBackupServiceTests : IDisposable
     }
 
     [Fact]
+    [Trait("Caso", "CT14")]
     public void CriarBackupGerenciado_CriaArquivoDbEChecksumECompanheiro()
     {
         var relogio = new FakeClockDeIntegracao();
@@ -77,6 +78,7 @@ public class EfBackupServiceTests : IDisposable
     }
 
     [Fact]
+    [Trait("Caso", "CT14")]
     public void CriarBackupGerenciado_BackupPassaNaVerificacaoDeIntegridade()
     {
         var relogio = new FakeClockDeIntegracao();
@@ -127,6 +129,7 @@ public class EfBackupServiceTests : IDisposable
     }
 
     [Fact]
+    [Trait("Caso", "CT14")]
     public void Validar_ArquivoValido_TodasAsChecagensPassam()
     {
         var relogio = new FakeClockDeIntegracao();
@@ -195,6 +198,7 @@ public class EfBackupServiceTests : IDisposable
     }
 
     [Fact]
+    [Trait("Caso", "CT15")]
     public void Validar_ArquivoCorrompido_FalhaNaIntegridade()
     {
         var relogio = new FakeClockDeIntegracao();
@@ -283,6 +287,7 @@ public class EfBackupServiceTests : IDisposable
     }
 
     [Fact]
+    [Trait("Caso", "CT15")]
     public void RestaurarPara_ArquivoInvalido_NaoAlteraABaseAtiva()
     {
         var relogio = new FakeClockDeIntegracao();
@@ -468,6 +473,7 @@ public class EfBackupServiceTests : IDisposable
     }
 
     [Fact]
+    [Trait("Caso", "CT15")]
     public void RestaurarPara_ArquivoCorrompidoComoOrigem_ContinuaFalhandoESemAlterarABaseAtiva()
     {
         var relogio = new FakeClockDeIntegracao();

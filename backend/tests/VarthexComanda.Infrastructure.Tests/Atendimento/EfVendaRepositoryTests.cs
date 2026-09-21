@@ -53,6 +53,7 @@ public class EfVendaRepositoryTests : IDisposable
     }
 
     [Fact]
+    [Trait("Caso", "CT12")]
     public void ListarPorData_VendaDentroDoIntervalo_RetornaComNumeroDaComanda()
     {
         var venda = CriarVendaConcluida(10, new DateTime(2026, 9, 18, 14, 0, 0, DateTimeKind.Utc));
@@ -120,6 +121,7 @@ public class EfVendaRepositoryTests : IDisposable
     }
 
     [Fact]
+    [Trait("Caso", "CT12")]
     public void BuscarItensDaVenda_VendaExistente_RetornaItensDaComandaOriginal()
     {
         var venda = CriarVendaConcluida(10, new DateTime(2026, 9, 18, 14, 0, 0, DateTimeKind.Utc));

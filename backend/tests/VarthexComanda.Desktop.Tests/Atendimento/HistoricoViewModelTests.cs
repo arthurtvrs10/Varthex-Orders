@@ -32,6 +32,7 @@ public class HistoricoViewModelTests
     }
 
     [Fact]
+    [Trait("Caso", "CT18")]
     public void Resumo_DuasVendas_CalculaQuantidadeTotalETicketMedio()
     {
         var relogio = new FakeClock { UtcNow = new DateTime(2026, 9, 18, 14, 0, 0, DateTimeKind.Utc) };
@@ -97,6 +98,7 @@ public class HistoricoViewModelTests
     }
 
     [Fact]
+    [Trait("Caso", "CT12")]
     public void SelecionarVenda_PopulaItensDaVendaSelecionada()
     {
         var relogio = new FakeClock { UtcNow = new DateTime(2026, 9, 18, 14, 0, 0, DateTimeKind.Utc) };

@@ -31,6 +31,7 @@ public class LoggingConfiguratorTests
 
     // CT22, RNF21
     [Fact]
+    [Trait("Caso", "CT22")]
     public void CreateLogger_RolaPorTamanho()
     {
         var logsDir = NovaPasta();
@@ -57,6 +58,7 @@ public class LoggingConfiguratorTests
 
     // CT22, RNF21
     [Fact]
+    [Trait("Caso", "CT22")]
     public void CreateLogger_RetemNoMaximoNArquivos()
     {
         var logsDir = NovaPasta();

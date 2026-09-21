@@ -10,6 +10,7 @@ namespace VarthexComanda.Application.Tests.Atendimento;
 public class AlterarQuantidadeTests
 {
     [Fact]
+    [Trait("Caso", "CT05")]
     public void Executar_QuantidadeValida_RecalculaSubtotalETotal()
     {
         var comandas = new FakeComandaRepository();
@@ -30,6 +31,7 @@ public class AlterarQuantidadeTests
     }
 
     [Fact]
+    [Trait("Caso", "CT06")]
     public void Executar_QuantidadeZeroOuNegativa_Falha()
     {
         var caso = new AlterarQuantidade(new FakeComandaRepository(), new FakeClock());
