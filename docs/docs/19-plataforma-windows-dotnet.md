@@ -128,10 +128,10 @@ Enquanto a arquitetura final estiver pendente (QV07), usa-se `win-x64`. O comand
 .\scripts\publicar.ps1            # opcional: -Saida <pasta>
 ```
 
-O script lê a versão do `<Version>` de `VarthexComanda.Desktop.csproj` (fonte única; `AssemblyVersion`, `FileVersion` e `InformationalVersion` ficam no mesmo arquivo), executa `dotnet publish` em `Release`, `win-x64`, `--self-contained true`, sem `PublishSingleFile` e sem trimming, e monta o pacote. Saídas (a pasta `artifacts/` é ignorada pelo Git):
+O script lê a versão do `<Version>` de `VarthexComanda.Desktop.csproj` (fonte única; `AssemblyVersion`, `FileVersion` e `InformationalVersion` ficam no mesmo arquivo), executa `dotnet publish` em `Release`, `win-x64`, `--self-contained true`, sem `PublishSingleFile`, sem trimming e sem arquivos `.pdb` (`-p:DebugType=none`, para não distribuir caminhos absolutos da máquina de build), e monta o pacote. A pasta `artifacts\publish\win-x64` é apagada a cada publicação; os `.zip` de versões anteriores **acumulam** em `artifacts\` e devem ser apagados à mão. Saídas (a pasta `artifacts/` é ignorada pelo Git):
 
 - `artifacts\publish\win-x64\` — pasta publicada, com `VarthexComanda.exe` (`AssemblyName = VarthexComanda`);
-- `artifacts\VarthexComanda-<versão>-win-x64.zip` — a pasta publicada mais `Instalar.cmd`, `Instalar.ps1`, `Desinstalar.ps1` e `LEIAME.txt` (de `scripts\pacote\`) na raiz do zip. Para a versão 1.0.0: cerca de 64 MB e cerca de 430 arquivos.
+- `artifacts\VarthexComanda-<versão>-win-x64.zip` — a pasta publicada mais `Instalar.cmd`, `Instalar.ps1`, `Desinstalar.cmd`, `Desinstalar.ps1` e `LEIAME.txt` (de `scripts\pacote\`) na raiz do zip. Para a versão 1.0.0: cerca de 64 MB e cerca de 430 arquivos.
 
 Manter múltiplos arquivos na primeira versão simplifica o diagnóstico das bibliotecas nativas do SQLite. O pacote deve ser testado em um Windows limpo sem SDK nem runtime do .NET (CT21) — **ainda pendente**; hoje só se verificou, numa máquina de desenvolvimento, que uma cópia instalada abre sem `dotnet` no `PATH`.
 

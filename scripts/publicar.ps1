@@ -6,9 +6,12 @@
     1. Le a versao do <Version> do VarthexComanda.Desktop.csproj.
     2. dotnet publish Release win-x64 --self-contained (multi-arquivo, sem
        PublishSingleFile e sem trimming) em <Saida>\publish\win-x64.
+       Nao inclui arquivos .pdb (-p:DebugType=none). A pasta publish\win-x64 e
+       apagada a cada execucao.
     3. Monta <Saida>\VarthexComanda-<versao>-win-x64.zip com os arquivos
-       publicados + Instalar.cmd, Instalar.ps1, Desinstalar.ps1 e LEIAME.txt
-       na raiz do zip.
+       publicados + Instalar.cmd, Instalar.ps1, Desinstalar.cmd,
+       Desinstalar.ps1 e LEIAME.txt na raiz do zip. Os .zip de versoes
+       anteriores continuam em <Saida> (acumulam; apague os antigos a mao).
 
 .PARAMETER Saida
     Pasta de saida (padrao: <raiz do repositorio>\artifacts).
@@ -23,7 +26,7 @@ $ErrorActionPreference = 'Stop'
 
 $raiz = Split-Path -Parent $PSScriptRoot
 if (-not $Saida) { $Saida = Join-Path $raiz 'artifacts' }
-$Saida = [IO.Path]::GetFullPath($Saida)
+$Saida = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath([Environment]::ExpandEnvironmentVariables($Saida.Trim().Trim('"')))
 
 $csproj = Join-Path $raiz 'backend\src\VarthexComanda.Desktop\VarthexComanda.Desktop.csproj'
 $pastaPacote = Join-Path $PSScriptRoot 'pacote'
@@ -56,7 +59,7 @@ if (Test-Path -LiteralPath $pastaPublicacao) {
     Remove-Item -LiteralPath $pastaPublicacao -Recurse -Force
 }
 
-& $dotnet publish $csproj -c Release -r win-x64 --self-contained true -o $pastaPublicacao -p:PublishSingleFile=false -p:PublishTrimmed=false
+& $dotnet publish $csproj -c Release -r win-x64 --self-contained true -o $pastaPublicacao -p:PublishSingleFile=false -p:PublishTrimmed=false -p:DebugType=none
 if ($LASTEXITCODE -ne 0) { throw "dotnet publish falhou (codigo $LASTEXITCODE)." }
 
 if (-not (Test-Path -LiteralPath (Join-Path $pastaPublicacao 'VarthexComanda.exe'))) {
@@ -81,7 +84,7 @@ function Add-ArquivosAoZip($zip, [string]$pasta) {
 $zip = [IO.Compression.ZipFile]::Open($arquivoZip, [IO.Compression.ZipArchiveMode]::Create)
 try {
     Add-ArquivosAoZip $zip $pastaPublicacao
-    foreach ($nomeArq in 'Instalar.cmd', 'Instalar.ps1', 'Desinstalar.ps1', 'LEIAME.txt') {
+    foreach ($nomeArq in 'Instalar.cmd', 'Instalar.ps1', 'Desinstalar.cmd', 'Desinstalar.ps1', 'LEIAME.txt') {
         $origem = Join-Path $pastaPacote $nomeArq
         if (-not (Test-Path -LiteralPath $origem)) { throw "Arquivo do pacote ausente: $origem" }
         [void][IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $origem, $nomeArq, [IO.Compression.CompressionLevel]::Optimal)

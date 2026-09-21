@@ -11,6 +11,7 @@ public class VersaoDoAplicativoTests
     [Fact]
     public void Atual_E1Ponto0Ponto0_SemSufixoDeRevisao()
     {
+        // Constante intencional: ao mudar <Version> no csproj, atualize aqui de proposito.
         Assert.Equal("1.0.0", VersaoDoAplicativo.Atual);
     }
 
@@ -22,6 +23,7 @@ public class VersaoDoAplicativoTests
             new ObterConfiguracao(repositorio),
             new SalvarConfiguracao(repositorio, new FakeClock()));
 
-        Assert.Equal("Versão 1.0.0", viewModel.VersaoTexto);
+        Assert.Matches(@"^\d+\.\d+\.\d+$", VersaoDoAplicativo.Atual);
+        Assert.Equal($"Versão {VersaoDoAplicativo.Atual}", viewModel.VersaoTexto);
     }
 }

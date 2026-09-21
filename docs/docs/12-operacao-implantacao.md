@@ -13,13 +13,15 @@
 9. executar teste completo offline;
 10. registrar versão instalada.
 
-O usuário não precisa instalar o SDK do .NET. A implantação usa o **pacote autocontido** `VarthexComanda-<versão>-win-x64.zip` (gerado por `scripts\publicar.ps1`, veja o documento 19), que traz o runtime do .NET e os scripts `Instalar.cmd`, `Instalar.ps1` e `Desinstalar.ps1`. Um instalador `.msi`/Inno Setup/WiX não foi adotado; fica para quando atualização e distribuição estiverem estabilizadas.
+O usuário não precisa instalar o SDK do .NET. A implantação usa o **pacote autocontido** `VarthexComanda-<versão>-win-x64.zip` (gerado por `scripts\publicar.ps1`, veja o documento 19), que traz o runtime do .NET e os scripts `Instalar.cmd`, `Instalar.ps1`, `Desinstalar.cmd` e `Desinstalar.ps1`. Um instalador `.msi`/Inno Setup/WiX não foi adotado; fica para quando atualização e distribuição estiverem estabilizadas.
 
 ### Procedimento com o pacote
 
 1. Copie o `.zip` para o computador, extraia-o **inteiro** numa pasta e dê dois cliques em `Instalar.cmd` (sem administrador). O script copia os arquivos para `%LOCALAPPDATA%\Programs\VarthexComanda`, grava `versao-instalada.txt` nessa pasta e cria o atalho `Varthex Comanda` na Área de Trabalho e no Menu Iniciar.
-2. Para outra pasta ou sem atalhos, execute no PowerShell `.\Instalar.ps1 -Destino "<pasta>" -SemAtalhos` (os dois parâmetros são opcionais e independentes).
+2. Para outra pasta ou sem atalhos, execute no Prompt de Comando ou no PowerShell, dentro da pasta extraída, `.\Instalar.cmd -Destino "<pasta>" -SemAtalhos` (os dois parâmetros são opcionais e independentes; o destino deve ser uma pasta local dedicada ao programa, nunca um caminho de rede, e os scripts recusam destinos perigosos como a raiz do disco, o perfil do usuário e a pasta de dados). `-WhatIf` simula sem alterar nada.
 3. Abra o aplicativo pelo atalho e siga os passos manuais abaixo.
+
+**Uma instalação e um conjunto de dados por conta do Windows.** O programa (`%LOCALAPPDATA%\Programs\VarthexComanda`) e os dados (`%LOCALAPPDATA%\VarthexComanda`) ficam no perfil de quem instalou. Com duas contas do Windows no mesmo computador, cada conta tem a sua própria instalação e o seu próprio banco, separado e vazio no começo; os dados de uma conta não aparecem na outra. Definir se o computador é compartilhado é a pendência aberta QV12 (documento 13).
 
 Correspondência com os 10 passos:
 
@@ -76,13 +78,13 @@ Com o pacote:
 
 1. feche o Varthex Comanda (o instalador recusa continuar com o aplicativo aberto);
 2. extraia o pacote da versão nova e execute `Instalar.cmd`;
-3. o script mostra "Atualizando de X para Y" (X vem de `versao-instalada.txt` da instalação existente, ou da versão do executável se o arquivo não existir), move a instalação atual para `%LOCALAPPDATA%\Programs\VarthexComanda.anterior` (uma só cópia, substituída a cada atualização), copia os arquivos novos, regrava `versao-instalada.txt` e recria os atalhos;
+3. o script mostra "Atualizando de X para Y" (X vem de `versao-instalada.txt` da instalação existente, ou da versão do executável se o arquivo não existir), move a instalação atual para `%LOCALAPPDATA%\Programs\VarthexComanda.anterior` (uma só cópia, substituída a cada atualização; se já existir uma pasta com esse nome que não contenha `VarthexComanda.exe`, o script recusa e não apaga nada até que ela seja renomeada ou removida), copia os arquivos novos, regrava `versao-instalada.txt` e recria os atalhos;
 4. os dados em `%LOCALAPPDATA%\VarthexComanda` não são tocados; as migrações do banco ocorrem na primeira abertura da versão nova (com cópia preventiva, se houver migração pendente);
 5. faça os testes do passo 5 acima.
 
-**Retorno manual** (não há atualização nem retorno automáticos): se a versão nova apresentar problema, feche o aplicativo; renomeie `%LOCALAPPDATA%\Programs\VarthexComanda` para `VarthexComanda.defeituosa`; renomeie `VarthexComanda.anterior` para `VarthexComanda`; abra pelo atalho. Se a versão nova já migrou o banco, restaure um backup feito antes da atualização (tela de Configurações). `Desinstalar.ps1` também apaga a pasta `.anterior`; faça o retorno antes de desinstalar.
+**Retorno manual** (não há atualização nem retorno automáticos): se a versão nova apresentar problema, feche o aplicativo; renomeie `%LOCALAPPDATA%\Programs\VarthexComanda` para `VarthexComanda.defeituosa`; renomeie `VarthexComanda.anterior` para `VarthexComanda`; abra pelo atalho. Se a versão nova já migrou o banco, restaure um backup feito antes da atualização (tela de Configurações). `Desinstalar.cmd` também apaga a pasta `.anterior`; faça o retorno antes de desinstalar.
 
-**Desinstalar:** `.\Desinstalar.ps1` (parâmetro opcional `-Destino`) recusa continuar com o aplicativo aberto, ou sem nenhuma instalação encontrada; remove a pasta do programa, a cópia `.anterior` e os atalhos "Varthex Comanda" que apontam para essa instalação; nunca remove a pasta de dados.
+**Desinstalar:** `Desinstalar.cmd` (dois cliques; parâmetro opcional `-Destino`, por exemplo `.\Desinstalar.cmd -Destino "<pasta>"`) recusa continuar com o aplicativo aberto, ou sem nenhuma instalação encontrada; remove a pasta do programa **inteira** (não guarde arquivos próprios nela), a cópia `.anterior` e os atalhos "Varthex Comanda" que apontam para essa instalação; nunca remove a pasta de dados.
 
 ## Diagnóstico
 

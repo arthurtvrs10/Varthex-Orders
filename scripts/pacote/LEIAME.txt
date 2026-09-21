@@ -12,8 +12,12 @@ o .NET nem qualquer outro programa. Não exige conta de administrador.
          %LOCALAPPDATA%\Programs\VarthexComanda
      e são criados atalhos "Varthex Comanda" na Área de Trabalho e no
      Menu Iniciar.
-   - Para instalar em outra pasta ou sem atalhos, use o PowerShell:
-         .\Instalar.ps1 -Destino "C:\Pasta\Outra" -SemAtalhos
+   - Para instalar em outra pasta ou sem atalhos, abra o Prompt de Comando ou
+     o PowerShell dentro da pasta extraída e execute:
+         .\Instalar.cmd -Destino "C:\Pasta\Outra" -SemAtalhos
+     (os dois parâmetros são opcionais; use uma pasta local e dedicada ao
+     programa, não uma pasta de rede)
+   - Para só simular, sem alterar nada: .\Instalar.cmd -WhatIf
 
 2) ONDE FICAM OS DADOS
    Comandas, produtos, vendas, fotos e backups ficam em:
@@ -22,6 +26,13 @@ o .NET nem qualquer outro programa. Não exige conta de administrador.
    (Para apagar os dados é preciso excluir essa pasta manualmente, e só faça
    isso se tiver certeza de que possui um backup.)
 
+   ATENÇÃO - uma instalação e um conjunto de dados POR CONTA DO WINDOWS:
+   tanto o programa quanto os dados ficam em %LOCALAPPDATA%, que é diferente
+   para cada usuário do Windows. Se duas contas do Windows usarem o
+   computador, cada uma terá a sua própria instalação e o seu próprio banco
+   de dados, separado e vazio no começo. Os dados de uma conta não aparecem na
+   outra. (Pendência de validação QV12: definir se o computador é compartilhado.)
+
 3) COMO ATUALIZAR
    - Feche o Varthex Comanda.
    - Extraia o pacote da versão nova e dê dois cliques em "Instalar.cmd".
@@ -29,21 +40,25 @@ o .NET nem qualquer outro programa. Não exige conta de administrador.
      programa e mantém os seus dados.
    - A versão anterior fica guardada em uma pasta ao lado, com o nome
      "VarthexComanda.anterior" (só a última versão é mantida; ela é
-     substituída a cada atualização).
+     substituída a cada atualização). Se já existir uma pasta com esse nome
+     que não seja uma cópia do Varthex Comanda, o instalador recusa e não
+     apaga nada: renomeie ou remova essa pasta e tente de novo.
    - A versão instalada fica registrada em "versao-instalada.txt" na pasta do
      programa e aparece no rodapé da tela Configurações.
 
 4) COMO DESINSTALAR
    - Feche o Varthex Comanda.
-   - Na pasta do programa (%LOCALAPPDATA%\Programs\VarthexComanda) ou neste
-     pacote, execute no PowerShell:
-         .\Desinstalar.ps1
-     (ou, se instalou em outra pasta: .\Desinstalar.ps1 -Destino "C:\Pasta\Outra")
-   - São removidos o programa, a cópia ".anterior" e os atalhos. Os dados
-     em %LOCALAPPDATA%\VarthexComanda continuam intactos.
+   - Dê dois cliques em "Desinstalar.cmd", na pasta do programa
+     (%LOCALAPPDATA%\Programs\VarthexComanda) ou neste pacote.
+     Se instalou em outra pasta, execute no Prompt de Comando ou no
+     PowerShell:
+         .\Desinstalar.cmd -Destino "C:\Pasta\Outra"
+   - É removida a pasta do programa INTEIRA (não guarde arquivos seus dentro
+     dela), a cópia ".anterior" e os atalhos. Os dados em
+     %LOCALAPPDATA%\VarthexComanda continuam intactos.
 
 5) COMO VOLTAR PARA A VERSÃO ANTERIOR (retorno)
-   Se a versão nova apresentar problema:
+   Se a versão nova apresentar problema (faça isso ANTES de desinstalar):
    - Feche o Varthex Comanda.
    - Renomeie a pasta "VarthexComanda" (em %LOCALAPPDATA%\Programs) para
      "VarthexComanda.defeituosa".
@@ -57,5 +72,5 @@ o .NET nem qualquer outro programa. Não exige conta de administrador.
 6) SE O INSTALADOR RECUSAR
    - "Feche o Varthex Comanda e tente de novo.": o aplicativo está aberto.
    - "Destino recusado": a pasta escolhida é perigosa (raiz do disco, sua
-     pasta de usuário, a pasta de dados etc.) ou não parece uma instalação do
-     Varthex Comanda. Escolha uma pasta dedicada e vazia.
+     pasta de usuário, a pasta de dados, pasta de rede etc.) ou não parece uma
+     instalação do Varthex Comanda. Escolha uma pasta dedicada e vazia.

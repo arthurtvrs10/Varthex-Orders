@@ -42,7 +42,7 @@ O aplicativo é entregue como um pacote `.zip` **autocontido** (`win-x64`): já
 inclui o runtime do .NET, então quem usa **não precisa instalar o .NET nem o
 SDK**, e a instalação não exige conta de administrador. O pacote não é um
 instalador `.msi`/`.exe`: são scripts (`Instalar.cmd`, `Instalar.ps1`,
-`Desinstalar.ps1`) que acompanham os arquivos do programa.
+`Desinstalar.cmd`, `Desinstalar.ps1`) que acompanham os arquivos do programa.
 
 **Gerar o pacote** (na máquina de desenvolvimento, que precisa do SDK do .NET 10):
 
@@ -53,7 +53,9 @@ instalador `.msi`/`.exe`: são scripts (`Instalar.cmd`, `Instalar.ps1`,
 Isso lê a versão do `<Version>` do `VarthexComanda.Desktop.csproj`, publica em
 `artifacts\publish\win-x64` e gera `artifacts\VarthexComanda-<versão>-win-x64.zip`
 (hoje `VarthexComanda-1.0.0-win-x64.zip`, cerca de 64 MB). O parâmetro opcional
-`-Saida <pasta>` troca a pasta `artifacts`.
+`-Saida <pasta>` troca a pasta `artifacts`. A pasta `artifacts\publish\win-x64`
+é apagada a cada publicação; já os `.zip` de versões anteriores **acumulam** em
+`artifacts` (apague os antigos à mão). Os arquivos `.pdb` não entram no pacote.
 
 **Instalar** (no computador do balcão):
 
@@ -62,14 +64,17 @@ Isso lê a versão do `<Version>` do `VarthexComanda.Desktop.csproj`, publica em
 3. O programa vai para `%LOCALAPPDATA%\Programs\VarthexComanda` e são criados
    os atalhos "Varthex Comanda" na Área de Trabalho e no Menu Iniciar. Para outra
    pasta ou sem atalhos, use no PowerShell:
-   `.\Instalar.ps1 -Destino "C:\Pasta\Outra" -SemAtalhos`.
+   `.\Instalar.cmd -Destino "C:\Pasta\Outra" -SemAtalhos` (também aceita
+   `-WhatIf`, para simular sem alterar nada).
 
 **Atualizar:** feche o app, extraia o pacote novo e execute `Instalar.cmd`
 de novo. Só os arquivos do programa são trocados; a versão anterior fica em
 `%LOCALAPPDATA%\Programs\VarthexComanda.anterior` para o retorno manual.
 
-**Desinstalar:** `.\Desinstalar.ps1` (no PowerShell, na pasta do programa ou do
-pacote) remove o programa, a cópia `.anterior` e os atalhos.
+**Desinstalar:** dê dois cliques em `Desinstalar.cmd` (na pasta do programa ou do
+pacote; para outro destino, `.\Desinstalar.cmd -Destino "C:\Pasta\Outra"`). Remove
+a pasta do programa **inteira** (não guarde arquivos seus ali), a cópia `.anterior`
+e os atalhos.
 
 **Os dados ficam separados do programa** (veja [Onde ficam os
 dados](#onde-ficam-os-dados)): atualizar e desinstalar **nunca** apagam
