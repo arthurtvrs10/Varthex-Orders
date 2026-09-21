@@ -71,11 +71,13 @@ public static class MassaMinimaGerador
 
         if (Directory.Exists(raiz))
         {
-            LimparSubpastasDoAplicativo(raiz); // so chega aqui vazia ou com --forcar
+            LimparSubpastasDoAplicativo(raiz); // so chega aqui vazia, ou com --forcar numa pasta com o marcador
         }
 
         var paths = new AppPaths(raiz);
         paths.EnsureCreated();
+        File.WriteAllText(Path.Combine(raiz, SegurancaDaSaida.NomeDoMarcador),
+            "Pasta gerada por VarthexComanda.MassaMinima (dados de homologacao descartaveis)." + Environment.NewLine);
 
         var fabrica = new FabricaDeContexto(paths.DatabasePath);
         var relogio = new RelogioDoGerador { UtcNow = agora };
@@ -458,12 +460,14 @@ public static class MassaMinimaGerador
 
     private static void LimparSubpastasDoAplicativo(string raiz)
     {
-        // --forcar: apaga apenas os quatro subdiretorios que o proprio aplicativo cria (nada mais na pasta)
+        // --forcar: apaga apenas os quatro subdiretorios que o proprio aplicativo cria (nada mais na pasta) e
+        // SOMENTE se a pasta tem o marcador de pasta gerada por esta ferramenta (segunda barreira, alem de ValidarOuRecusar)
         foreach (var nome in new[] { "data", "logs", "backups", "fotos" })
         {
             var caminho = Path.Combine(raiz, nome);
             if (Directory.Exists(caminho))
             {
+                SegurancaDaSaida.ExigirMarcadorParaLimpar(raiz);
                 Directory.Delete(caminho, recursive: true);
             }
         }

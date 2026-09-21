@@ -4,7 +4,7 @@ Esta pasta reúne tudo o que a Etapa 8 do [guia de implementação](../docs/14-g
 
 Versão do aplicativo homologada: **1.0.0** (pacote `VarthexComanda-1.0.0-win-x64.zip`, cerca de 64 MB, autocontido). Data das evidências: 2026-09-21.
 
-> **Estado em uma frase:** a parte automatizável está provada (554 testes verdes e seis ensaios com o aplicativo real, todos aprovados); **a homologação humana ainda não aconteceu**. Falta o computador da loja (QV07), o teste sem rede física (CT13), a instalação num Windows limpo (CT21), a maquininha de verdade, o treinamento dos operadores e as respostas do responsável (QV01–QV14). Nada aqui autoriza dizer que o sistema está "homologado".
+> **Estado em uma frase:** a parte automatizável está provada (559 testes verdes e seis ensaios com o aplicativo real, todos aprovados); **a homologação humana ainda não aconteceu**. Falta o computador da loja (QV07), o teste sem rede física (CT13), a instalação num Windows limpo (CT21), a maquininha de verdade, o treinamento dos operadores e as respostas do responsável (QV01–QV14). Nada aqui autoriza dizer que o sistema está "homologado".
 
 ## Índice
 
@@ -31,7 +31,7 @@ Todos os comandos partem da raiz do repositório e exigem o SDK do .NET (somente
 dotnet test backend\VarthexComanda.slnx
 ```
 
-Resultado da última execução: **554 testes, 0 falhas** (Domain 4, Application 85, Infrastructure 250, Desktop 215).
+Resultado da última execução: **559 testes, 0 falhas** (Domain 4, Application 85, Infrastructure 254, Desktop 216).
 
 ### 2. Rastreabilidade dos casos (CT → testes)
 
@@ -58,7 +58,7 @@ dotnet run --project backend\tools\VarthexComanda.MassaMinima -- --saida C:\Homo
 ```
 
 - A ferramenta **recusa** a pasta real de dados (`%LOCALAPPDATA%\VarthexComanda`), a pasta do perfil, raízes de disco e qualquer pasta que contenha a real.
-- Recusa pasta não vazia sem `--forcar` (que só apaga os quatro subdiretórios `data`, `logs`, `backups` e `fotos`).
+- Recusa pasta não vazia sem `--forcar`; `--forcar` só vale em pasta que a própria ferramenta criou (marcador `.varthex-massa-minima` na raiz) e só apaga os quatro subdiretórios `data`, `logs`, `backups` e `fotos`. Recusa também Documentos, Área de Trabalho, Imagens, Músicas, Vídeos, Downloads, o perfil do usuário e os pais/raiz dessas pastas, e caminhos que passem por junction/atalho para a pasta real dos dados.
 - `--agora <data UTC ISO>` fixa a data de referência (o padrão é agora).
 
 Para usar a massa no aplicativo, defina `VARTHEX_COMANDA_DADOS` com a pasta gerada antes de abri-lo (veja o [roteiro](roteiro-ensaio-manual.md)).

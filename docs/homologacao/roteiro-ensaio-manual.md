@@ -169,7 +169,7 @@ Evidência: ______________________________________________
 
 Critério: com o aplicativo aberto, uma nova execução mostra aviso e não abre outra janela nem outra conexão com a base.
 
-- [ ] Com o aplicativo aberto (`Varthex-TESTE.cmd`), abrir **o mesmo programa** outra vez (dois cliques no `Varthex-TESTE.cmd`; também tente o atalho normal do Menu Iniciar).
+- [ ] Com o aplicativo aberto (`Varthex-TESTE.cmd`), abrir **o mesmo programa** outra vez (dois cliques no `Varthex-TESTE.cmd`). **Não use o atalho do Menu Iniciar**: ele abre sem `VARTHEX_COMANDA_DADOS` e apontaria para os dados reais da loja. Se quiser conferir que o atalho também mostra o aviso, faça isso só num computador de teste, com a primeira instância comprovadamente aberta.
 - [ ] Aparece o aviso: **"O Varthex Comanda já está aberto neste computador."**
 - [ ] Depois de clicar em OK, continua existindo **uma única janela** do Varthex Comanda (barra de tarefas) e o Gerenciador de Tarefas (aba Detalhes) mostra um único `VarthexComanda.exe`.
 - [ ] O aplicativo original continua funcionando normalmente.
@@ -206,7 +206,7 @@ Complementa o CT20 e o RNF05: o que a loja realmente vai enfrentar numa queda de
 - [ ] **Sem fechar o aplicativo**, reiniciar o Windows (Iniciar > Reiniciar; se aparecer aviso de aplicativo aberto, escolha reiniciar mesmo assim).
 - [ ] Depois de reiniciar, abrir o `Varthex-TESTE.cmd`.
 - [ ] A comanda continua aberta com os mesmos itens e o mesmo total; nenhuma venda foi criada.
-- [ ] (Opcional, apenas se os dados forem descartáveis) Repetir desligando o computador pelo botão de energia, para simular queda de energia.
+- [ ] (Opcional, **só numa máquina virtual ou computador de teste** — nunca no computador de produção da loja) Repetir desligando pelo botão de energia, para simular queda de energia.
 
 Resultado obtido: ______________________________________________
 Situação: [ ] Aprovado  [ ] Reprovado  [ ] Bloqueado

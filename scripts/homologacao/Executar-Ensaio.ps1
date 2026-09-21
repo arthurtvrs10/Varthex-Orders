@@ -18,7 +18,11 @@
     diferente de zero se algum ensaio falhar.
 
     SEGURANCA (ver tambem Ajuda.ps1):
-    * aborta se ja houver VarthexComanda em execucao (pode ser o app do usuario);
+    * aborta se ja houver VarthexComanda em execucao (pode ser o app do usuario):
+      Assert-SemAppEmExecucao roda antes de TODA abertura, exceto a segunda instancia
+      do E2 (proposital: precisa haver uma primeira, propria, em execucao) e o reinicio
+      automatico do E5 (feito pelo proprio app; validado pelo log 'Iniciando' na pasta
+      de dados descartavel antes de qualquer interacao);
     * so encerra PIDs que este script iniciou;
     * o app so roda com VARTHEX_COMANDA_DADOS numa pasta descartavel dentro de
       -Saida, conferida antes de cada abertura;
@@ -277,8 +281,11 @@ function Ensaio-E3 {
 
     Registrar "  Stop-Process -Force no PID $($processo.Id) (termino forcado, sem OnExit)"
     [void](Stop-AppProprio -ProcessId $processo.Id -Forcado)
+    if (-not (Wait-SaidaDoProcesso $processo.Id 15)) { throw "O PID proprio $($processo.Id) nao encerrou apos o termino forcado." }
     Start-Sleep -Milliseconds 800
 
+    # o processo proprio saiu: qualquer VarthexComanda que apareca agora nao e nosso -> aborta
+    Assert-SemAppEmExecucao
     $processo2 = Start-App -Exe $script:Exe -PastaDados $dados -RaizPermitida $Saida
     $janela2 = Wait-JanelaPrincipal -Processo $processo2
     Start-Sleep -Milliseconds 1200
@@ -385,6 +392,7 @@ function Ensaio-E5 {
     $confirmacao = Wait-Janela -ProcessId $processo.Id -Titulo 'Restaurar backup' -Segundos 15
     if (-not $confirmacao) { throw 'A confirmacao "Restaurar backup" nao apareceu.' }
     Registrar "  confirmacao: $((@(Get-TextosDe $confirmacao) | Where-Object { $_.Length -gt 20 }) -join ' ')"
+    $iniciosAntesDoReinicio = @(Get-LinhasDoLog $dados 'Iniciando Varthex Comanda').Count
     Invoke-Elemento (Find-Elemento -Raiz $confirmacao -Nome 'Sim' -Tipo 'Button' -Segundos 5)
 
     $avisoOk = Wait-Janela -ProcessId $processo.Id -Titulo 'Varthex Comanda' -ContendoTexto 'Backup restaurado' -Segundos 30
@@ -403,6 +411,18 @@ function Ensaio-E5 {
     }
     if (-not $reiniciado) { throw 'O aplicativo nao reiniciou sozinho apos a restauracao.' }
     Registrar "  o app reiniciou sozinho: PID $($reiniciado.Id)"
+    # antes de interagir: o processo reiniciado tem de estar nos dados DESCARTAVEIS (e nao nos reais da loja).
+    # Prova: uma linha NOVA 'Iniciando Varthex Comanda' apareceu em <dados>\logs depois do reinicio.
+    $iniciou = $false
+    $limiteLog = (Get-Date).AddSeconds(30)
+    while ((Get-Date) -lt $limiteLog -and -not $iniciou) {
+        $iniciou = @(Get-LinhasDoLog $dados 'Iniciando Varthex Comanda').Count -gt $iniciosAntesDoReinicio
+        if (-not $iniciou) { Start-Sleep -Milliseconds 300 }
+    }
+    if (-not $iniciou) {
+        throw 'O app reiniciado nao registrou "Iniciando" no log da pasta descartavel: nao ha prova de que usa os dados do ensaio. Abortado sem interagir.'
+    }
+    Registrar "  o reinicio esta nos dados descartaveis: 'Iniciando Varthex Comanda' passou de $iniciosAntesDoReinicio para $(@(Get-LinhasDoLog $dados 'Iniciando Varthex Comanda').Count) no log de <dados>\logs"
     $janela2 = Wait-JanelaPrincipal -Processo $reiniciado -Segundos 40
     Start-Sleep -Milliseconds 1200
     $slots = @(Wait-Slots $janela2)

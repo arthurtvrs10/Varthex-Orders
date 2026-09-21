@@ -3,7 +3,7 @@
 Cenários e critérios vêm de [Testes e aceitação](../docs/09-testes-aceitacao.md). Formato condensado do [modelo de caso de teste](../templates/caso-teste.md): cada linha traz cenário, evidência, situação e observações.
 
 - **Versão:** Varthex Comanda 1.0.0. **Data das evidências:** 2026-09-21. **Máquina:** de desenvolvimento (Windows 11 Pro 10.0.26200, x64), *não* o computador da loja ([matriz-compatibilidade.md](matriz-compatibilidade.md)).
-- **Testes automatizados:** 554 verdes, 0 falhas (Domain 4, Application 85, Infrastructure 250, Desktop 215). A lista completa de testes por caso está em [rastreabilidade-testes.md](rastreabilidade-testes.md), **gerada** e conferida pelo teste `RastreabilidadeDosCasosTests`; abaixo aparecem só os nomes mais representativos.
+- **Testes automatizados:** 559 verdes, 0 falhas (Domain 4, Application 85, Infrastructure 254, Desktop 216). A lista completa de testes por caso está em [rastreabilidade-testes.md](rastreabilidade-testes.md), **gerada** por `RastreabilidadeDosCasosTests`; um teste confere que o arquivo commitado está em dia com os testes; abaixo aparecem só os nomes mais representativos.
 - **Ensaios (E1–E6):** o aplicativo real (instalado do pacote) controlado por UI Automation, em dados descartáveis ([ensaio-2026-09-21.txt](evidencias/ensaio-2026-09-21.txt)). Todos aprovados, com as ressalvas de cada linha.
 
 ## Situações usadas

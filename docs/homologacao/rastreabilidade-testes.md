@@ -5,7 +5,8 @@
 
 Cada caso de `docs/docs/09-testes-aceitacao.md` aparece com os testes automatizados marcados com
 `[Trait("Caso", "CTnn")]`. A coluna **Tipo** diz o que a cobertura automatizada prova:
-`automatizado`, `estrutural` (prova por construção do código, não do comportamento em execução)
+`automatizado`, `parcial` (há teste automatizado, mas parte do critério só se prova com o app real ou hardware),
+`estrutural` (prova por construção do código, não do comportamento em execução)
 ou `manual` (sem teste automatizado). A **Nota** registra os limites; o que sobra (ensaio no app real,
 no computador da loja) está descrito em `docs/homologacao/`.
 
@@ -27,9 +28,9 @@ no computador da loja) está descrito em `docs/homologacao/`.
 | CT14 | Criar backup | Cópia abre, passa na integridade e possui checksum | automatizado | 3 | Serviço real de backup sobre SQLite real. |
 | CT15 | Rejeitar backup corrompido | Base ativa permanece inalterada | automatizado | 7 | Backup real com bytes corrompidos: caso de uso recusa sem nenhuma escrita na base ativa (hash idêntico). |
 | CT16 | Atualizar aplicação | Migrações completam e totais anteriores permanecem | automatizado | 2 | Banco criado só até a `InitialCreate`, com dados por SQL, migrado até a última com backup preventivo; totais, vendas e comanda aberta preservados. |
-| CT17 | Navegar por teclado | É possível localizar, adicionar e iniciar encerramento | automatizado | 41 | Parcial: ViewModel e XAML (atalhos, foco, Enter/Esc). A prova com teclado físico real é ensaio manual. |
+| CT17 | Navegar por teclado | É possível localizar, adicionar e iniciar encerramento | parcial | 41 | Parcial: ViewModel e XAML (atalhos, foco, Enter/Esc). A prova com teclado físico real é ensaio manual. |
 | CT18 | Resumo diário | Quatro vendas totalizando R$ 120,00 geram ticket médio R$ 30,00 | automatizado | 2 | ViewModel do histórico sobre SQLite real, com os valores literais. |
-| CT19 | Impedir segunda instância | Com o aplicativo aberto, nova execução exibe aviso e não abre outra conexão com a base | automatizado | 1 | Parcial: teste unitário da trava (mutex). A prova com o segundo executável (aviso na tela e nenhuma segunda conexão) é ensaio. |
+| CT19 | Impedir segunda instância | Com o aplicativo aberto, nova execução exibe aviso e não abre outra conexão com a base | parcial | 1 | Parcial: teste unitário da trava (mutex). A prova com o segundo executável (aviso na tela e nenhuma segunda conexão) é ensaio. |
 | CT20 | Recuperar comandas abertas | Após término forçado, a reabertura mostra os mesmos itens e totais sem criar venda | automatizado | 4 | Nível de repositório: reabre o SQLite real. O término forçado do processo do app é ensaio. |
 | CT21 | Instalar no Windows | Pacote autocontido inicia em instalação limpa sem exigir SDK ou runtime separado | manual | 0 | Sem teste automatizado: exige um Windows limpo (procedimento em docs/homologacao). |
 | CT22 | Controlar logs | Rotação remove arquivos além da retenção e respeita o limite de armazenamento configurado | automatizado | 2 | Rotação por tamanho e retenção de N arquivos com o configurador real de log. |
@@ -140,7 +141,7 @@ no computador da loja) está descrito em `docs/homologacao/`.
 - `AtualizacaoDaAplicacaoTests.CT16_BancoNoEsquemaDaInitialCreate_AtualizaMantendoTotaisEVendas` (Infrastructure.Tests)
 - `MigracaoDoBancoTests.BancoComAlgumasMigracoesAplicadasEOutrasPendentes_ExigeBackupPreventivo` (Infrastructure.Tests)
 
-### CT17 — Navegar por teclado (automatizado)
+### CT17 — Navegar por teclado (parcial)
 
 - `AtendimentoTecladoXamlTests.AtendimentoView_ExpoeCampoDeNumeroEDeBusca` (Desktop.Tests)
 - `AtendimentoTecladoXamlTests.AtendimentoView_ItemSelecionado_TemLinhaComFundoDestacado` (Desktop.Tests)
@@ -189,7 +190,7 @@ no computador da loja) está descrito em `docs/homologacao/`.
 - `CriteriosDeTelaComBancoRealTests.CT18_QuatroVendasQueSomamR120_GeramTicketMedioR30` (Desktop.Tests)
 - `HistoricoViewModelTests.Resumo_DuasVendas_CalculaQuantidadeTotalETicketMedio` (Desktop.Tests)
 
-### CT19 — Impedir segunda instância (automatizado)
+### CT19 — Impedir segunda instância (parcial)
 
 - `SingleInstanceGuardTests.TryAcquire_SegundaGuardaComMesmoNome_FalhaAteAPrimeiraLiberar` (Infrastructure.Tests)
 

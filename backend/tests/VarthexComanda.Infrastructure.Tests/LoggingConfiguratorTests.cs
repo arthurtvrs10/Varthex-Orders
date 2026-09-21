@@ -47,6 +47,8 @@ public class LoggingConfiguratorTests
             var arquivos = Directory.GetFiles(logsDir, "varthex-comanda-*.log");
             Assert.True(arquivos.Length >= 2, $"esperava >= 2 arquivos, havia {arquivos.Length}");
             foreach (var arquivo in arquivos)
+                // tolerancia de 512 bytes alem do limite de 2048: o sink de arquivo so rola DEPOIS de gravar o evento
+                // que ultrapassa o limite, entao um arquivo pode exceder o teto por, no maximo, uma linha (~100 x + cabecalho)
                 Assert.True(new FileInfo(arquivo).Length <= 2048 + 512, $"{arquivo} passou do limite");
         }
         finally

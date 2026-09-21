@@ -27,7 +27,7 @@ public class RastreabilidadeDosCasosTests
 {
     public const string VariavelDeGeracao = "VARTHEX_GERAR_RASTREABILIDADE";
 
-    public enum Tipo { Automatizado, Estrutural, Manual }
+    public enum Tipo { Automatizado, Parcial, Estrutural, Manual }
 
     public sealed record Caso(string Codigo, string Cenario, string Criterio, Tipo Tipo, string Nota);
 
@@ -67,11 +67,11 @@ public class RastreabilidadeDosCasosTests
             "Backup real com bytes corrompidos: caso de uso recusa sem nenhuma escrita na base ativa (hash idêntico)."),
         new Caso("CT16", "Atualizar aplicação", "Migrações completam e totais anteriores permanecem", Tipo.Automatizado,
             "Banco criado só até a `InitialCreate`, com dados por SQL, migrado até a última com backup preventivo; totais, vendas e comanda aberta preservados."),
-        new Caso("CT17", "Navegar por teclado", "É possível localizar, adicionar e iniciar encerramento", Tipo.Automatizado,
+        new Caso("CT17", "Navegar por teclado", "É possível localizar, adicionar e iniciar encerramento", Tipo.Parcial,
             "Parcial: ViewModel e XAML (atalhos, foco, Enter/Esc). A prova com teclado físico real é ensaio manual."),
         new Caso("CT18", "Resumo diário", "Quatro vendas totalizando R$ 120,00 geram ticket médio R$ 30,00", Tipo.Automatizado,
             "ViewModel do histórico sobre SQLite real, com os valores literais."),
-        new Caso("CT19", "Impedir segunda instância", "Com o aplicativo aberto, nova execução exibe aviso e não abre outra conexão com a base", Tipo.Automatizado,
+        new Caso("CT19", "Impedir segunda instância", "Com o aplicativo aberto, nova execução exibe aviso e não abre outra conexão com a base", Tipo.Parcial,
             "Parcial: teste unitário da trava (mutex). A prova com o segundo executável (aviso na tela e nenhuma segunda conexão) é ensaio."),
         new Caso("CT20", "Recuperar comandas abertas", "Após término forçado, a reabertura mostra os mesmos itens e totais sem criar venda", Tipo.Automatizado,
             "Nível de repositório: reabre o SQLite real. O término forçado do processo do app é ensaio."),
@@ -200,6 +200,44 @@ public class RastreabilidadeDosCasosTests
         }
     }
 
+    // Anti-deriva: o arquivo commitado em docs/homologacao tem de ser exatamente o que os testes geram hoje.
+    // Falha quando a raiz do repositorio e encontrada e o conteudo difere (ou o arquivo sumiu); so retorna sem
+    // verificar quando a raiz do repositorio nao e localizavel (testes executados fora do repositorio).
+    [Fact]
+    public void ArquivoCommitadoDeRastreabilidade_EstaEmDiaComOsTestes()
+    {
+        var raiz = LocalizarRaizDoRepositorio();
+        if (raiz is null)
+        {
+            Console.WriteLine("Raiz do repositorio (pasta com backend e docs) nao encontrada acima de " +
+                              AppContext.BaseDirectory + ": conferencia do arquivo commitado NAO executada.");
+            return;
+        }
+
+        var caminho = Path.Combine(raiz, "docs", "homologacao", "rastreabilidade-testes.md");
+        Assert.True(File.Exists(caminho), $"Falta {caminho}. Gere com {VariavelDeGeracao}=<esse caminho> e rode este teste.");
+
+        var esperado = Normalizar(GerarMarkdown(MapaDaSuite(), Catalogo));
+        var commitado = Normalizar(File.ReadAllText(caminho));
+        Assert.True(esperado == commitado,
+            "docs/homologacao/rastreabilidade-testes.md esta desatualizado em relacao aos testes. Regenere: defina " +
+            $"{VariavelDeGeracao}={caminho} e rode 'dotnet test backend/tests/VarthexComanda.Desktop.Tests --filter RastreabilidadeDosCasosTests'.");
+    }
+
+    private static string Normalizar(string texto) => texto.Replace("\r\n", "\n").TrimEnd('\n');
+
+    private static string? LocalizarRaizDoRepositorio()
+    {
+        for (var pasta = new DirectoryInfo(AppContext.BaseDirectory); pasta is not null; pasta = pasta.Parent)
+        {
+            if (Directory.Exists(Path.Combine(pasta.FullName, "backend")) && Directory.Exists(Path.Combine(pasta.FullName, "docs")))
+            {
+                return pasta.FullName;
+            }
+        }
+        return null;
+    }
+
     // O guarda tem de FALHAR de verdade quando um caso perde todos os testes: mapa sintetico sem CT05.
     [Fact]
     public void Verificar_FalhaQuandoUmCasoObrigatorioPerdeTodosOsTestes()
@@ -250,7 +288,8 @@ public class RastreabilidadeDosCasosTests
             "",
             "Cada caso de `docs/docs/09-testes-aceitacao.md` aparece com os testes automatizados marcados com",
             "`[Trait(\"Caso\", \"CTnn\")]`. A coluna **Tipo** diz o que a cobertura automatizada prova:",
-            "`automatizado`, `estrutural` (prova por construção do código, não do comportamento em execução)",
+            "`automatizado`, `parcial` (há teste automatizado, mas parte do critério só se prova com o app real ou hardware),",
+            "`estrutural` (prova por construção do código, não do comportamento em execução)",
             "ou `manual` (sem teste automatizado). A **Nota** registra os limites; o que sobra (ensaio no app real,",
             "no computador da loja) está descrito em `docs/homologacao/`.",
             "",
@@ -289,6 +328,7 @@ public class RastreabilidadeDosCasosTests
     private static string TipoComoTexto(Tipo tipo) => tipo switch
     {
         Tipo.Automatizado => "automatizado",
+        Tipo.Parcial => "parcial",
         Tipo.Estrutural => "estrutural",
         _ => "manual",
     };

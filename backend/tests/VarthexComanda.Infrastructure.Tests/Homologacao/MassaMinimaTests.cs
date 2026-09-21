@@ -267,16 +267,19 @@ public sealed class MassaMinimaTests : IClassFixture<MassaMinimaTests.MassaGerad
         Directory.CreateDirectory(Path.Combine(pasta, "data"));
         File.WriteAllText(Path.Combine(pasta, "data", "sobra.txt"), "lixo de execucao anterior");
         File.WriteAllText(Path.Combine(pasta, "meu-arquivo.txt"), "nao e do gerador");
+        File.WriteAllText(Path.Combine(pasta, SegurancaDaSaida.NomeDoMarcador), "marcador de uma geracao anterior");
 
-        // sem --forcar: recusa e nao mexe em nada
+        // sem --forcar: recusa (e sugere --forcar, pois a pasta tem o marcador) e nao mexe em nada
         var ex = Assert.Throws<RecusaDeMassaException>(() => MassaMinimaGerador.Gerar(pasta, Agora));
         Assert.Contains("nao esta vazia", ex.Message);
+        Assert.Contains("--forcar", ex.Message);
         Assert.True(File.Exists(Path.Combine(pasta, "data", "sobra.txt")));
 
         var segundo = MassaMinimaGerador.Gerar(pasta, Agora, forcar: true);
 
         Assert.True(File.Exists(Path.Combine(pasta, "meu-arquivo.txt")));       // fora dos 4 subdiretorios: intocado
         Assert.False(File.Exists(Path.Combine(pasta, "data", "sobra.txt")));    // subdiretorio do app: refeito
+        Assert.True(File.Exists(Path.Combine(pasta, SegurancaDaSaida.NomeDoMarcador)));
         var primeiro = _massa.Resumo;
         Assert.Equal(primeiro with { PastaRaiz = "", PerfisDasAbertas = [] }, segundo with { PastaRaiz = "", PerfisDasAbertas = [] });
         Assert.Equal(primeiro.PerfisDasAbertas, segundo.PerfisDasAbertas);
@@ -358,7 +361,17 @@ public sealed class MassaMinimaTests : IClassFixture<MassaMinimaTests.MassaGerad
         File.WriteAllText(Path.Combine(naoVazia, "a.txt"), "x");
         erro = new StringWriter();
         Assert.Equal(2, LinhaDeComando.Executar(["--saida", naoVazia], saida, erro));
-        Assert.Contains("--forcar", erro.ToString());
+        Assert.Contains("nao foi criada por esta ferramenta", erro.ToString());
+        Assert.DoesNotContain("--forcar", erro.ToString()); // pasta alheia: nao sugere --forcar
+        Assert.Equal(2, LinhaDeComando.Executar(["--saida", naoVazia, "--forcar"], saida, new StringWriter()));
+        Assert.True(File.Exists(Path.Combine(naoVazia, "a.txt")));
+
+        var comMarcador = NovaPastaTemporaria();
+        Directory.CreateDirectory(comMarcador);
+        File.WriteAllText(Path.Combine(comMarcador, SegurancaDaSaida.NomeDoMarcador), "x");
+        erro = new StringWriter();
+        Assert.Equal(2, LinhaDeComando.Executar(["--saida", comMarcador], saida, erro));
+        Assert.Contains("--forcar", erro.ToString()); // aqui sim: a pasta e da ferramenta
 
         erro = new StringWriter();
         Assert.Equal(1, LinhaDeComando.Executar([], saida, erro)); // sem --saida

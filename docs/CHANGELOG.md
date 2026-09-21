@@ -8,7 +8,7 @@ Entregue (tudo o que uma máquina de desenvolvimento prova sem terceiros; nenhum
 - Massa mínima: ferramenta `backend/tools/VarthexComanda.MassaMinima` (`--saida <pasta>`), reproduzível, que recusa a pasta real de dados; teste confere as contagens do documento 09.
 - Ensaios com o aplicativo real (`scripts/homologacao/Executar-Ensaio.ps1`, UI Automation, dados descartáveis): E1 RNF03 (média de 1736 ms em 5 aberturas), E2 CT19, E3 CT20, E4 CT09, E5 restauração de backup, E6 sem conexões de rede (apoio). Todos aprovados; transcrição em `docs/homologacao/evidencias/ensaio-2026-09-21.txt`.
 - Documentos em `docs/homologacao/`: README, checklist da Etapa 8, matriz de compatibilidade (RNF17), resultados por CT, roteiro do ensaio manual, guia do operador e pendências (QV01 a QV14 com a situação real e as pendências técnicas). Documentos 10 e 13 ganharam ponteiros; o CT17 entrou na linha do OBJ01 do documento 10.
-- Suíte: 554 testes verdes (Domain 4, Application 85, Infrastructure 250, Desktop 215).
+- Suíte: 559 testes verdes (Domain 4, Application 85, Infrastructure 254, Desktop 216).
 
 Pendente (a homologação humana **ainda não aconteceu**):
 
