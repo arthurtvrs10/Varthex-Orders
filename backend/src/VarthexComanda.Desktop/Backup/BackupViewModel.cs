@@ -98,6 +98,7 @@ public partial class BackupViewModel : ObservableObject
                 // o nome carrega data e hora (yyyy-MM-dd-HHmmss), então a ordem decrescente do
                 // nome é a mais recente primeiro; corrompido-*.db.bak nunca casa com este padrão
                 var arquivos = Directory.GetFiles(pasta, "varthex-comanda-*.db")
+                    .Where(f => f.EndsWith(".db", StringComparison.OrdinalIgnoreCase)) // nunca o .db.fotos.zip
                     .OrderByDescending(Path.GetFileName, StringComparer.Ordinal);
                 foreach (var caminho in arquivos)
                 {

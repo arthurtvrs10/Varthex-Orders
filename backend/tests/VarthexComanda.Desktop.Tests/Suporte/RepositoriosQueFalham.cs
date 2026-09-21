@@ -82,6 +82,8 @@ internal sealed class ProdutoRepositoryQueFalha : IProdutoRepository
 
     public IReadOnlyList<Produto> Pesquisar(int? categoriaId, string? texto) => _interno.Pesquisar(categoriaId, texto);
 
+    public IReadOnlyList<string> ListarNomesDeFotos() => _interno.ListarNomesDeFotos();
+
     public Produto Salvar(Produto produto) =>
         Falhar ? throw new FalhaTecnicaSimuladaException() : _interno.Salvar(produto);
 }

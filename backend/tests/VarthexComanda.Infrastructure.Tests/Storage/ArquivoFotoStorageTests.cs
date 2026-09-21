@@ -184,4 +184,19 @@ public class ArquivoFotoStorageTests : IDisposable
 
         Assert.True(File.Exists(foraDaPasta));
     }
+
+    [Theory]
+    [InlineData("a.jpg", true)]
+    [InlineData("A.JPEG", true)]
+    [InlineData("b.png", true)]
+    [InlineData("c.BMP", true)]
+    [InlineData("d.txt", false)]
+    [InlineData("e.png.exe", false)]
+    [InlineData("semextensao", false)]
+    [InlineData("", false)]
+    [InlineData(null, false)]
+    public void ExtensaoPermitida_SegueAWhitelistDeImagens(string? nome, bool esperado)
+    {
+        Assert.Equal(esperado, ArquivoFotoStorage.ExtensaoPermitida(nome));
+    }
 }

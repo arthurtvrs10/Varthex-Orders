@@ -13,5 +13,7 @@ internal sealed class RepositorioQueFalhaAoSalvar : IProdutoRepository
 
     public IReadOnlyList<Produto> Pesquisar(int? categoriaId, string? texto) => _interno.Pesquisar(categoriaId, texto);
 
+    public IReadOnlyList<string> ListarNomesDeFotos() => _interno.ListarNomesDeFotos();
+
     public Produto Salvar(Produto produto) => throw new InvalidOperationException("falha simulada");
 }

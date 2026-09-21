@@ -49,7 +49,7 @@ Em produção, derive a pasta com `Environment.SpecialFolder.LocalApplicationDat
 | Elemento | Padrão inicial |
 | --- | --- |
 | Frequência | Primeira abertura do dia e encerramento do aplicativo quando houve mudanças |
-| Retenção local | 30 cópias diárias |
+| Retenção local | 30 cópias diárias do banco; as fotos vão em `.db.fotos.zip` ao lado, gerado só quando o conjunto de fotos muda, mantendo os 3 zips mais recentes por pasta (a restauração usa o zip da própria cópia ou, se não houver, o mais recente da pasta, e nunca apaga fotos) |
 | Nome | `lanchonete-AAAA-MM-DD-HHMMSS.db` |
 | Integridade | `PRAGMA integrity_check` e checksum |
 | Cópia externa | Pendrive ou pasta sincronizada ao fim do dia |

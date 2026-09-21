@@ -81,6 +81,7 @@ public sealed class BackupViewModelModoRestauracaoTests : IDisposable
         CriarArquivo("varthex-comanda-2026-09-12-090000.db.sha256", "abc123\n");
         CriarArquivo("varthex-comanda-2026-09-11-100000.db");
         CriarArquivo("corrompido-2026-09-13-000000.db.bak");
+        CriarArquivo("varthex-comanda-2026-09-12-090000.db.fotos.zip");
         CriarArquivo("anotacoes.txt");
         var (viewModel, _, _) = CriarViewModel();
 

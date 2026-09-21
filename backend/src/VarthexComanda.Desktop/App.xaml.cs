@@ -1,3 +1,4 @@
+using System.IO;
 using System.Diagnostics;
 using System.Windows;
 using Microsoft.EntityFrameworkCore;
@@ -38,11 +39,10 @@ public partial class App : System.Windows.Application
         _guard = new SingleInstanceGuard("VarthexComanda.SingleInstance");
         if (!_guard.TryAcquire())
         {
-            MessageBox.Show(
-                "O Varthex Comanda já está aberto neste computador.",
+            JanelaAviso.Mostrar(
                 "Varthex Comanda",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+                "O Varthex Comanda já está aberto neste computador.",
+                TipoAviso.Informacao);
             Shutdown();
             return;
         }
@@ -62,11 +62,10 @@ public partial class App : System.Windows.Application
         DispatcherUnhandledException += (sender, args) =>
         {
             _logger?.Error(args.Exception, "Erro nao tratado na interface");
-            MessageBox.Show(
-                "Ocorreu um erro inesperado no Varthex Comanda. Consulte os logs.",
+            JanelaAviso.Mostrar(
                 "Varthex Comanda",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
+                "Ocorreu um erro inesperado no Varthex Comanda. Consulte os logs.",
+                TipoAviso.Erro);
             args.Handled = true;
         };
 
@@ -173,6 +172,8 @@ public partial class App : System.Windows.Application
                 var abertas = _serviceProvider.GetRequiredService<IComandaRepository>().ListarAbertas().Count;
                 _logger.Information("Comandas abertas recuperadas: {Quantidade}", abertas);
 
+                RegistrarFotosSemProduto(paths);
+
                 _serviceProvider.GetRequiredService<CriarBackupAutomatico>().Executar();
 
                 _serviceProvider.GetRequiredService<MainWindow>().Show();
@@ -190,11 +191,10 @@ public partial class App : System.Windows.Application
         catch (Exception ex)
         {
             _logger.Error(ex, "Falha ao preparar o banco de dados");
-            MessageBox.Show(
-                "Não foi possível preparar o banco de dados do Varthex Comanda. Consulte os logs.",
+            JanelaAviso.Mostrar(
                 "Varthex Comanda",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
+                "Não foi possível preparar o banco de dados do Varthex Comanda. Consulte os logs.",
+                TipoAviso.Erro);
             Shutdown();
             return;
         }
@@ -202,6 +202,30 @@ public partial class App : System.Windows.Application
         if (bancoCorrompido)
         {
             AbrirModoRestauracao();
+        }
+    }
+
+    // Só informativo: conta fotos em fotos\ que nenhum produto referencia. Nunca apaga nada (uma
+    // restauração de banco antigo poderia deixar fotos válidas "sem produto") e nunca derruba a inicialização.
+    private void RegistrarFotosSemProduto(AppPaths paths)
+    {
+        try
+        {
+            if (!Directory.Exists(paths.FotosDirectory))
+            {
+                return;
+            }
+
+            var referenciadas = _serviceProvider!.GetRequiredService<IProdutoRepository>()
+                .ListarNomesDeFotos()
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var semProduto = Directory.GetFiles(paths.FotosDirectory)
+                .Count(f => ArquivoFotoStorage.ExtensaoPermitida(f) && !referenciadas.Contains(Path.GetFileName(f)));
+            _logger!.Information("Fotos sem produto: {Quantidade}", semProduto);
+        }
+        catch (Exception ex)
+        {
+            _logger?.Warning(ex, "Falha em {Operacao}", "ContarFotosSemProduto");
         }
     }
 
@@ -220,11 +244,10 @@ public partial class App : System.Windows.Application
         catch (Exception ex)
         {
             _logger!.Error(ex, "Falha em {Operacao}", "AbrirModoRestauracao");
-            MessageBox.Show(
-                "O banco de dados está corrompido e não foi possível abrir a tela de restauração. Consulte os logs.",
+            JanelaAviso.Mostrar(
                 "Varthex Comanda",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
+                "O banco de dados está corrompido e não foi possível abrir a tela de restauração. Consulte os logs.",
+                TipoAviso.Erro);
             Shutdown();
         }
     }
@@ -258,11 +281,10 @@ public partial class App : System.Windows.Application
         catch (Exception ex)
         {
             _logger?.Warning(ex, "Falha em {Operacao}", "ReiniciarAplicativo");
-            MessageBox.Show(
-                "A restauração foi concluída, mas não foi possível reiniciar automaticamente. Feche e abra o Varthex Comanda manualmente.",
+            JanelaAviso.Mostrar(
                 "Varthex Comanda",
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
+                "A restauração foi concluída, mas não foi possível reiniciar automaticamente. Feche e abra o Varthex Comanda manualmente.",
+                TipoAviso.Aviso);
         }
         finally
         {

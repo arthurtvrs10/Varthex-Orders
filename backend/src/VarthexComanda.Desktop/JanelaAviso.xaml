@@ -1,0 +1,25 @@
+<Window x:Class="VarthexComanda.Desktop.JanelaAvisoView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Width="560" SizeToContent="Height" MinHeight="200"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize" ShowInTaskbar="False"
+        FocusManager.FocusedElement="{Binding ElementName=BotaoOk}"
+        Background="White">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="12" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Border x:Name="FaixaTipo" Grid.Column="0" Background="#1F5FBF" />
+        <Grid Grid.Column="1" Margin="28">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock x:Name="TextoMensagem" Grid.Row="0" FontSize="16" TextWrapping="Wrap"
+                       Foreground="#23252A" Margin="0,4,0,28" />
+            <Button x:Name="BotaoOk" Grid.Row="1" Content="OK" Width="150" Height="56" FontSize="18" FontWeight="Bold"
+                    HorizontalAlignment="Right" IsDefault="True" IsCancel="True" Click="Ok_Click" />
+        </Grid>
+    </Grid>
+</Window>

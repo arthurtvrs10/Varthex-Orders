@@ -152,4 +152,23 @@ public class EfProdutoRepositoryTests : IDisposable
 
         Assert.Null(repositorio.BuscarPorId(salvo.Id)!.FotoArquivo);
     }
+
+    [Fact]
+    public void ListarNomesDeFotos_DevolveSoOsNomesPreenchidos()
+    {
+        var repositorio = new EfProdutoRepository(_fabrica);
+        var agora = DateTime.UtcNow;
+        foreach (var (nome, foto) in new (string, string?)[] { ("A", "a.png"), ("B", null), ("C", ""), ("D", "d.jpg") })
+        {
+            repositorio.Salvar(new Produto
+            {
+                Id = 0, CategoriaId = _categoriaId, Nome = nome, PrecoCentavos = 100,
+                Ativo = true, CriadoEm = agora, AtualizadoEm = agora, FotoArquivo = foto
+            });
+        }
+
+        var nomes = repositorio.ListarNomesDeFotos();
+
+        Assert.Equal(new[] { "a.png", "d.jpg" }, nomes.OrderBy(n => n).ToArray());
+    }
 }

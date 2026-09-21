@@ -34,6 +34,7 @@ internal sealed class ProdutoRepositoryDeBancoCorrompido : IProdutoRepository
     public Produto? BuscarPorId(int id) => throw new FalhaTecnicaSimuladaException();
     public IReadOnlyList<Produto> Pesquisar(int? categoriaId, string? texto) => throw new FalhaTecnicaSimuladaException();
     public Produto Salvar(Produto produto) => throw new FalhaTecnicaSimuladaException();
+    public IReadOnlyList<string> ListarNomesDeFotos() => throw new FalhaTecnicaSimuladaException();
 }
 
 internal sealed class ConfiguracaoRepositoryDeBancoCorrompido : IConfiguracaoRepository
