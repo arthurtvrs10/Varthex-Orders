@@ -57,7 +57,7 @@ public partial class App : System.Windows.Application
         var pastasMascaradas = new PastasMascaradas();
         pastasMascaradas.AdicionarDados(paths.Root);
         _logger = LoggingConfigurator.CreateLogger(paths.LogsDirectory, pastas: pastasMascaradas);
-        _logger.Information("Iniciando Varthex Comanda");
+        _logger.Information("Iniciando Varthex Comanda {Versao}", VersaoDoAplicativo.Atual);
 
         DispatcherUnhandledException += (sender, args) =>
         {

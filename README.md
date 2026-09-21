@@ -38,16 +38,57 @@ Histórico: vendas do dia, resumo e detalhe dos itens.
 
 ## Instalação
 
-Ainda **não há instalador**. O app roda a partir do código, com o SDK do .NET 10
-instalado no Windows:
+O aplicativo é entregue como um pacote `.zip` **autocontido** (`win-x64`): já
+inclui o runtime do .NET, então quem usa **não precisa instalar o .NET nem o
+SDK**, e a instalação não exige conta de administrador. O pacote não é um
+instalador `.msi`/`.exe`: são scripts (`Instalar.cmd`, `Instalar.ps1`,
+`Desinstalar.cmd`, `Desinstalar.ps1`) que acompanham os arquivos do programa.
 
-```sh
-dotnet run --project backend/src/VarthexComanda.Desktop
+**Gerar o pacote** (na máquina de desenvolvimento, que precisa do SDK do .NET 10):
+
+```powershell
+.\scripts\publicar.ps1
 ```
 
-A publicação autocontida (`win-x64`) e o instalador estão no roteiro — veja
-[Próximos passos](#próximos-passos) e
-[Plataforma Windows e .NET](docs/docs/19-plataforma-windows-dotnet.md).
+Isso lê a versão do `<Version>` do `VarthexComanda.Desktop.csproj`, publica em
+`artifacts\publish\win-x64` e gera `artifacts\VarthexComanda-<versão>-win-x64.zip`
+(hoje `VarthexComanda-1.0.0-win-x64.zip`, cerca de 64 MB). O parâmetro opcional
+`-Saida <pasta>` troca a pasta `artifacts`. A pasta `artifacts\publish\win-x64`
+é apagada a cada publicação; já os `.zip` de versões anteriores **acumulam** em
+`artifacts` (apague os antigos à mão). Os arquivos `.pdb` não entram no pacote.
+
+**Instalar** (no computador do balcão):
+
+1. Extraia o `.zip` **inteiro** numa pasta (não execute de dentro do zip).
+2. Dê dois cliques em `Instalar.cmd`.
+3. O programa vai para `%LOCALAPPDATA%\Programs\VarthexComanda` e são criados
+   os atalhos "Varthex Comanda" na Área de Trabalho e no Menu Iniciar. Para outra
+   pasta ou sem atalhos, use no PowerShell:
+   `.\Instalar.cmd -Destino "C:\Pasta\Outra" -SemAtalhos` (também aceita
+   `-WhatIf`, para simular sem alterar nada).
+
+**Atualizar:** feche o app, extraia o pacote novo e execute `Instalar.cmd`
+de novo. Só os arquivos do programa são trocados; a versão anterior fica em
+`%LOCALAPPDATA%\Programs\VarthexComanda.anterior` para o retorno manual.
+
+**Desinstalar:** dê dois cliques em `Desinstalar.cmd` (na pasta do programa ou do
+pacote; para outro destino, `.\Desinstalar.cmd -Destino "C:\Pasta\Outra"`). Remove
+a pasta do programa **inteira** (não guarde arquivos seus ali), a cópia `.anterior`
+e os atalhos.
+
+**Os dados ficam separados do programa** (veja [Onde ficam os
+dados](#onde-ficam-os-dados)): atualizar e desinstalar **nunca** apagam
+`%LOCALAPPDATA%\VarthexComanda`. A variável de ambiente `VARTHEX_COMANDA_DADOS`
+redireciona essa pasta (demonstrações e testes) e os scripts de instalação a
+respeitam ao recusar destinos perigosos.
+
+O passo a passo completo, o retorno à versão anterior e o diagnóstico estão em
+[Operação e implantação](docs/docs/12-operacao-implantacao.md); as decisões de
+publicação, em [Plataforma Windows e .NET](docs/docs/19-plataforma-windows-dotnet.md).
+
+> **Para desenvolvedores:** rodar a partir do código exige o SDK do .NET 10 —
+> `dotnet run --project backend/src/VarthexComanda.Desktop` (veja
+> [Compilando](#compilando)).
 
 ## O que ele faz
 
@@ -155,17 +196,23 @@ configurações estão entregues e cobertas por testes automatizados.
 
 ### Próximos passos
 
-- Publicação autocontida e instalador limpo (RNF09 / RNF17).
+- Validar o pacote autocontido num Windows limpo, sem nenhum .NET instalado
+  (CT21), e testar antivírus, a versão/arquitetura do Windows-alvo (RNF17) e a
+  instalação com atalhos no computador do balcão.
+- Instalador `.msi`/Inno Setup/WiX: **não adotado** por ora (o pacote é um
+  `.zip` com scripts); avaliar quando a distribuição se estabilizar.
 - Navegação completa por teclado com foco visível (RNF18); hoje só o **F4** existe.
 - Rotação e limite de tamanho dos logs (RNF21).
-- Incluir as fotos no backup e na restauração.
 - Homologação no computador real (CT01–CT22, teste sem internet, treinamento).
 
 ### Limitações conhecidas
 
-- Fotos ficam fora do backup: restaurar num computador novo traz os produtos,
-  mas as imagens aparecem como o cinza padrão até serem escolhidas de novo.
-- Sem instalador, quem usa precisa do SDK do .NET 10 para rodar o app.
+- O pacote autocontido ainda **não foi validado num Windows limpo** sem .NET
+  (CT21 pendente): só foi verificado numa máquina de desenvolvimento, iniciando
+  a cópia instalada sem `dotnet` no `PATH`.
+- Sem assinatura de código (o Windows pode exibir aviso de aplicativo
+  desconhecido), sem atualização automática e com retorno à versão anterior
+  manual.
 - A versão e a arquitetura exatas do Windows-alvo ainda estão pendentes
   (QV07 em [pendências](docs/docs/13-pendencias-validacao.md)).
 

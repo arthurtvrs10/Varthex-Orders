@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VarthexComanda.Desktop.Atendimento"
         mc:Ignorable="d"
-        Title="Encerrar comanda" Width="560" SizeToContent="Height"
+        Title="Encerrar comanda" Icon="pack://application:,,,/VarthexComanda;component/Assets/VarthexComanda.ico" Width="560" SizeToContent="Height"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
         FocusManager.FocusedElement="{Binding ElementName=CaixaCobrancaAprovada}">
     <Window.Resources>

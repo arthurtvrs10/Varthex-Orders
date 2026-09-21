@@ -1,5 +1,16 @@
 # Histórico de alterações
 
+## 1.16 - 2026-09-21 - Publicação autocontida (Etapa 7, fatia 4)
+
+- O executável passou a se chamar `VarthexComanda.exe` (`AssemblyName = VarthexComanda`; namespaces inalterados).
+- Versão `1.0.0` definida no `<Version>` do projeto Desktop; aparece no rodapé da tela Configurações e na linha "Iniciando Varthex Comanda 1.0.0" do log. Ícone do aplicativo (`.ico` multitamanho) na janela, no executável e nos atalhos.
+- `scripts\publicar.ps1` publica em `win-x64`, autocontido e multiarquivo, e gera `artifacts\VarthexComanda-1.0.0-win-x64.zip` (cerca de 64 MB, cerca de 430 arquivos, runtime do .NET incluso).
+- O pacote traz `Instalar.cmd`/`Instalar.ps1` (instalação por usuário em `%LOCALAPPDATA%\Programs\VarthexComanda`, sem administrador, com atalhos na Área de Trabalho e no Menu Iniciar, `-Destino` e `-SemAtalhos`), `Desinstalar.cmd`/`Desinstalar.ps1` e `LEIAME.txt`. Os scripts recusam destinos perigosos e recusam continuar com o aplicativo aberto; o instalador grava `versao-instalada.txt`.
+- Os dados (`%LOCALAPPDATA%\VarthexComanda`) ficam separados e são preservados na atualização e na desinstalação. A atualização guarda a versão anterior em `VarthexComanda.anterior`.
+- Documentação: README e documentos 12 e 19 passam a descrever a instalação pelo pacote; instalador de terceiros (MSI/Inno/WiX/MSIX) fica como melhoria futura.
+- Verificado em máquina de desenvolvimento: uma cópia instalada abriu sem `dotnet` no `PATH` e com pasta de dados descartável; a janela apareceu e o log registrou a versão 1.0.0.
+- Limitações conhecidas: **CT21 pendente** (teste num Windows limpo sem nenhum .NET, em outra máquina ou VM); antivírus, versão/arquitetura do Windows-alvo (QV07) e instalação com atalhos no computador do balcão ainda não validados; sem assinatura de código; sem atualização automática; retorno à versão anterior é manual.
+
 ## 1.15 - 2026-09-21 - Acabamento (Etapa 7, fatia 3)
 
 - As janelas nativas de aviso (segunda instância, erro inesperado, falha ao preparar o banco, restauração concluída) foram trocadas por uma janela de aviso grande, no mesmo padrão de toque da confirmação.
