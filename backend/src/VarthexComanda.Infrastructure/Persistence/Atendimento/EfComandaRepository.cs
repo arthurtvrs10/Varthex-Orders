@@ -62,6 +62,17 @@ public class EfComandaRepository : IComandaRepository
         return comanda;
     }
 
+    public Comanda DefinirNomeCliente(int comandaId, string? nome)
+    {
+        using var contexto = _fabricaContexto.CreateDbContext();
+        var comanda = contexto.Comandas.SingleOrDefault(c => c.Id == comandaId)
+            ?? throw new InvalidOperationException("Comanda não encontrada.");
+        if (comanda.Status != StatusComanda.Aberta) throw new ComandaNaoAbertaException();
+        comanda.NomeCliente = nome;
+        contexto.SaveChanges();
+        return comanda;
+    }
+
     public ComandaComItens AdicionarItem(int comandaId, Produto produto, int quantidade, DateTime agora)
     {
         using var contexto = _fabricaContexto.CreateDbContext();

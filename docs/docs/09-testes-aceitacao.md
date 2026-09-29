@@ -29,6 +29,15 @@
 
 ## Testes adicionais obrigatórios
 
+CT24: salvar/corrigir/remover nome opcional, validar limite, reabrir aplicativo e
+conferir persistência, exibir nome na grade/encerramento/histórico, impedir alteração
+após encerramento/cancelamento e não herdar nome ao reutilizar número. Migração
+deve preservar comandas antigas com nome nulo.
+
+CT23: ativação e renovação offline, assinatura inválida, computador incorreto,
+vencimento, chave vitalícia, relógio atrasado e persistência protegida.
+Ver [Licenciamento offline](20-licenciamento-offline.md).
+
 ### Catálogo
 
 - nomes vazios e com espaços externos;

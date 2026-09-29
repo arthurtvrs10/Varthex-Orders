@@ -62,6 +62,7 @@
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="Comanda" DisplayMemberBinding="{Binding NumeroComanda}" Width="80" />
+                            <GridViewColumn Header="Cliente" DisplayMemberBinding="{Binding NomeCliente}" Width="150" />
                             <GridViewColumn Header="Total" DisplayMemberBinding="{Binding Venda.TotalCentavos, Converter={StaticResource Moeda}}" Width="90" />
                             <GridViewColumn Header="Horário" DisplayMemberBinding="{Binding Venda.FinalizadaEm, Converter={StaticResource Horario}}" Width="70" />
                         </GridView>

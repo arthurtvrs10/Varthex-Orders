@@ -16,6 +16,7 @@ internal sealed class FalhaTecnicaSimuladaException : Exception
 internal sealed class ComandaRepositoryQueFalha : IComandaRepository
 {
     private readonly IComandaRepository _interno;
+    public Comanda DefinirNomeCliente(int comandaId, string? nome) { Verificar(); return _interno.DefinirNomeCliente(comandaId, nome); }
 
     public ComandaRepositoryQueFalha(IComandaRepository interno) => _interno = interno;
 

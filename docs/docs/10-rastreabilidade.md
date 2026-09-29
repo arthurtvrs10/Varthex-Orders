@@ -1,5 +1,11 @@
 # Rastreabilidade
 
+Identificação por nome: RF29 → RN28/RNF13 → CT24 (`DefinirNomeClienteTests`,
+`EfComandaRepositoryTests` e `AtendimentoViewModelTests`).
+
+Licenciamento comercial: RF28 → RN24–RN27 → CT23 (`LicencaOfflineTests` e
+`ServicoLicencaTests`). Detalhes em [Licenciamento offline](20-licenciamento-offline.md).
+
 ## Instalador EXE (2026-09-29)
 
 A distribuição principal agora usa `artifacts\VarthexComanda-1.0.0-Setup-win-x64.exe`.

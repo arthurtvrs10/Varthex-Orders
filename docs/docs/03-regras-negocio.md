@@ -28,6 +28,15 @@
 
 ## Invariantes de dados
 
+RN28: nome do cliente é opcional, limitado a 80 caracteres sem controles/quebras de
+linha. Espaços nas pontas são removidos; vazio remove o nome. Somente comandas
+abertas podem ser renomeadas. O nome fica no histórico da sessão e não é reutilizado
+automaticamente quando o mesmo número abre uma nova comanda.
+
+RN24–RN27: prazos fixos de licença, bloqueio por licença inválida/vencida,
+preservação de dados e detecção de atraso do relógio estão definidos em
+[Licenciamento offline](20-licenciamento-offline.md).
+
 - `subtotal_centavos = preco_unitario_centavos * quantidade`;
 - `comanda.total_centavos = soma(item_comanda.subtotal_centavos)`;
 - `venda.total_centavos = comanda.total_centavos` revalidado no encerramento;

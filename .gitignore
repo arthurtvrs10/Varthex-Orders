@@ -1,2 +1,4 @@
 .claude
 artifacts/
+**/*privada*.pem
+**/licenca-*.txt

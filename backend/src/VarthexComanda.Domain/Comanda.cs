@@ -9,4 +9,5 @@ public class Comanda
     public DateTime? FechadaEm { get; set; }
     public required long TotalCentavos { get; set; }
     public string? Observacao { get; set; }
+    public string? NomeCliente { get; set; }
 }

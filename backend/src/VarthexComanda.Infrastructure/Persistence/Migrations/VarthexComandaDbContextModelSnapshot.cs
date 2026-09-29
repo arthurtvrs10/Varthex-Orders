@@ -110,6 +110,11 @@ namespace VarthexComanda.Infrastructure.Persistence.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("fechada_em");
 
+                    b.Property<string>("NomeCliente")
+                        .HasMaxLength(80)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("nome_cliente");
+
                     b.Property<int>("Numero")
                         .HasColumnType("INTEGER")
                         .HasColumnName("numero");

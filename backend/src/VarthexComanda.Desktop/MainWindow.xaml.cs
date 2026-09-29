@@ -75,6 +75,7 @@ public partial class MainWindow : Window
     private void MostrarBackup_Click(object sender, RoutedEventArgs e) => IrParaBackup();
 
     private void MostrarConfiguracao_Click(object sender, RoutedEventArgs e) => IrParaConfiguracoes();
+    private void MostrarLicenca_Click(object sender, RoutedEventArgs e) => ((App)System.Windows.Application.Current).RenovarLicenca();
 
     private void IrParaAtendimento()
     {

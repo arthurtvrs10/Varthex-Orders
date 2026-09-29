@@ -48,7 +48,7 @@
 | RNF10 | Armazenamento | Dinheiro é persistido como inteiro em centavos | Inspeção de esquema |
 | RNF11 | Backup | Cópia automática não bloqueia atendimento por mais de 2 segundos | Teste com base de referência |
 | RNF12 | Recuperação | Arquivo inválido é rejeitado antes de substituir a base | Teste com arquivo corrompido |
-| RNF13 | Privacidade | MVP não solicita CPF, telefone ou nome do cliente | Inspeção de telas e banco |
+| RNF13 | Privacidade | Não solicita CPF nem telefone; nome do cliente é opcional, por solicitação do responsável em 29/09/2026 | Inspeção de telas e banco |
 | RNF14 | Segurança local | Pasta de dados usa permissões do usuário do sistema operacional | Inspeção de permissões |
 | RNF15 | Manutenibilidade | Banco evolui por migrações versionadas e reversíveis por backup | Teste de atualização |
 | RNF16 | Observabilidade | Falhas geram mensagem compreensível e log técnico local | Teste de exceções |
@@ -59,6 +59,14 @@
 | RNF21 | Controle de logs | Logs devem ter rotação e limite configurado para não preencher o disco | Teste de retenção e tamanho |
 
 ## Dependências
+
+RF29: informar, corrigir e remover um nome opcional de até 80 caracteres na comanda
+aberta; exibir na grade, no encerramento e no histórico. O número continua sendo
+o identificador; nomes repetidos são permitidos.
+
+RF28: ativar e renovar licença offline por chave assinada vinculada ao computador,
+conforme [Licenciamento offline](20-licenciamento-offline.md). Planos vitalício ou
+1, 2 e 3 meses; sem integração de pagamentos.
 
 - RF09 depende de RF03 e de produto ativo.
 - RF14 a RF17 dependem de comanda aberta com ao menos um item.

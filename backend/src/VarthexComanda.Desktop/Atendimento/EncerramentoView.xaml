@@ -13,6 +13,7 @@
     </Window.Resources>
     <StackPanel Margin="16">
         <TextBlock Text="{Binding NumeroComanda, StringFormat='Comanda {0}'}" FontWeight="Bold" FontSize="16" Margin="0,0,0,12" />
+        <TextBlock Text="{Binding NomeCliente}" FontSize="16" TextWrapping="Wrap" Margin="0,0,0,8" />
 
         <ListView ItemsSource="{Binding Itens}" MaxHeight="240" FontSize="14">
             <ListView.View>

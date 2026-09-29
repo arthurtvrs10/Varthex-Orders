@@ -1,6 +1,8 @@
 using System.IO;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Threading;
+using VarthexComanda.Desktop.Licenciamento;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -31,10 +33,14 @@ public partial class App : System.Windows.Application
     private ILogger? _logger;
     private ServiceProvider? _serviceProvider;
     private bool _startupConcluido;
+    private ServicoLicenca? _licenca;
+    private DispatcherTimer? _timerLicenca;
+    private bool _ativando;
 
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
         _guard = new SingleInstanceGuard("VarthexComanda.SingleInstance");
         if (!_guard.TryAcquire())
@@ -43,6 +49,18 @@ public partial class App : System.Windows.Application
                 "Varthex Comanda",
                 "O Varthex Comanda já está aberto neste computador.",
                 TipoAviso.Informacao);
+            Shutdown();
+            return;
+        }
+
+        try
+        {
+            _licenca = new ServicoLicenca();
+            if (!GarantirLicenca()) { Shutdown(); return; }
+        }
+        catch (Exception ex)
+        {
+            JanelaAviso.Mostrar("Varthex Comanda", "Não foi possível verificar a licença. " + ex.Message, TipoAviso.Erro);
             Shutdown();
             return;
         }
@@ -203,6 +221,43 @@ public partial class App : System.Windows.Application
         {
             AbrirModoRestauracao();
         }
+        MainWindow = Windows.OfType<MainWindow>().FirstOrDefault();
+        ShutdownMode = ShutdownMode.OnMainWindowClose;
+        _timerLicenca = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromSeconds(15) };
+        _timerLicenca.Tick += (_, _) => { if (!GarantirLicenca()) Shutdown(); };
+        _timerLicenca.Start();
+    }
+
+    public void RenovarLicenca()
+    {
+        if (_licenca is null || _ativando) return;
+        _ativando = true;
+        try
+        {
+            string mensagem;
+            try { var atual = _licenca.Verificar(); mensagem = atual.Vencimento is null ? "Licença vitalícia ativa." : $"Licença válida até {atual.Vencimento.Value.ToOffset(TimeSpan.FromHours(-3)):dd/MM/yyyy HH:mm}."; }
+            catch (Exception ex) { mensagem = ex.Message; }
+            new JanelaLicenca(_licenca, mensagem) { Owner = MainWindow }.ShowDialog();
+        }
+        finally { _ativando = false; }
+        if (!GarantirLicenca()) Shutdown();
+    }
+
+    private bool GarantirLicenca()
+    {
+        if (_ativando) return true;
+        try { _licenca!.Verificar(); return true; }
+        catch (Exception ex)
+        {
+            _ativando = true;
+            try
+            {
+                var janela = new JanelaLicenca(_licenca!, ex is InvalidOperationException ? ex.Message : "Não foi possível ler ou salvar a licença. Verifique as permissões locais.");
+                if (MainWindow is MainWindow principal && principal.IsVisible) janela.Owner = principal;
+                return janela.ShowDialog() == true;
+            }
+            finally { _ativando = false; }
+        }
     }
 
     // Só informativo: conta fotos em fotos\ que nenhum produto referencia. Nunca apaga nada (uma
@@ -254,6 +309,7 @@ public partial class App : System.Windows.Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _timerLicenca?.Stop();
         if (_startupConcluido)
         {
             _serviceProvider?.GetRequiredService<CriarBackupAutomatico>().Executar(incondicional: true);

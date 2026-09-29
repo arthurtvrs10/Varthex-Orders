@@ -30,6 +30,7 @@
             <Button x:Name="BotaoHistorico" Content="Histórico" ToolTip="Ctrl+3" AutomationProperties.AccessKey="Ctrl+3" Padding="18,8" FontSize="15" Margin="0,0,8,0" Click="MostrarHistorico_Click" />
             <Button x:Name="BotaoBackup" Content="Backup" ToolTip="Ctrl+4" AutomationProperties.AccessKey="Ctrl+4" Padding="18,8" FontSize="15" Margin="0,0,8,0" Click="MostrarBackup_Click" />
             <Button x:Name="BotaoConfiguracoes" Content="Configurações" ToolTip="Ctrl+5" AutomationProperties.AccessKey="Ctrl+5" Padding="18,8" FontSize="15" Click="MostrarConfiguracao_Click" />
+            <Button Content="Licença" Padding="18,8" FontSize="15" Margin="8,0,0,0" Click="MostrarLicenca_Click" />
         </StackPanel>
         <ContentControl x:Name="ConteudoPrincipal" />
     </DockPanel>

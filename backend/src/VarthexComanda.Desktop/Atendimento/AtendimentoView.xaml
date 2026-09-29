@@ -76,7 +76,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Button Margin="4" Height="104" HorizontalContentAlignment="Stretch"
+                            <Button Margin="4" Height="128" HorizontalContentAlignment="Stretch"
                                     Command="{Binding DataContext.AbrirOuSelecionarSlotCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                     CommandParameter="{Binding}">
                                 <Button.Style>
@@ -105,9 +105,12 @@
                                         <TextBlock Text="COMANDA" FontSize="10" FontWeight="Bold" />
                                         <TextBlock Text="{Binding TempoFormatado}" FontSize="10" DockPanel.Dock="Right" HorizontalAlignment="Right" />
                                     </DockPanel>
-                                    <TextBlock Grid.Row="1" Text="{Binding Numero, StringFormat='{}{0:00}'}"
+                                    <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Numero, StringFormat='{}{0:00}'}"
                                                FontSize="28" FontWeight="Bold"
                                                HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding NomeCliente}" ToolTip="{Binding NomeCliente}" TextTrimming="CharacterEllipsis" FontSize="13" HorizontalAlignment="Center" />
+                                    </StackPanel>
                                     <TextBlock Grid.Row="2" HorizontalAlignment="Center" FontSize="11">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
@@ -255,8 +258,17 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" FontWeight="Bold" FontSize="12" Foreground="#4A4A47" Margin="0,0,0,8"
+                <StackPanel Grid.Row="0" Margin="0,0,0,8">
+                <TextBlock FontWeight="Bold" FontSize="12" Foreground="#4A4A47" Margin="0,0,0,8"
                            Text="{Binding ComandaAtual.Numero, StringFormat='COMANDA #{0}'}" />
+                <TextBlock Text="Nome do cliente (opcional)" Margin="0,0,0,4" />
+                <DockPanel>
+                    <Button Content="Salvar nome" DockPanel.Dock="Right" Margin="8,0,0,0" Padding="12,6" Command="{Binding SalvarNomeClienteCommand}" />
+                    <TextBox x:Name="CampoNomeCliente" AutomationProperties.Name="Nome do cliente (opcional)" MaxLength="80" Text="{Binding NomeCliente, UpdateSourceTrigger=PropertyChanged}">
+                        <TextBox.InputBindings><KeyBinding Key="Enter" Command="{Binding SalvarNomeClienteCommand}" /></TextBox.InputBindings>
+                    </TextBox>
+                </DockPanel>
+                </StackPanel>
 
                 <Border Grid.Row="1" BorderBrush="#C4C4C4" BorderThickness="1">
                     <Grid>

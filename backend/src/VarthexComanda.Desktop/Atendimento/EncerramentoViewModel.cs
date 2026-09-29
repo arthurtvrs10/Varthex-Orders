@@ -28,6 +28,8 @@ public partial class EncerramentoViewModel : ObservableObject
 
     [ObservableProperty]
     private int numeroComanda;
+    [ObservableProperty]
+    private string? nomeCliente;
 
     [ObservableProperty]
     private long totalCentavos;
@@ -53,6 +55,7 @@ public partial class EncerramentoViewModel : ObservableObject
         }
 
         NumeroComanda = detalhe.Comanda.Numero;
+        NomeCliente = detalhe.Comanda.NomeCliente;
         TotalCentavos = detalhe.Comanda.TotalCentavos;
         Itens.Clear();
         foreach (var item in detalhe.Itens)

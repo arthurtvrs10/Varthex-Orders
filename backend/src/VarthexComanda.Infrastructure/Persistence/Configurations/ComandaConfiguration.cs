@@ -31,6 +31,7 @@ public class ComandaConfiguration : IEntityTypeConfiguration<Comanda>
         builder.Property(c => c.FechadaEm).HasColumnName("fechada_em");
         builder.Property(c => c.TotalCentavos).HasColumnName("total_centavos").HasDefaultValue(0L).IsRequired();
         builder.Property(c => c.Observacao).HasColumnName("observacao");
+        builder.Property(c => c.NomeCliente).HasColumnName("nome_cliente").HasMaxLength(80);
 
         builder.HasIndex(c => c.Numero)
             .IsUnique()

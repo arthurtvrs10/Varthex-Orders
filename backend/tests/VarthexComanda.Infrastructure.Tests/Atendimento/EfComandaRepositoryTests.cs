@@ -38,6 +38,19 @@ public class EfComandaRepositoryTests : IDisposable
     }
 
     [Fact]
+    public void NomePersisteENaoPassaParaProximaComandaDoMesmoNumero()
+    {
+        var repo = new EfComandaRepository(_fabrica);
+        var comanda = repo.AbrirComanda(1, DateTime.UtcNow);
+        repo.DefinirNomeCliente(comanda.Id, "João");
+        Assert.Equal("João", new EfComandaRepository(_fabrica).BuscarComItens(comanda.Id)!.Comanda.NomeCliente);
+        repo.CancelarComanda(comanda.Id, DateTime.UtcNow);
+        Assert.Throws<VarthexComanda.Application.Atendimento.ComandaNaoAbertaException>(() => repo.DefinirNomeCliente(comanda.Id, "Outro"));
+        Assert.Null(repo.AbrirComanda(1, DateTime.UtcNow).NomeCliente);
+        Assert.Equal("João", repo.BuscarComItens(comanda.Id)!.Comanda.NomeCliente);
+    }
+
+    [Fact]
     [Trait("Caso", "CT01")]
     public void AbrirComanda_NumeroLivre_CriaComandaAberta()
     {

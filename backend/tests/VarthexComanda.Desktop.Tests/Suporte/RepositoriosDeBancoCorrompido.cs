@@ -10,6 +10,7 @@ namespace VarthexComanda.Desktop.Tests.Suporte;
 internal sealed class ComandaRepositoryDeBancoCorrompido : IComandaRepository
 {
     private static Exception Falha() => new FalhaTecnicaSimuladaException();
+    public Comanda DefinirNomeCliente(int comandaId, string? nome) => throw Falha();
 
     public IReadOnlyList<Comanda> ListarAbertas() => throw Falha();
     public ComandaComItens? BuscarComItens(int comandaId) => throw Falha();

@@ -1,5 +1,23 @@
 # Histórico de alterações
 
+## 1.20 - 2026-09-29 - Nome na comanda (aplicativo 1.2.0)
+
+- Campo opcional Nome do cliente e botão Salvar nome na comanda aberta.
+- Nome na grade, no encerramento e no histórico; até 80 caracteres, editável enquanto aberta.
+- Migração aditiva `AddNomeClienteComanda`; sessões antigas permanecem sem nome.
+- RF29, RN28, CT24; RNF13 ajustado conforme solicitação explícita do responsável.
+- Validação: 586 testes aprovados (4 Domain, 105 Application, 255 Infrastructure, 222 Desktop), incluindo migrações existentes e persistência do nome; instalador 1.2.0 gerado.
+
+
+## 1.19 - 2026-09-29 - Licenciamento offline (aplicativo 1.1.0)
+
+- Ativação por assinatura RSA, código de computador e prazo fixo: vitalícia ou 1–3 meses.
+- Tela de ativação e renovação, verificação periódica e registro de último uso protegido por DPAPI.
+- Emissor separado, chave privada fora do Git e dos pacotes de distribuição.
+- RF28, RN24–RN27 e CT23 descritos em [Licenciamento offline](docs/20-licenciamento-offline.md).
+- Validação: 578 testes aprovados (4 Domain, 99 Application, 254 Infrastructure, 221 Desktop), incluindo diálogo de ativação; pacote conferido sem emissor ou chave privada. Homologação em Windows limpo permanece pendente.
+
+
 ## Instalador EXE (2026-09-29)
 
 A distribuição principal agora usa `artifacts\VarthexComanda-1.0.0-Setup-win-x64.exe`.

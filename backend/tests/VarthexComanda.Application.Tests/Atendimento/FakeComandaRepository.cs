@@ -10,6 +10,14 @@ public class FakeComandaRepository : IComandaRepository
     private int _proximoComandaId = 1;
     private int _proximoItemId = 1;
 
+    public Comanda DefinirNomeCliente(int comandaId, string? nome)
+    {
+        var comanda = _comandas.Single(c => c.Id == comandaId);
+        if (comanda.Status != StatusComanda.Aberta) throw new ComandaNaoAbertaException();
+        comanda.NomeCliente = nome;
+        return comanda;
+    }
+
     public IReadOnlyList<Comanda> ListarAbertas() =>
         _comandas.Where(c => c.Status == StatusComanda.Aberta).OrderBy(c => c.Numero).ToList();
 

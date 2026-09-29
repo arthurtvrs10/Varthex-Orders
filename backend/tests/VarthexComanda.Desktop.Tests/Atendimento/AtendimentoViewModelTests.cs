@@ -11,6 +11,23 @@ namespace VarthexComanda.Desktop.Tests.Atendimento;
 
 public class AtendimentoViewModelTests
 {
+    [Fact]
+    public void SalvarNomeAtualizaGradeERecarregaAoSelecionar()
+    {
+        var (vm, _, _, _) = CriarViewModel();
+        vm.NovoNumero = "1";
+        vm.AbrirCommand.Execute(null);
+        vm.NomeCliente = "  Maria  ";
+        vm.SalvarNomeClienteCommand.Execute(null);
+        Assert.Equal("Maria", vm.Slots.Single(s => s.Numero == 1).NomeCliente);
+        vm.FecharEdicaoCommand.Execute(null);
+        vm.AbrirOuSelecionarSlotCommand.Execute(vm.Slots.Single(s => s.Numero == 1));
+        Assert.Equal("Maria", vm.NomeCliente);
+        vm.NomeCliente = "";
+        vm.SalvarNomeClienteCommand.Execute(null);
+        Assert.Null(vm.ComandaAtual!.NomeCliente);
+    }
+
     private static (AtendimentoViewModel viewModel, FakeProdutoRepository produtos, FakeConfirmador confirmador, FakeEncerramentoDialog encerramentoDialog) CriarViewModel(bool confirmar = true)
     {
         var categorias = new FakeCategoriaRepository();

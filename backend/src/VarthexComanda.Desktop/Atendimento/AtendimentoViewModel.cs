@@ -96,6 +96,29 @@ public partial class AtendimentoViewModel : ObservableObject
     private string novoNumero = string.Empty;
 
     [ObservableProperty]
+    private string nomeCliente = string.Empty;
+
+    [RelayCommand]
+    private void SalvarNomeCliente()
+    {
+        if (ComandaAtual is null) return;
+        try
+        {
+            var resultado = new DefinirNomeCliente(_comandas).Executar(ComandaAtual.Id, NomeCliente);
+            if (!resultado.Sucesso) { Mensagem = string.Join(" ", resultado.Erros); return; }
+            ComandaAtual = resultado.Valor!;
+            NomeCliente = ComandaAtual.NomeCliente ?? string.Empty;
+            AtualizarComandasAbertas();
+            Mensagem = "Nome salvo.";
+        }
+        catch (Exception ex)
+        {
+            _logger?.Error(ex, "Falha em {Operacao}", "SalvarNomeCliente");
+            Mensagem = "Não foi possível salvar o nome. Tente novamente.";
+        }
+    }
+
+    [ObservableProperty]
     private Comanda? comandaAtual;
 
     [ObservableProperty]
@@ -203,6 +226,7 @@ public partial class AtendimentoViewModel : ObservableObject
         }
 
         ComandaAtual = detalhe.Comanda;
+        NomeCliente = ComandaAtual.NomeCliente ?? string.Empty;
         ItemSelecionadoId = null;
         SubstituirItens(detalhe.Itens, null);
         VerTotalCommand.NotifyCanExecuteChanged();
@@ -212,6 +236,7 @@ public partial class AtendimentoViewModel : ObservableObject
     private void FecharEdicao()
     {
         ComandaAtual = null;
+        NomeCliente = string.Empty;
         ItemSelecionadoId = null;
         TextoBuscaCatalogo = string.Empty;
         Itens.Clear();
@@ -524,6 +549,7 @@ public partial class AtendimentoViewModel : ObservableObject
                     Numero = numero,
                     Aberta = true,
                     ComandaId = comanda.Id,
+                    NomeCliente = comanda.NomeCliente,
                     TotalFormatado = CentavosParaMoedaConverter.Formatar(comanda.TotalCentavos),
                     TempoFormatado = FormatarTempoAberta(comanda.AbertaEm, agora)
                 });
@@ -548,6 +574,7 @@ public partial class AtendimentoViewModel : ObservableObject
                 Numero = comanda.Numero,
                 Aberta = true,
                 ComandaId = comanda.Id,
+                NomeCliente = comanda.NomeCliente,
                 TotalFormatado = CentavosParaMoedaConverter.Formatar(comanda.TotalCentavos),
                 TempoFormatado = FormatarTempoAberta(comanda.AbertaEm, agora)
             });

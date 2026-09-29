@@ -1,33 +1,25 @@
 <div align="center">
 
-## Instalador EXE (2026-09-29)
-
-A distribuição principal agora usa `artifacts\VarthexComanda-1.0.0-Setup-win-x64.exe`.
-Dê dois cliques e siga o assistente em português. Inclui o .NET, cria atalhos e
-permite desinstalar por Aplicativos Instalados do Windows, sem administrador.
-Banco, fotos e backups ficam separados e são preservados.
-
-Para gerar: `.\scripts\gerar-instalador.ps1`. Requer Inno Setup 6 instalado,
-ou `-Compilador <caminho de ISCC.exe>`. Saída em `artifacts`, com SHA-256.
-Atualizações usam o mesmo instalador; não criam backup dos binários anteriores.
-O ZIP e os procedimentos com scripts abaixo continuam como alternativa.
-Esta decisão substitui referências anteriores à ausência de instalador EXE.
-Sem alteração de RF/RN de negócio; rastreabilidade: RNF09, RNF14, RNF17 e CT21.
-559 testes Release passaram; CT21 em Windows limpo sem .NET permanece pendente.
-
-
 # Varthex Comanda
 
 ![Plataforma](https://img.shields.io/badge/plataforma-Windows-blue)
 ![.NET](https://img.shields.io/badge/.NET-10-512BD4)
 ![WPF](https://img.shields.io/badge/UI-WPF-5C2D91)
 ![SQLite](https://img.shields.io/badge/banco-SQLite-003B57)
-![Testes](https://img.shields.io/badge/testes-240%20passando-brightgreen)
+![Testes](https://img.shields.io/badge/testes-586%20passando-brightgreen)
 ![Licen%C3%A7a](https://img.shields.io/badge/licen%C3%A7a-n%C3%A3o%20definida-lightgrey)
 
 **Um aplicativo desktop para Windows que controla o consumo por comandas
 numeradas: você lança os itens, ele calcula o total e mostra o valor para você
 digitar na maquininha — sem nunca tocar em pagamento.**
+
+### Download para Windows
+
+[**Baixar Varthex Comanda 1.2.0 — Windows 64 bits (.exe)**](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.0/VarthexComanda-1.2.0-Setup-win-x64.exe)
+
+[Notas da versão](https://github.com/arthurtvrs10/Varthex-Orders/releases/tag/v1.2.0) · [SHA-256](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.0/VarthexComanda-1.2.0-Setup-win-x64.exe.sha256)
+
+Instalador com .NET incluso. Funciona offline e exige uma licença de ativação.
 
 <img src="docs/design/atendimento-grade.png" alt="Grade de comandas" width="900">
 
@@ -54,11 +46,32 @@ Histórico: vendas do dia, resumo e detalhe dos itens.
 
 ## Instalação
 
-O aplicativo é entregue como um pacote `.zip` **autocontido** (`win-x64`): já
-inclui o runtime do .NET, então quem usa **não precisa instalar o .NET nem o
-SDK**, e a instalação não exige conta de administrador. O pacote não é um
-instalador `.msi`/`.exe`: são scripts (`Instalar.cmd`, `Instalar.ps1`,
-`Desinstalar.cmd`, `Desinstalar.ps1`) que acompanham os arquivos do programa.
+1. [Baixe o instalador para Windows 64 bits](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.0/VarthexComanda-1.2.0-Setup-win-x64.exe).
+2. Execute o `.exe` e siga o assistente em português; não é necessário instalar .NET ou usar administrador.
+3. Abra o programa, envie o código do computador ao responsável e informe a chave recebida.
+
+**Atualizar:** feche o aplicativo e execute o novo instalador. Licença e dados são
+preservados. **Desinstalar:** use Aplicativos Instalados do Windows; os dados são mantidos.
+
+Para identificar o cliente, abra a comanda, preencha **Nome do cliente (opcional)**
+e clique em **Salvar nome** (ou Enter). Para remover, deixe vazio e salve.
+O nome aparece na grade, encerramento e histórico. Atualizar mantém a licença e os dados.
+
+A ativação offline é obrigatória. O emissor de licenças e a chave
+privada são exclusivos do responsável e nunca devem ser enviados ao cliente.
+Veja [como emitir, ativar e renovar licenças](docs/docs/20-licenciamento-offline.md).
+
+### Gerar o instalador
+
+Com SDK .NET 10 e Inno Setup 6 instalados, execute `.\scripts\gerar-instalador.ps1`.
+O `.exe` e seu SHA-256 ficam em `artifacts`. A cópia versionada para distribuição
+fica em `downloads/windows`. Não distribua a pasta `artifacts` inteira, pois ela
+também pode conter a chave privada do emissor.
+
+### ZIP alternativo para instalação manual
+
+O script abaixo também gera um ZIP autocontido com scripts de instalação.
+As instruções desta subseção referem-se somente a esse pacote alternativo.
 
 **Gerar o pacote** (na máquina de desenvolvimento, que precisa do SDK do .NET 10):
 
@@ -68,7 +81,7 @@ instalador `.msi`/`.exe`: são scripts (`Instalar.cmd`, `Instalar.ps1`,
 
 Isso lê a versão do `<Version>` do `VarthexComanda.Desktop.csproj`, publica em
 `artifacts\publish\win-x64` e gera `artifacts\VarthexComanda-<versão>-win-x64.zip`
-(hoje `VarthexComanda-1.0.0-win-x64.zip`, cerca de 64 MB). O parâmetro opcional
+(hoje `VarthexComanda-1.2.0-win-x64.zip`, cerca de 66 MB). O parâmetro opcional
 `-Saida <pasta>` troca a pasta `artifacts`. A pasta `artifacts\publish\win-x64`
 é apagada a cada publicação; já os `.zip` de versões anteriores **acumulam** em
 `artifacts` (apague os antigos à mão). Os arquivos `.pdb` não entram no pacote.
@@ -215,8 +228,7 @@ configurações estão entregues e cobertas por testes automatizados.
 - Validar o pacote autocontido num Windows limpo, sem nenhum .NET instalado
   (CT21), e testar antivírus, a versão/arquitetura do Windows-alvo (RNF17) e a
   instalação com atalhos no computador do balcão.
-- Instalador `.msi`/Inno Setup/WiX: **não adotado** por ora (o pacote é um
-  `.zip` com scripts); avaliar quando a distribuição se estabilizar.
+- Validar o instalador Inno Setup no computador do balcão.
 - Navegação completa por teclado com foco visível (RNF18); hoje só o **F4** existe.
 - Rotação e limite de tamanho dos logs (RNF21).
 - Homologação no computador real (CT01–CT22, teste sem internet, treinamento).

@@ -18,7 +18,7 @@ public class EfVendaRepository : IVendaRepository
         using var contexto = _fabricaContexto.CreateDbContext();
         return contexto.Vendas
             .Where(v => v.FinalizadaEm >= inicioUtc && v.FinalizadaEm < fimUtc && v.Status == StatusVenda.Concluida)
-            .Join(contexto.Comandas, v => v.ComandaId, c => c.Id, (v, c) => new VendaResumo { Venda = v, NumeroComanda = c.Numero })
+            .Join(contexto.Comandas, v => v.ComandaId, c => c.Id, (v, c) => new VendaResumo { Venda = v, NumeroComanda = c.Numero, NomeCliente = c.NomeCliente })
             .OrderBy(vr => vr.Venda.FinalizadaEm)
             .ToList();
     }
