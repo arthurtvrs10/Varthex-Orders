@@ -1,5 +1,21 @@
 # Histórico de alterações
 
+## Instalador EXE (2026-09-29)
+
+A distribuição principal agora usa `artifacts\VarthexComanda-1.0.0-Setup-win-x64.exe`.
+Dê dois cliques e siga o assistente em português. Inclui o .NET, cria atalhos e
+permite desinstalar por Aplicativos Instalados do Windows, sem administrador.
+Banco, fotos e backups ficam separados e são preservados.
+
+Para gerar: `.\scripts\gerar-instalador.ps1`. Requer Inno Setup 6 instalado,
+ou `-Compilador <caminho de ISCC.exe>`. Saída em `artifacts`, com SHA-256.
+Atualizações usam o mesmo instalador; não criam backup dos binários anteriores.
+O ZIP e os procedimentos com scripts abaixo continuam como alternativa.
+Esta decisão substitui referências anteriores à ausência de instalador EXE.
+Sem alteração de RF/RN de negócio; rastreabilidade: RNF09, RNF14, RNF17 e CT21.
+559 testes Release passaram; CT21 em Windows limpo sem .NET permanece pendente.
+
+
 ## 1.17 - 2026-09-21 - Homologação (Etapa 8)
 
 Entregue (tudo o que uma máquina de desenvolvimento prova sem terceiros; nenhum código de produto foi alterado):
