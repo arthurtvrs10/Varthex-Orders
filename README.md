@@ -13,14 +13,6 @@
 numeradas: você lança os itens, ele calcula o total e mostra o valor para você
 digitar na maquininha — sem nunca tocar em pagamento.**
 
-### Download para Windows
-
-[**Baixar Varthex Comanda 1.2.0 — Windows 64 bits (.exe)**](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.0/VarthexComanda-1.2.0-Setup-win-x64.exe)
-
-[Notas da versão](https://github.com/arthurtvrs10/Varthex-Orders/releases/tag/v1.2.0) · [SHA-256](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.0/VarthexComanda-1.2.0-Setup-win-x64.exe.sha256)
-
-Instalador com .NET incluso. Funciona offline e exige uma licença de ativação.
-
 <img src="docs/design/atendimento-grade.png" alt="Grade de comandas" width="900">
 
 </div>
@@ -29,6 +21,20 @@ Pensado para o balcão de um pequeno negócio: uma grade com todas as comandas
 (livres ou abertas), um menu de produtos com foto e um carrinho em tabela, tudo
 com botões grandes o bastante para o toque. Funciona 100% offline, com os dados
 num banco SQLite local.
+
+## Windows
+
+[![Baixar para Windows](docs/design/download-windows.svg)](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.0/VarthexComanda-1.2.0-Setup-win-x64.exe)
+
+O botão baixa diretamente o instalador **Varthex Comanda 1.2.0 para Windows 64 bits**.
+Instala para o usuário atual, sem exigir administrador, e já inclui o .NET.
+O aplicativo funciona offline e precisa de uma chave de ativação.
+
+Para atualizar, feche o Varthex e execute o instalador. Sua licença e seus dados
+são preservados. O executável ainda não possui assinatura de código, por isso
+o Windows pode exibir um aviso de aplicativo desconhecido.
+
+[Notas da versão](https://github.com/arthurtvrs10/Varthex-Orders/releases/tag/v1.2.0) · [Verificar integridade (SHA-256)](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.0/VarthexComanda-1.2.0-Setup-win-x64.exe.sha256)
 
 ## Telas
 
