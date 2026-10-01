@@ -38,15 +38,17 @@ o Windows pode exibir um aviso de aplicativo desconhecido.
 
 ## Telas
 
-![Dentro da comanda](docs/design/atendimento-comanda.png)
+Telas da versão 1.2.1, renderizadas diretamente pelo WPF com dados fictícios em memória, sem acessar o banco do usuário.
 
-Dentro da comanda: menu com fotos à esquerda, carrinho à direita.
+<img src="docs/design/atendimento-comanda.png" alt="Comanda com nome do cliente, catálogo e itens selecionados na nova identidade visual" width="900">
 
-![Produtos](docs/design/produtos.png)
+Dentro da comanda: nome do cliente, catálogo à esquerda e itens com total à direita. Os exemplos também mostram produtos sem foto.
 
-Produtos: cadastro com foto, modo de edição.
+<img src="docs/design/produtos.png" alt="Cadastro de produtos no modo de edição, com preço, categoria e foto opcional" width="900">
 
-![Histórico](docs/design/historico.png)
+Produtos: edição de nome, categoria, preço e foto opcional.
+
+<img src="docs/design/historico.png" alt="Histórico com vendas fictícias, resumo do dia e detalhes dos itens" width="900">
 
 Histórico: vendas do dia, resumo e detalhe dos itens.
 
