@@ -36,6 +36,23 @@ o Windows pode exibir um aviso de aplicativo desconhecido.
 
 [Notas da versão](downloads/windows/README.md) · [Verificar integridade (SHA-256)](downloads/windows/VarthexComanda-1.2.1-Setup-win-x64.exe.sha256)
 
+## Android — gerador de chaves
+
+### [⬇ Baixar Varthex Licenças 1.0.0 (APK)](downloads/android/Varthex-Licencas-1.0.0.apk?raw=true)
+
+Aplicativo para **Android 8.0 ou superior**, exclusivo do responsável pelas licenças.
+Gera chaves offline de **1, 2, 3 meses ou vitalícias**, com opções para copiar e compartilhar.
+
+1. Baixe o APK no celular, abra o arquivo e permita a instalação quando solicitado pelo Android.
+2. Importe a chave privada `.pem` do emissor original.
+3. Informe o cliente, cole o código do computador e escolha o plano e a data inicial.
+4. Confirme a autorização e toque em **Gerar chave de ativação**. Envie somente a licença gerada ao cliente.
+
+A chave privada não está incluída no APK e não deve ser compartilhada com clientes.
+A compatibilidade das licenças com o Windows foi validada; a instalação e a interface ainda precisam ser conferidas em um aparelho Android.
+
+[Instruções completas](mobile/licencas/README.md) · [Verificar integridade (SHA-256)](downloads/android/Varthex-Licencas-1.0.0.apk.sha256)
+
 ## Telas
 
 Telas do código atual, com cores originais, controles quadrados e marca no rodapé. Renderizadas diretamente pelo WPF com dados fictícios em memória, sem acessar o banco do usuário. O instalador 1.2.1 ainda utiliza o layout anterior.
@@ -68,10 +85,6 @@ O nome aparece na grade, encerramento e histórico. Atualizar mantém a licença
 A ativação offline é obrigatória. O emissor de licenças e a chave
 privada são exclusivos do responsável e nunca devem ser enviados ao cliente.
 Veja [como emitir, ativar e renovar licenças](docs/docs/20-licenciamento-offline.md).
-
-### Emissor de licenças para Android
-
-O responsável pode gerar chaves offline pelo [Varthex Licenças para Android](mobile/licencas/README.md), com planos de 1, 2, 3 meses ou vitalício. [Baixar APK](downloads/android/Varthex-Licencas-1.0.0.apk?raw=true). A chave privada é importada separadamente e nunca deve ser enviada ao cliente.
 
 ### Gerar o instalador Windows
 
