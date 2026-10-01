@@ -24,9 +24,9 @@ num banco SQLite local.
 
 ## Windows
 
-[![Baixar para Windows](docs/design/download-windows.svg)](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.0/VarthexComanda-1.2.0-Setup-win-x64.exe)
+[![Baixar para Windows](docs/design/download-windows.svg)](downloads/windows/VarthexComanda-1.2.1-Setup-win-x64.exe?raw=true)
 
-O botão baixa diretamente o instalador **Varthex Comanda 1.2.0 para Windows 64 bits**.
+O botão baixa diretamente o instalador **Varthex Comanda 1.2.1 para Windows 64 bits**.
 Instala para o usuário atual, sem exigir administrador, e já inclui o .NET.
 O aplicativo funciona offline e precisa de uma chave de ativação.
 
@@ -34,7 +34,7 @@ Para atualizar, feche o Varthex e execute o instalador. Sua licença e seus dado
 são preservados. O executável ainda não possui assinatura de código, por isso
 o Windows pode exibir um aviso de aplicativo desconhecido.
 
-[Notas da versão](https://github.com/arthurtvrs10/Varthex-Orders/releases/tag/v1.2.0) · [Verificar integridade (SHA-256)](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.0/VarthexComanda-1.2.0-Setup-win-x64.exe.sha256)
+[Notas da versão](downloads/windows/README.md) · [Verificar integridade (SHA-256)](downloads/windows/VarthexComanda-1.2.1-Setup-win-x64.exe.sha256)
 
 ## Telas
 
@@ -52,7 +52,7 @@ Histórico: vendas do dia, resumo e detalhe dos itens.
 
 ## Instalação
 
-1. [Baixe o instalador para Windows 64 bits](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.0/VarthexComanda-1.2.0-Setup-win-x64.exe).
+1. [Baixe o instalador para Windows 64 bits](downloads/windows/VarthexComanda-1.2.1-Setup-win-x64.exe?raw=true).
 2. Execute o `.exe` e siga o assistente em português; não é necessário instalar .NET ou usar administrador.
 3. Abra o programa, envie o código do computador ao responsável e informe a chave recebida.
 
@@ -87,7 +87,7 @@ As instruções desta subseção referem-se somente a esse pacote alternativo.
 
 Isso lê a versão do `<Version>` do `VarthexComanda.Desktop.csproj`, publica em
 `artifacts\publish\win-x64` e gera `artifacts\VarthexComanda-<versão>-win-x64.zip`
-(hoje `VarthexComanda-1.2.0-win-x64.zip`, cerca de 66 MB). O parâmetro opcional
+(hoje `VarthexComanda-1.2.1-win-x64.zip`, cerca de 66 MB). O parâmetro opcional
 `-Saida <pasta>` troca a pasta `artifacts`. A pasta `artifacts\publish\win-x64`
 é apagada a cada publicação; já os `.zip` de versões anteriores **acumulam** em
 `artifacts` (apague os antigos à mão). Os arquivos `.pdb` não entram no pacote.
