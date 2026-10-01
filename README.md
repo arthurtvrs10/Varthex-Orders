@@ -6,7 +6,7 @@
 ![.NET](https://img.shields.io/badge/.NET-10-512BD4)
 ![WPF](https://img.shields.io/badge/UI-WPF-5C2D91)
 ![SQLite](https://img.shields.io/badge/banco-SQLite-003B57)
-![Testes](https://img.shields.io/badge/testes-586%20passando-brightgreen)
+![Testes](https://img.shields.io/badge/testes-593%20passando-brightgreen)
 ![Licen%C3%A7a](https://img.shields.io/badge/licen%C3%A7a-n%C3%A3o%20definida-lightgrey)
 
 **Um aplicativo desktop para Windows que controla o consumo por comandas
@@ -37,6 +37,22 @@ são preservados. O executável ainda não possui assinatura de código, por iss
 o Windows pode exibir um aviso de aplicativo desconhecido.
 
 [Notas da versão](downloads/windows/README.md) · [Verificar integridade (SHA-256)](downloads/windows/VarthexComanda-1.2.2-Setup-win-x64.exe.sha256)
+
+## Windows — demonstração com produtos
+
+[![Baixar demonstração para Windows](docs/design/download-windows.svg)](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.3-demo/VarthexComanda-Demo-1.2.3-Setup-win-x64.exe)
+
+**Edição Demonstração 1.2.3**, pronta para testar com **12 produtos e imagens realistas geradas por IA com fundo branco**:
+pastéis de carne, queijo, frango com requeijão e pizza; coxinha, kibe, bolinha de queijo,
+batata frita, refrigerantes cola, guaraná e laranja, além de água mineral.
+Os preços são fictícios e podem ser editados.
+
+Instala o atalho **Comanda Demonstração** e mantém os dados separados, em
+`%LOCALAPPDATA%\VarthexComandaDemo`. Não substitui o aplicativo nem o catálogo normal.
+O catálogo é criado só na primeira utilização; reabrir ou reinstalar preserva suas alterações.
+Funciona offline e requer uma chave de ativação — a ativação existente no mesmo computador é reutilizada.
+
+[Detalhes do catálogo e das imagens](demo/README.md) · [Release da demonstração](https://github.com/arthurtvrs10/Varthex-Orders/releases/tag/v1.2.3-demo)
 
 ## Android — gerador de chaves
 

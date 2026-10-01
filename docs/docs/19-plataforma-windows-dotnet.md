@@ -1,5 +1,25 @@
 # Plataforma Windows e .NET
 
+## Edição de demonstração (2026-10-01)
+
+Solicitada pelo responsável para testar um catálogo ilustrado. `scripts/gerar-demo.ps1`
+gera um instalador separado, com AppId e atalhos próprios. `--demonstracao` ou o
+marcador `edicao-demonstracao.txt` seleciona `%LOCALAPPDATA%\VarthexComandaDemo`,
+ignorando `VARTHEX_COMANDA_DADOS` nessa edição para não atingir uma base real.
+O instalador padrão mantém o comportamento anterior.
+
+Após as migrações, somente uma base sem categorias, produtos ou comandas recebe
+12 produtos fictícios em quatro categorias, com preços de teste e imagens geradas
+por IA com fundo branco. O marcador transacional impede a repetição da carga;
+atualizações e reaberturas preservam alterações. A carga não cria vendas ou comandas.
+Banco e fotos ficam fora da pasta do programa e sobrevivem à desinstalação.
+A licença offline continua obrigatória e é compartilhada com a ativação existente
+do mesmo computador. Nenhuma chave privada ou licença pronta é distribuída.
+
+Rastreabilidade: RF01/RF03, RN04/RN05 preservados, RNF01/RNF09/RNF14, CT21.
+`DemonstracaoTests` verifica carga real, imagens, não duplicação, preservação de
+edições, recusa de caminhos de foto inválidos e isolamento da base normal.
+
 ## Instalador EXE (2026-09-29)
 
 A distribuição principal agora usa `artifacts\VarthexComanda-1.0.0-Setup-win-x64.exe`.

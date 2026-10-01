@@ -1,5 +1,14 @@
 # Histórico de alterações
 
+## Demonstração 1.2.3 - 2026-10-01 - Catálogo com imagens
+
+- Edição separada com 12 produtos fictícios: pastéis, salgados, porção e bebidas.
+- Imagens realistas geradas por IA sobre fundo branco, incluídas para uso offline.
+- Carga inicial transacional e única; base, instalação e atalhos separados da edição normal.
+- Mantém licença offline e preserva alterações e dados entre execuções e reinstalações.
+- Validação: 593 testes aprovados, incluindo sete cenários novos da demonstração e leitura das 12 imagens.
+- Rastreabilidade: RF01/RF03, RN04/RN05, RNF01/RNF09/RNF14, CT21; Windows limpo permanece pendente.
+
 ## Aplicativo 1.2.2 - 2026-10-01 - Instalador atualizado
 
 - Instalador Windows recompilado com controles quadrados, cores originais e logo e crédito somente no rodapé.

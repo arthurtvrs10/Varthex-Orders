@@ -16,6 +16,8 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <Content Include="..\..\..\demo\catalogo.json" Link="demo\catalogo.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\demo\fotos\*.png" Link="demo\fotos\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

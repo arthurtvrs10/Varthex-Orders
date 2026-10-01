@@ -1,0 +1,74 @@
+[
+  {
+    "Categoria": "Pastéis",
+    "Nome": "Pastel de carne",
+    "PrecoCentavos": 1000,
+    "Foto": "pastelCarne.png"
+  },
+  {
+    "Categoria": "Pastéis",
+    "Nome": "Pastel de queijo",
+    "PrecoCentavos": 1000,
+    "Foto": "pastelQueijo.png"
+  },
+  {
+    "Categoria": "Pastéis",
+    "Nome": "Pastel de frango com requeijão",
+    "PrecoCentavos": 1200,
+    "Foto": "pastelFrango.png"
+  },
+  {
+    "Categoria": "Pastéis",
+    "Nome": "Pastel de pizza",
+    "PrecoCentavos": 1100,
+    "Foto": "pastelPizza.png"
+  },
+  {
+    "Categoria": "Salgados",
+    "Nome": "Coxinha de frango",
+    "PrecoCentavos": 700,
+    "Foto": "coxinha.png"
+  },
+  {
+    "Categoria": "Salgados",
+    "Nome": "Kibe de carne",
+    "PrecoCentavos": 700,
+    "Foto": "kibe.png"
+  },
+  {
+    "Categoria": "Salgados",
+    "Nome": "Bolinha de queijo (3 un.)",
+    "PrecoCentavos": 800,
+    "Foto": "bolinha.png"
+  },
+  {
+    "Categoria": "Porções",
+    "Nome": "Batata frita",
+    "PrecoCentavos": 1500,
+    "Foto": "batata.png"
+  },
+  {
+    "Categoria": "Bebidas",
+    "Nome": "Refrigerante cola 350 ml",
+    "PrecoCentavos": 600,
+    "Foto": "cola.png"
+  },
+  {
+    "Categoria": "Bebidas",
+    "Nome": "Refrigerante guaraná 350 ml",
+    "PrecoCentavos": 600,
+    "Foto": "guarana.png"
+  },
+  {
+    "Categoria": "Bebidas",
+    "Nome": "Refrigerante laranja 350 ml",
+    "PrecoCentavos": 600,
+    "Foto": "laranja.png"
+  },
+  {
+    "Categoria": "Bebidas",
+    "Nome": "Água mineral 500 ml",
+    "PrecoCentavos": 400,
+    "Foto": "agua.png"
+  }
+]
