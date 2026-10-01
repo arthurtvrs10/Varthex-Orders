@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Lumen — "Aperture"
+     Concept: the o of the name cut open like a camera aperture, because the
+     brand owns clarity.
+     Grid: circle. U = 100. Outer Ø = 96 (U*0.96). Ring stroke = U/8.33 = 12.
+     Counter Ø = 72 (U*0.72). Blade height = 12 (= ring stroke), entering on the
+     horizontal axis so the cut reads at 16px.
+     One path, fill-rule evenodd: the ring, then a bar that XORs a gap out of the
+     ring's right side and simultaneously fills the blade inside the counter. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <path fill-rule="evenodd" fill="#0D0D0D"
+        d="M50 2a48 48 0 1 0 0 96 48 48 0 1 0 0-96Zm0 12a36 36 0 1 1 0 72 36 36 0 1 1 0-72ZM45 44H99V56H45Z"/>
+</svg>

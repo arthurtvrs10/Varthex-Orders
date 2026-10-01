@@ -1,0 +1,164 @@
+[
+  {
+    "name": "Grafite",
+    "hex": "#23252A",
+    "role": "ink",
+    "rgb": [
+      35,
+      37,
+      42
+    ],
+    "cmyk": [
+      17,
+      12,
+      0,
+      84
+    ],
+    "pms": "",
+    "lstar": 14.7
+  },
+  {
+    "name": "Laranja balc\u00e3o",
+    "hex": "#C56820",
+    "role": "brand",
+    "rgb": [
+      197,
+      104,
+      32
+    ],
+    "cmyk": [
+      0,
+      47,
+      84,
+      23
+    ],
+    "pms": "",
+    "lstar": 53.9
+  },
+  {
+    "name": "Papel",
+    "hex": "#FFF9F2",
+    "role": "surface",
+    "rgb": [
+      255,
+      249,
+      242
+    ],
+    "cmyk": [
+      0,
+      2,
+      5,
+      0
+    ],
+    "pms": "",
+    "lstar": 98.2
+  },
+  {
+    "name": "Carv\u00e3o",
+    "hex": "#47433F",
+    "role": "neutral",
+    "rgb": [
+      71,
+      67,
+      63
+    ],
+    "cmyk": [
+      0,
+      6,
+      11,
+      72
+    ],
+    "pms": "",
+    "lstar": 28.7
+  },
+  {
+    "name": "Cinza quente",
+    "hex": "#817971",
+    "role": "neutral",
+    "rgb": [
+      129,
+      121,
+      113
+    ],
+    "cmyk": [
+      0,
+      6,
+      12,
+      49
+    ],
+    "pms": "",
+    "lstar": 51.3
+  },
+  {
+    "name": "Areia",
+    "hex": "#D9CFC3",
+    "role": "neutral",
+    "rgb": [
+      217,
+      207,
+      195
+    ],
+    "cmyk": [
+      0,
+      5,
+      10,
+      15
+    ],
+    "pms": "",
+    "lstar": 83.6
+  },
+  {
+    "name": "Sucesso",
+    "hex": "#26734D",
+    "role": "success",
+    "rgb": [
+      38,
+      115,
+      77
+    ],
+    "cmyk": [
+      67,
+      0,
+      33,
+      55
+    ],
+    "pms": "",
+    "lstar": 43.1
+  },
+  {
+    "name": "Aten\u00e7\u00e3o",
+    "hex": "#8C6500",
+    "role": "warning",
+    "rgb": [
+      140,
+      101,
+      0
+    ],
+    "cmyk": [
+      0,
+      28,
+      100,
+      45
+    ],
+    "pms": "",
+    "lstar": 45.5
+  },
+  {
+    "name": "Erro",
+    "hex": "#B23B32",
+    "role": "danger",
+    "rgb": [
+      178,
+      59,
+      50
+    ],
+    "cmyk": [
+      0,
+      67,
+      72,
+      30
+    ],
+    "pms": "",
+    "lstar": 42.5
+  }
+]

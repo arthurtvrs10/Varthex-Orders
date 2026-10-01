@@ -1,0 +1,205 @@
+{
+  "brand": {
+    "name": "Varthex",
+    "descriptor": "COMANDA",
+    "tagline": "Cada pedido em seu lugar.",
+    "story": "Uma comanda clara deixa o atendimento mais simples. Três linhas de pedidos contidas em uma ficha compacta representam organização no balcão.",
+    "promise": [
+      "Identificar com clareza.",
+      "Organizar o atendimento.",
+      "Conferir com confiança."
+    ],
+    "voice": {
+      "adjectives": [
+        "simples",
+        "confiável",
+        "moderna"
+      ],
+      "we_say": [
+        "Cada pedido em seu lugar."
+      ],
+      "we_dont_say": [
+        "Revolucionário"
+      ]
+    },
+    "contact": {},
+    "legal": "Varthex Comanda — proposta de identidade"
+  },
+  "brief": {
+    "business": "Aplicativo offline de comandas para negócios de alimentação.",
+    "audience": "Donos e atendentes de pequenos restaurantes e hamburguerias.",
+    "must_not_look_like": "Monograma V, talheres, hambúrguer ou ícone de pagamento. Concorrentes não informados.",
+    "name_relation": "abstract",
+    "owns_the_word": "organização",
+    "character": [
+      "simples",
+      "confiável",
+      "moderna"
+    ],
+    "lives_mostly_on": "Ícone do aplicativo Windows, instalador e cabeçalho digital.",
+    "forbidden": [
+      "monograma V",
+      "gradientes",
+      "3D"
+    ],
+    "assumed": false,
+    "assumptions": [
+      "Concorrentes e elementos da logo anterior não informados."
+    ]
+  },
+  "concept": {
+    "name": "Comanda organizada",
+    "sentence": "Uma ficha compacta com três linhas alinhadas representa cada pedido em seu lugar.",
+    "name_relation": "abstract",
+    "operation": "Três linhas vazadas no corpo de uma ficha com base destacável.",
+    "exclusions": [
+      "V",
+      "talheres",
+      "hambúrguer",
+      "check",
+      "gradientes"
+    ],
+    "rejected": [
+      {
+        "name": "Pedido concluído",
+        "why_not": "Lembra gerenciador de tarefas."
+      },
+      {
+        "name": "Ficha de balcão",
+        "why_not": "Lembra ingresso."
+      }
+    ],
+    "form": {
+      "elaboration": "moderate",
+      "naturalness": "stylized",
+      "shape": "mixed",
+      "symmetry": "asymmetric",
+      "completeness": "complete"
+    }
+  },
+  "typography": {
+    "display": {
+      "fontsource": "manrope",
+      "weights": [
+        500,
+        700
+      ],
+      "class": "Sans geométrica",
+      "role": "Logo e títulos"
+    },
+    "text": {
+      "fontsource": "ibm-plex-mono",
+      "weights": [
+        400,
+        500
+      ],
+      "class": "Monoespaçada",
+      "role": "Números e legendas"
+    }
+  },
+  "scale": {
+    "base": 16,
+    "ratio": 1.2
+  },
+  "colors": [
+    {
+      "name": "Grafite",
+      "hex": "#23252A",
+      "role": "ink"
+    },
+    {
+      "name": "Laranja balcão",
+      "hex": "#C56820",
+      "role": "brand"
+    },
+    {
+      "name": "Papel",
+      "hex": "#FFF9F2",
+      "role": "surface"
+    },
+    {
+      "name": "Carvão",
+      "hex": "#47433F",
+      "role": "neutral"
+    },
+    {
+      "name": "Cinza quente",
+      "hex": "#817971",
+      "role": "neutral"
+    },
+    {
+      "name": "Areia",
+      "hex": "#D9CFC3",
+      "role": "neutral"
+    },
+    {
+      "name": "Sucesso",
+      "hex": "#26734D",
+      "role": "success"
+    },
+    {
+      "name": "Atenção",
+      "hex": "#8C6500",
+      "role": "warning"
+    },
+    {
+      "name": "Erro",
+      "hex": "#B23B32",
+      "role": "danger"
+    }
+  ],
+  "logo": {
+    "grid": "modular",
+    "unit": 100,
+    "metrics": {
+      "U": "100",
+      "módulo": "10",
+      "corpo": "64 × 76",
+      "linhas": "36 / 36 / 24 × 8",
+      "raio": "4"
+    },
+    "symbol": "identity/src/symbol.svg",
+    "wordmark": {
+      "text": "varthex",
+      "font": "display",
+      "weight": 700,
+      "size": 100,
+      "tracking": -0.025
+    },
+    "descriptor": {
+      "text": "COMANDA",
+      "font": "display",
+      "weight": 500,
+      "size_ratio": 0.34,
+      "tracking": 0.08,
+      "align": "left",
+      "gap_ratio": 0.3
+    },
+    "lockup": {
+      "symbol_scale": 1.55,
+      "gap_ratio": 0.42,
+      "stacked_gap_ratio": 0.5
+    },
+    "clearspace": {
+      "unit_label": "x",
+      "unit_source": "glyph",
+      "unit_glyph": "x",
+      "factor": 1
+    },
+    "min_size": {
+      "digital_symbol_px": 16,
+      "digital_lockup_px": 140,
+      "print_symbol_mm": 8,
+      "print_lockup_mm": 35
+    }
+  },
+  "board": {
+    "title": "Comanda organizada — identidade visual",
+    "lang": "pt",
+    "layout": "mosaic",
+    "layout_reason": "escolhido pelo usuário"
+  },
+  "mockups": {
+    "items": []
+  }
+}

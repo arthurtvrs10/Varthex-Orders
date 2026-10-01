@@ -1,0 +1,21 @@
+Contrast report (WCAG 2.1)
+====================================================
+Grafite      on surface    14.67:1  AAA
+Laranja balcão on surface     3.74:1  AA-large
+Laranja balcão on ink         3.92:1  AA-large
+Papel        on ink        14.67:1  AAA
+Carvão       on surface     9.37:1  AAA
+Carvão       on ink         1.56:1  FAIL  (tint — not for text)
+Cinza quente on surface     4.09:1  AA-large
+Cinza quente on ink         3.58:1  AA-large
+Areia        on surface     1.47:1  FAIL  (tint — not for text)
+Areia        on ink         9.98:1  AAA
+Sucesso      on surface     5.51:1  AA
+Sucesso      on ink         2.66:1  FAIL
+Atenção      on surface     5.05:1  AA
+Atenção      on ink          2.9:1  FAIL
+Erro         on surface     5.63:1  AA
+Erro         on ink          2.6:1  FAIL
+
+3 text/mark pairing(s) below 3:1.
+Fix by adjusting lightness — never by outlining the text.

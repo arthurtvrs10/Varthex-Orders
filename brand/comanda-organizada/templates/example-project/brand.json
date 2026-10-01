@@ -1,0 +1,202 @@
+{
+  "brand": {
+    "name": "Lumen",
+    "descriptor": "Store",
+    "tagline": "Tech made simple.\nLife made smarter.",
+    "story": "Lumen Store is built on the belief that technology should be simple, meaningful and human-centered. We design digital experiences that bring clarity, connect people, and drive real impact.",
+    "promise": [
+      "We create with purpose.",
+      "We design with empathy.",
+      "We deliver with excellence."
+    ],
+    "voice": {
+      "adjectives": [
+        "clear",
+        "engineered",
+        "quiet"
+      ],
+      "we_say": [
+        "Here is what it does.",
+        "One less step.",
+        "Built to last."
+      ],
+      "we_dont_say": [
+        "Revolutionary.",
+        "Game-changing.",
+        "Unleash your potential."
+      ]
+    },
+    "contact": {
+      "person": "Ana Ribeiro",
+      "role": "Head of Retail",
+      "email": "ana@lumen.store",
+      "phone": "+55 11 90000-0000",
+      "site": "lumen.store",
+      "address": "Rua das Palmeiras 120 · São Paulo"
+    },
+    "legal": "Lumen Store Ltda · CNPJ 00.000.000/0001-00 · lumen.store"
+  },
+  "brief": {
+    "business": "An online store for considered consumer technology.",
+    "audience": "Urban buyers, 25–45, who research before they buy.",
+    "must_not_look_like": "Blue, rounded, cart-icon marketplace brands.",
+    "name_relation": "letterform",
+    "owns_the_word": "clarity",
+    "character": [
+      "clear",
+      "engineered",
+      "quiet"
+    ],
+    "lives_mostly_on": "App icon and a 900px site header.",
+    "forbidden": [
+      "blue",
+      "gradients",
+      "isometric illustration"
+    ],
+    "assumed": true
+  },
+  "concept": {
+    "name": "Aperture",
+    "sentence": "The o of the name is cut open like a camera aperture, because the brand owns clarity.",
+    "name_relation": "letterform",
+    "operation": "One horizontal cut through the ring, on the optical axis.",
+    "exclusions": [
+      "blue",
+      "cart icon",
+      "gradients",
+      "isometric illustration",
+      "swoosh"
+    ],
+    "rejected": [
+      {
+        "name": "Signal",
+        "sentence": "Two rising bars as a wave.",
+        "why_not": "The wave is the category default — it des-positions nothing."
+      },
+      {
+        "name": "Stack",
+        "sentence": "Three offset planes.",
+        "why_not": "Reads as cloud infrastructure, not retail."
+      }
+    ],
+    "form": {
+      "elaboration": "moderate",
+      "naturalness": "stylized",
+      "shape": "round",
+      "symmetry": "asymmetric",
+      "completeness": "incomplete"
+    }
+  },
+  "typography": {
+    "display": {
+      "fontsource": "poppins",
+      "weights": [
+        400,
+        500,
+        600,
+        700
+      ],
+      "class": "Geometric sans",
+      "role": "Wordmark, headings, display"
+    },
+    "text": {
+      "fontsource": "inter",
+      "weights": [
+        400,
+        600
+      ],
+      "class": "Grotesque",
+      "role": "Body copy, UI, long form"
+    }
+  },
+  "scale": {
+    "base": 16,
+    "ratio": 1.25
+  },
+  "colors": [
+    {
+      "name": "Ink",
+      "hex": "#0D0D0D",
+      "role": "ink",
+      "pms": "Black 6 C"
+    },
+    {
+      "name": "Graphite",
+      "hex": "#2A2A2A",
+      "role": "neutral"
+    },
+    {
+      "name": "Steel",
+      "hex": "#5C5C5C",
+      "role": "neutral"
+    },
+    {
+      "name": "Mist",
+      "hex": "#A1A1A1",
+      "role": "neutral"
+    },
+    {
+      "name": "Paper",
+      "hex": "#FFFFFF",
+      "role": "surface"
+    }
+  ],
+  "logo": {
+    "grid": "circle",
+    "unit": 100,
+    "metrics": {
+      "U": "100 (symbol viewBox)",
+      "ring stroke": "U/8.33 = 12",
+      "counter": "0.72 U = 72",
+      "blade": "= ring stroke",
+      "corner radius": "0 — hard, everywhere"
+    },
+    "symbol": "identity/src/symbol.svg",
+    "wordmark": {
+      "text": "Lumen",
+      "font": "display",
+      "weight": 700,
+      "size": 100,
+      "tracking": -0.025
+    },
+    "descriptor": {
+      "text": "Store",
+      "font": "display",
+      "weight": 500,
+      "size_ratio": 0.34,
+      "tracking": 0.08,
+      "align": "center",
+      "gap_ratio": 0.24
+    },
+    "lockup": {
+      "symbol_scale": 1.55,
+      "gap_ratio": 0.42,
+      "stacked_gap_ratio": 0.5
+    },
+    "clearspace": {
+      "unit_label": "a",
+      "unit_source": "glyph",
+      "unit_glyph": "a",
+      "factor": 1
+    },
+    "min_size": {
+      "digital_symbol_px": 16,
+      "digital_lockup_px": 90,
+      "print_symbol_mm": 8,
+      "print_lockup_mm": 25
+    }
+  },
+  "board": {
+    "title": "Brand Identity System"
+  },
+  "mockups": {
+    "items": [
+      "card",
+      "phone",
+      "email",
+      "contract"
+    ],
+    "goods_color": "#141414",
+    "mark_color": "rgba(255,255,255,.92)"
+  }
+}

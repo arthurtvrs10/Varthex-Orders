@@ -1,0 +1,62 @@
+{
+  "base": 16,
+  "ratio": 1.2,
+  "steps": [
+    {
+      "name": "Display",
+      "px": 33,
+      "line_height": 0.95,
+      "tracking_em": -0.02,
+      "weight": 700
+    },
+    {
+      "name": "H1",
+      "px": 28,
+      "line_height": 1.1,
+      "tracking_em": -0.015,
+      "weight": 700
+    },
+    {
+      "name": "H2",
+      "px": 23,
+      "line_height": 1.15,
+      "tracking_em": -0.01,
+      "weight": 600
+    },
+    {
+      "name": "H3",
+      "px": 19,
+      "line_height": 1.2,
+      "tracking_em": -0.005,
+      "weight": 600
+    },
+    {
+      "name": "Body L",
+      "px": 18,
+      "line_height": 1.55,
+      "tracking_em": 0,
+      "weight": 400
+    },
+    {
+      "name": "Body",
+      "px": 16,
+      "line_height": 1.6,
+      "tracking_em": 0,
+      "weight": 400
+    },
+    {
+      "name": "Small",
+      "px": 13,
+      "line_height": 1.5,
+      "tracking_em": 0,
+      "weight": 400
+    },
+    {
+      "name": "Caption",
+      "px": 12,
+      "line_height": 1.4,
+      "tracking_em": 0.02,
+      "weight": 500
+    }
+  ]
+}

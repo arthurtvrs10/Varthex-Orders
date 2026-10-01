@@ -1,0 +1,231 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "brand.json — single source of truth for a brand identity project",
+  "type": "object",
+  "required": ["brand", "typography", "colors", "logo"],
+  "properties": {
+    "brand": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "description": "The wordmark text." },
+        "keywords": { "type": "array", "items": { "type": "string" }, "maxItems": 4, "description": "Up to four words for the board's keywords panel (flood-wide). Falls back to voice adjectives." },
+        "descriptor": { "type": "string", "description": "Optional subordinate word, e.g. 'Store'." },
+        "tagline": { "type": "string", "description": "Use \\n to force the line break." },
+        "story": { "type": "string", "description": "3–4 sentences. Real copy, never lorem." },
+        "promise": { "type": "array", "items": { "type": "string" }, "maxItems": 4 },
+        "voice": {
+          "type": "object",
+          "properties": {
+            "adjectives": { "type": "array", "items": { "type": "string" }, "maxItems": 3 },
+            "we_say": { "type": "array", "items": { "type": "string" } },
+            "we_dont_say": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "contact": {
+          "type": "object",
+          "properties": {
+            "person": { "type": "string" }, "role": { "type": "string" },
+            "email": { "type": "string" }, "phone": { "type": "string" },
+            "site": { "type": "string" }, "address": { "type": "string" }
+          }
+        },
+        "legal": { "type": "string", "description": "Footer line for letterhead/contract." }
+      }
+    },
+
+    "brief": {
+      "type": "object",
+      "description": "The six lines from references/01. Quoted, not paraphrased.",
+      "properties": {
+        "business": { "type": "string" },
+        "audience": { "type": "string" },
+        "redesign": { "type": "object", "description": "Only when a logo already exists. High commitment = evolve, not replace (Walsh et al. 2010).", "properties": {
+          "existing": { "type": "boolean" },
+          "commitment": { "enum": ["low", "medium", "high"] },
+          "keep": { "type": "array", "items": { "type": "string" } } } },
+        "must_not_look_like": { "type": "string" },
+        "name_relation": { "enum": ["literal", "abstract", "letterform", "wordmark-only"] },
+        "owns_the_word": { "type": "string" },
+        "character": { "type": "array", "items": { "type": "string" } },
+        "lives_mostly_on": { "type": "string" },
+        "forbidden": { "type": "array", "items": { "type": "string" } },
+        "assumed": { "type": "boolean", "description": "true when answered by Claude, not the client." }
+      }
+    },
+
+    "concept": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "sentence": { "type": "string", "description": "One sentence. If it needs 'and', it is two logos." },
+        "name_relation": { "enum": ["literal", "abstract", "letterform", "wordmark-only"] },
+        "operation": { "type": "string", "description": "The single operation performed on the form." },
+        "form": { "type": "object", "description": "Form profile — see references/11-evidence-base.md.", "properties": {
+          "elaboration": { "enum": ["low", "moderate", "high"] },
+          "naturalness": { "enum": ["representational", "stylized", "abstract"] },
+          "shape": { "enum": ["round", "angular", "mixed"] },
+          "symmetry": { "enum": ["symmetric", "asymmetric"] },
+          "completeness": { "enum": ["complete", "incomplete"] } } },
+        "attributes": { "type": "array", "maxItems": 3, "items": { "type": "object", "properties": { "label": { "type": "string" }, "icon": { "type": "string", "description": "Name of an icon in the icon set." } } }, "description": "What the mark means, as three icon + label tiles (editorial, flood-wide). Falls back to the brief adjectives." },
+        "exclusions": { "type": "array", "items": { "type": "string" } },
+        "rejected": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": { "name": { "type": "string" }, "sentence": { "type": "string" }, "why_not": { "type": "string" } }
+          }
+        }
+      }
+    },
+
+    "typography": {
+      "type": "object",
+      "description": "Keys are roles. 'display' is required; 'text' and 'mono' are optional.",
+      "properties": {
+        "display": { "$ref": "#/definitions/family" },
+        "text": { "$ref": "#/definitions/family" },
+        "mono": { "$ref": "#/definitions/family" }
+      },
+      "required": ["display"]
+    },
+
+    "scale": {
+      "type": "object",
+      "properties": {
+        "base": { "type": "number", "default": 16 },
+        "ratio": { "type": "number", "enum": [1.2, 1.25, 1.333, 1.5], "default": 1.25 }
+      }
+    },
+
+    "colors": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["name", "hex"],
+        "properties": {
+          "name": { "type": "string" },
+          "hex": { "type": "string", "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$" },
+          "role": { "enum": ["ink", "surface", "brand", "accent", "neutral", "success", "warning", "danger"] },
+          "pms": { "type": "string", "description": "Nearest Pantone — to be confirmed on a proof." }
+        }
+      }
+    },
+
+    "logo": {
+      "type": "object",
+      "properties": {
+        "grid": { "enum": ["circle", "modular", "angle"] },
+        "unit": { "type": "number", "default": 100, "description": "U, in the symbol's viewBox units." },
+        "metrics": {
+          "type": "object",
+          "description": "Stated as formulas of U, so the grid is reproducible.",
+          "additionalProperties": { "type": "string" }
+        },
+        "symbol": { "type": "string", "default": "identity/src/symbol.svg" },
+        "wordmark": {
+          "type": "object",
+          "properties": {
+            "text": { "type": "string" }, "font": { "enum": ["display", "text", "mono"] },
+            "weight": { "type": "integer" }, "size": { "type": "number" },
+            "tracking": { "type": "number", "description": "em units, e.g. -0.02" },
+            "custom_svg": { "type": "string", "description": "Path to a hand-drawn wordmark; overrides the outlined type." }
+          }
+        },
+        "descriptor": {
+          "type": "object",
+          "properties": {
+            "text": { "type": "string" }, "font": { "enum": ["display", "text", "mono"] },
+            "weight": { "type": "integer" },
+            "size_ratio": { "type": "number", "default": 0.34, "description": "of the wordmark cap height" },
+            "tracking": { "type": "number", "default": 0.06 },
+            "align": { "enum": ["left", "center", "right"], "default": "center" },
+            "gap_ratio": { "type": "number", "default": 0.22 }
+          }
+        },
+        "lockup": {
+          "type": "object",
+          "properties": {
+            "symbol_scale": { "type": "number", "default": 1.5, "description": "symbol height ÷ wordmark cap height" },
+            "gap_ratio": { "type": "number", "default": 0.45, "description": "gap ÷ symbol width" },
+            "stacked_gap_ratio": { "type": "number", "default": 0.5 }
+          }
+        },
+        "clearspace": {
+          "type": "object",
+          "properties": {
+            "unit_label": { "type": "string", "default": "a" },
+            "unit_source": { "enum": ["glyph", "cap_height", "stroke"], "default": "glyph" },
+            "unit_glyph": { "type": "string", "default": "a" },
+            "factor": { "type": "number", "default": 1 }
+          }
+        },
+        "min_size": {
+          "type": "object",
+          "properties": {
+            "digital_symbol_px": { "type": "integer", "default": 16 },
+            "digital_lockup_px": { "type": "integer", "default": 90 },
+            "print_symbol_mm": { "type": "number", "default": 8 },
+            "print_lockup_mm": { "type": "number", "default": 25 }
+          }
+        }
+      }
+    },
+
+    "icons": {
+      "type": "array",
+      "description": "24×24 grid. Provide `d` (path data) or `file`. Use currentColor downstream.",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" },
+          "d": { "type": "string" },
+          "file": { "type": "string" },
+          "style": { "enum": ["outline", "filled"], "default": "outline" }
+        }
+      }
+    },
+
+    "board": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "default": "Brand Identity System" },
+        "layout": { "enum": ["studio", "mosaic", "flood", "flood-wide", "editorial", "gallery"], "description": "Board composition, one per reference in assets/. Set by scripts/pick_layout.py --write (brief-scored, or the user's pick). If absent, build_board.py picks from the brief and prints why." },
+        "layout_reason": { "type": "string", "description": "Why this layout — written by pick_layout.py." },
+        "prefer": { "type": "array", "items": { "type": "string" }, "description": "Layouts the client pointed at (+4 in the score)." },
+        "avoid": { "type": "array", "items": { "type": "string" }, "description": "Layouts to exclude." },
+        "mode": { "enum": ["dark", "light", "flood"], "description": "Optional override of the layout's colour treatment. Leave unset so colours follow the layout. 'flood' needs a brand/accent hue." },
+        "lang": { "enum": ["en", "pt"], "default": "en", "description": "Language of the board's panel labels." },
+        "labels": { "type": "object", "additionalProperties": { "type": "string" }, "description": "Override single labels, e.g. { \"story\": \"Nossa história\" }." },
+        "cta": { "type": "string", "description": "Button label on the phone screen." },
+        "theme_overrides": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    },
+
+    "mockups": {
+      "type": "object",
+      "properties": {
+        "items": { "type": "array", "items": { "enum": ["card", "phone", "email", "contract"] } },
+        "goods_color": { "type": "string", "default": "#141414" },
+        "mark_color": { "type": "string", "default": "rgba(255,255,255,.92)" }
+      }
+    }
+  },
+
+  "definitions": {
+    "family": {
+      "type": "object",
+      "required": ["fontsource"],
+      "properties": {
+        "fontsource": { "type": "string", "description": "npm @fontsource id, e.g. 'poppins'." },
+        "weights": { "type": "array", "items": { "type": "integer" }, "maxItems": 4 },
+        "italic": { "type": "boolean" },
+        "class": { "type": "string", "description": "Geometric sans / Grotesque / Serif …" },
+        "role": { "type": "string" },
+        "substituted_for": { "type": "string", "description": "Licensed font this stands in for; disclose it." }
+      }
+    }
+  }
+}
