@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VarthexComanda.Desktop"
         mc:Ignorable="d"
-        Title="Varthex Comanda" Icon="pack://application:,,,/VarthexComanda;component/Assets/VarthexComanda.ico" Height="760" Width="1200" Background="{StaticResource Papel}" Foreground="{StaticResource Grafite}">
+        Title="Varthex Comanda" Icon="pack://application:,,,/VarthexComanda;component/Assets/VarthexComanda.ico" Height="700" Width="1200">
     <Window.InputBindings>
         <KeyBinding Key="D1" Modifiers="Control" Command="{x:Static local:MainWindow.IrParaAtendimentoCommand}" />
         <KeyBinding Key="NumPad1" Modifiers="Control" Command="{x:Static local:MainWindow.IrParaAtendimentoCommand}" />
@@ -18,21 +18,15 @@
         <KeyBinding Key="D5" Modifiers="Control" Command="{x:Static local:MainWindow.IrParaConfiguracoesCommand}" />
         <KeyBinding Key="NumPad5" Modifiers="Control" Command="{x:Static local:MainWindow.IrParaConfiguracoesCommand}" />
     </Window.InputBindings>
-    <DockPanel Background="{StaticResource Papel}">
-        <Border DockPanel.Dock="Top" Background="{StaticResource Grafite}" Padding="24,16" BorderBrush="{StaticResource Laranja}" BorderThickness="0,0,0,3">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Image Source="Assets/LogoBranca.png" Width="190" Height="44" Stretch="Uniform" HorizontalAlignment="Left" AutomationProperties.Name="Varthex Comanda" />
-                <TextBlock Grid.Column="1" Text="Desenvolvido pela Varthex"
-                           Foreground="#D9CFC3" FontSize="12" Margin="24,0,0,0"
-                           HorizontalAlignment="Right" VerticalAlignment="Center" TextWrapping="Wrap" />
-            </Grid>
+    <DockPanel Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
+        <Border DockPanel.Dock="Bottom" Background="#F2F2F0" BorderBrush="#C4C4C4" BorderThickness="0,1,0,0" Padding="12,6">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="Desenvolvido pela Varthex" Foreground="#666666" FontSize="11" VerticalAlignment="Center" Margin="0,0,12,0" />
+                <Image Source="Assets/LogoRodape.png" Width="100" Height="24" Stretch="Uniform" AutomationProperties.Name="Varthex Comanda" />
+            </StackPanel>
         </Border>
         <!-- Visivel apenas no modo de restauracao (banco corrompido): ver MainWindow.EntrarModoRestauracao. -->
-        <Border x:Name="FaixaRestauracao" DockPanel.Dock="Top" Background="#B23B32" Padding="16,12" Visibility="Collapsed">
+        <Border x:Name="FaixaRestauracao" DockPanel.Dock="Top" Background="#B71C1C" Padding="16,12" Visibility="Collapsed">
             <TextBlock Text="O banco de dados está corrompido. Restaure um backup para continuar. Nenhuma outra função está disponível."
                        Foreground="White" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap" />
         </Border>

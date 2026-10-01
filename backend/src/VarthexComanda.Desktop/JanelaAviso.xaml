@@ -5,7 +5,7 @@
         Width="560" SizeToContent="Height" MinHeight="200"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize" ShowInTaskbar="False"
         FocusManager.FocusedElement="{Binding ElementName=BotaoOk}"
-        Background="White" Foreground="{StaticResource Grafite}">
+        Background="White">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="12" />

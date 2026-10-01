@@ -11,7 +11,7 @@ public class CategoriaSelecionadaParaCorConverter : IMultiValueConverter
     {
         if (values.Length == 2 && values[0] is Categoria item && values[1] is Categoria selecionada && item.Id == selecionada.Id)
         {
-            return new SolidColorBrush(Color.FromRgb(0xF3, 0xEA, 0xE0));
+            return new SolidColorBrush(Color.FromRgb(0xED, 0xED, 0xEA));
         }
 
         return Brushes.White;

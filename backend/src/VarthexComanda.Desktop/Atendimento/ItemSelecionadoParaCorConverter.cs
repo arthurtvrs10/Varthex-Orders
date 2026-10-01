@@ -12,7 +12,7 @@ namespace VarthexComanda.Desktop.Atendimento;
 public class ItemSelecionadoParaCorConverter : IMultiValueConverter
 {
     private static readonly Brush Fundo = Congelar(new SolidColorBrush(Color.FromRgb(0xFB, 0xE3, 0xC2)));
-    private static readonly Brush Marca = Congelar(new SolidColorBrush(Color.FromRgb(0xC5, 0x68, 0x20)));
+    private static readonly Brush Marca = Congelar(new SolidColorBrush(Color.FromRgb(0xD9, 0x82, 0x2B)));
 
     public object Convert(object[] values, Type targetType, object? parameter, CultureInfo culture)
     {

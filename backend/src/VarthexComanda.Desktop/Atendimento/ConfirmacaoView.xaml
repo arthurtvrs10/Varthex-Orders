@@ -4,7 +4,7 @@
         Icon="pack://application:,,,/VarthexComanda;component/Assets/VarthexComanda.ico"
         Width="580" SizeToContent="Height" MinHeight="230"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize" ShowInTaskbar="False"
-        Background="White" Foreground="{StaticResource Grafite}">
+        Background="White">
     <Grid Margin="28">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

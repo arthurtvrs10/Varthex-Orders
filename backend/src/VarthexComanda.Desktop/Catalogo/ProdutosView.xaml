@@ -5,7 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="clr-namespace:VarthexComanda.Desktop.Catalogo"
              xmlns:atendimento="clr-namespace:VarthexComanda.Desktop.Atendimento"
-             mc:Ignorable="d" Background="{StaticResource Papel}" Foreground="{StaticResource Grafite}">
+             mc:Ignorable="d">
     <UserControl.Resources>
         <local:FotoArquivoParaImagemConverter x:Key="FotoImagem" />
         <local:CaminhoArquivoParaImagemConverter x:Key="CaminhoImagem" />
@@ -62,7 +62,7 @@
         </ListView>
 
         <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="2"
-                BorderBrush="#D9CFC3" BorderThickness="1" Background="White" Padding="16">
+                BorderBrush="#C4C4C4" BorderThickness="1" Background="White" Padding="16">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -76,27 +76,27 @@
 
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <TextBlock Text="FOTO" FontWeight="Bold" FontSize="12" Foreground="#47433F" Margin="0,0,0,4" />
+                        <TextBlock Text="FOTO" FontWeight="Bold" FontSize="12" Foreground="#4A4A47" Margin="0,0,0,4" />
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <Grid Width="140" Height="140" Background="#F3EAE0" ClipToBounds="True">
+                            <Grid Width="140" Height="140" Background="#EDEDEA" ClipToBounds="True">
                                 <Image Source="{Binding FotoArquivoAtual, Converter={StaticResource FotoImagem}}" Stretch="UniformToFill" />
                                 <Image Source="{Binding FotoPendenteCaminho, Converter={StaticResource CaminhoImagem}}" Stretch="UniformToFill" />
                             </Grid>
                             <StackPanel Margin="12,0,0,0" VerticalAlignment="Top">
                                 <Button Content="Escolher foto..." Click="EscolherFoto_Click" Padding="12,6" Margin="0,0,0,6" />
                                 <Button Content="Remover foto" Command="{Binding RemoverFotoCommand}" Padding="12,6" Margin="0,0,0,6" />
-                                <TextBlock Text="JPG, PNG ou BMP · até 10 MB" FontSize="11" Foreground="#47433F" />
+                                <TextBlock Text="JPG, PNG ou BMP · até 10 MB" FontSize="11" Foreground="#6B6B67" />
                             </StackPanel>
                         </StackPanel>
 
-                        <TextBlock Text="NOME DO PRODUTO" FontWeight="Bold" FontSize="12" Foreground="#47433F" Margin="0,0,0,4" />
+                        <TextBlock Text="NOME DO PRODUTO" FontWeight="Bold" FontSize="12" Foreground="#4A4A47" Margin="0,0,0,4" />
                         <TextBox Text="{Binding NomeProduto, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12" />
 
-                        <TextBlock Text="CATEGORIA" FontWeight="Bold" FontSize="12" Foreground="#47433F" Margin="0,0,0,4" />
+                        <TextBlock Text="CATEGORIA" FontWeight="Bold" FontSize="12" Foreground="#4A4A47" Margin="0,0,0,4" />
                         <ComboBox ItemsSource="{Binding Categorias}" DisplayMemberPath="Nome"
                                   SelectedItem="{Binding CategoriaProduto}" Margin="0,0,0,12" />
 
-                        <TextBlock Text="PREÇO (R$)" FontWeight="Bold" FontSize="12" Foreground="#47433F" Margin="0,0,0,4" />
+                        <TextBlock Text="PREÇO (R$)" FontWeight="Bold" FontSize="12" Foreground="#4A4A47" Margin="0,0,0,4" />
                         <TextBox Text="{Binding PrecoProdutoReais, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12" />
 
                         <CheckBox Content="Ativo" IsChecked="{Binding ProdutoAtivo}" Margin="0,0,0,12"
@@ -119,11 +119,11 @@
 
                 <DockPanel Grid.Row="3" Margin="0,12,0,0">
                     <Button x:Name="BotaoCadastrar" Style="{StaticResource BotaoGravarPadrao}" DockPanel.Dock="Right" Content="Cadastrar produto" Padding="20,0" Height="60" FontSize="16"
-                            Background="#26734D" Foreground="White" FontWeight="Bold"
+                            Background="#3F8F5F" Foreground="White" FontWeight="Bold"
                             Command="{Binding SalvarCommand}"
                             Visibility="{Binding ProdutoSelecionado, Converter={StaticResource VisivelSeNovo}}" />
                     <Button x:Name="BotaoSalvar" Style="{StaticResource BotaoGravarPadrao}" DockPanel.Dock="Right" Content="Salvar" Padding="20,0" Height="60" FontSize="16"
-                            Background="#26734D" Foreground="White" FontWeight="Bold"
+                            Background="#3F8F5F" Foreground="White" FontWeight="Bold"
                             Command="{Binding SalvarCommand}"
                             Visibility="{Binding ProdutoSelecionado, Converter={StaticResource VisivelSeEdicao}}" />
                     <StackPanel Orientation="Horizontal"

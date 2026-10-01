@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Encerrar comanda" Icon="pack://application:,,,/VarthexComanda;component/Assets/VarthexComanda.ico" Width="560" SizeToContent="Height"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
-        FocusManager.FocusedElement="{Binding ElementName=CaixaCobrancaAprovada}" Background="{StaticResource Papel}" Foreground="{StaticResource Grafite}">
+        FocusManager.FocusedElement="{Binding ElementName=CaixaCobrancaAprovada}">
     <Window.Resources>
         <local:CentavosParaMoedaConverter x:Key="Moeda" />
     </Window.Resources>
@@ -39,7 +39,7 @@
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
             <Button x:Name="BotaoVoltar" Content="Voltar para a comanda" IsCancel="True" Command="{Binding VoltarCommand}" Height="56" FontSize="16" Padding="18,0" Margin="0,0,8,0" />
             <Button x:Name="BotaoConfirmarEncerrar" Content="Confirmar e encerrar" IsDefault="True" Command="{Binding ConfirmarEncerrarCommand}" Height="56" FontSize="16" Padding="18,0"
-                    Background="#26734D" Foreground="White" FontWeight="Bold" />
+                    Background="#3F8F5F" Foreground="White" FontWeight="Bold" />
         </StackPanel>
     </StackPanel>
 </Window>
