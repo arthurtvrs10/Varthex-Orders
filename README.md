@@ -38,7 +38,7 @@ o Windows pode exibir um aviso de aplicativo desconhecido.
 
 ## Telas
 
-Telas da versão 1.2.1, renderizadas diretamente pelo WPF com dados fictícios em memória, sem acessar o banco do usuário.
+Telas do código atual, com cores originais, controles quadrados e marca no rodapé. Renderizadas diretamente pelo WPF com dados fictícios em memória, sem acessar o banco do usuário. O instalador 1.2.1 ainda utiliza o layout anterior.
 
 <img src="docs/design/atendimento-comanda.png" alt="Comanda com nome do cliente, catálogo e itens selecionados na nova identidade visual" width="900">
 
