@@ -22,6 +22,8 @@ Pensado para o balcão de um pequeno negócio: uma grade com todas as comandas
 com botões grandes o bastante para o toque. Funciona 100% offline, com os dados
 num banco SQLite local.
 
+[Abrir design no Canva](https://www.canva.com/design/DAHWxyICQfE/IsxM-jV_WbNmWiN2n2sUjQ/edit?ui=eyJFIjp7Im0iOnRydWUsIkE_IjoibiJ9LCJLIjp7IkEiOiIyZjNkNGUzNC1jMjE1LTRiMTQtYjI0Ni05ODU0Mjc5NjI3MjAifX0)
+
 ## Windows
 
 [![Baixar para Windows](docs/design/download-windows.svg)](downloads/windows/VarthexComanda-1.2.1-Setup-win-x64.exe?raw=true)
