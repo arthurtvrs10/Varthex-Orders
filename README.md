@@ -38,7 +38,9 @@ o Windows pode exibir um aviso de aplicativo desconhecido.
 
 ## Android — gerador de chaves
 
-### [⬇ Baixar Varthex Licenças 1.0.0 (APK)](downloads/android/Varthex-Licencas-1.0.0.apk?raw=true)
+[![Baixar para Android](docs/design/download-android.svg)](downloads/android/Varthex-Licencas-1.0.0.apk?raw=true)
+
+O botão baixa o APK **Varthex Licenças 1.0.0**.
 
 Aplicativo para **Android 8.0 ou superior**, exclusivo do responsável pelas licenças.
 Gera chaves offline de **1, 2, 3 meses ou vitalícias**, com opções para copiar e compartilhar.
