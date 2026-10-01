@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VarthexComanda.Desktop"
         mc:Ignorable="d"
-        Title="Varthex Comanda" Icon="pack://application:,,,/VarthexComanda;component/Assets/VarthexComanda.ico" Height="700" Width="1200">
+        Title="Varthex Comanda" Icon="pack://application:,,,/VarthexComanda;component/Assets/VarthexComanda.ico" Height="760" Width="1200" Background="{StaticResource Papel}" Foreground="{StaticResource Grafite}">
     <Window.InputBindings>
         <KeyBinding Key="D1" Modifiers="Control" Command="{x:Static local:MainWindow.IrParaAtendimentoCommand}" />
         <KeyBinding Key="NumPad1" Modifiers="Control" Command="{x:Static local:MainWindow.IrParaAtendimentoCommand}" />
@@ -18,9 +18,12 @@
         <KeyBinding Key="D5" Modifiers="Control" Command="{x:Static local:MainWindow.IrParaConfiguracoesCommand}" />
         <KeyBinding Key="NumPad5" Modifiers="Control" Command="{x:Static local:MainWindow.IrParaConfiguracoesCommand}" />
     </Window.InputBindings>
-    <DockPanel>
+    <DockPanel Background="{StaticResource Papel}">
+        <Border DockPanel.Dock="Top" Background="{StaticResource Grafite}" Padding="24,16" BorderBrush="{StaticResource Laranja}" BorderThickness="0,0,0,3">
+            <Image Source="Assets/LogoBranca.png" Width="190" Height="44" Stretch="Uniform" HorizontalAlignment="Left" AutomationProperties.Name="Varthex Comanda" />
+        </Border>
         <!-- Visivel apenas no modo de restauracao (banco corrompido): ver MainWindow.EntrarModoRestauracao. -->
-        <Border x:Name="FaixaRestauracao" DockPanel.Dock="Top" Background="#B71C1C" Padding="16,12" Visibility="Collapsed">
+        <Border x:Name="FaixaRestauracao" DockPanel.Dock="Top" Background="#B23B32" Padding="16,12" Visibility="Collapsed">
             <TextBlock Text="O banco de dados está corrompido. Restaure um backup para continuar. Nenhuma outra função está disponível."
                        Foreground="White" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap" />
         </Border>

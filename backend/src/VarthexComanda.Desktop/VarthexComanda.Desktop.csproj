@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\VarthexComanda.Application\VarthexComanda.Application.csproj" />
@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <Resource Include="Assets\VarthexComanda.ico" />
+    <Resource Include="Assets\LogoBranca.png" />
     <EmbeddedResource Include="Licenciamento\licenca-publica.pem" LogicalName="VarthexComanda.licenca-publica.pem" />
   </ItemGroup>
 

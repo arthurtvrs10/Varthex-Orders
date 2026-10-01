@@ -3,6 +3,18 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:VarthexComanda.Desktop">
     <Application.Resources>
+        <SolidColorBrush x:Key="Grafite" Color="#23252A" />
+        <SolidColorBrush x:Key="Laranja" Color="#C56820" />
+        <SolidColorBrush x:Key="Papel" Color="#FFF9F2" />
+        <Style TargetType="Window">
+            <Setter Property="Background" Value="{StaticResource Papel}" />
+            <Setter Property="Foreground" Value="{StaticResource Grafite}" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+        </Style>
+        <Style TargetType="UserControl">
+            <Setter Property="Background" Value="{StaticResource Papel}" />
+            <Setter Property="Foreground" Value="{StaticResource Grafite}" />
+        </Style>
         <!-- Foco visivel de alto contraste (RNF18): contorno azul solido de 3 px, sem pontilhado. -->
         <Style x:Key="FocoVisivel" TargetType="Control">
             <Setter Property="Template">
@@ -48,6 +60,24 @@
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
         <Style TargetType="Button">
+            <Setter Property="Background" Value="#FFF9F2" />
+            <Setter Property="Foreground" Value="#23252A" />
+            <Setter Property="BorderBrush" Value="#817971" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Surface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" RecognizesAccessKey="True" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Surface" Property="BorderBrush" Value="#C56820" /></Trigger>
+                            <Trigger Property="IsPressed" Value="True"><Setter TargetName="Surface" Property="Opacity" Value="0.75" /></Trigger>
+                            <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Surface" Property="Opacity" Value="0.45" /></Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
             <Setter Property="FocusVisualStyle" Value="{StaticResource FocoVisivel}" />
             <Setter Property="MinHeight" Value="46" />
             <Setter Property="MinWidth" Value="46" />

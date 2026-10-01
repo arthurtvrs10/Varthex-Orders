@@ -17,4 +17,4 @@ Identidade **Comanda Organizada**, aprovada em 30/09/2026: símbolo de ficha de 
 
 `comanda-organizada/brand.json` concentra as definições da identidade. Os vetores originais estão em `identity/src/`, os scripts de geração em `scripts/` e as apresentações em `pages/`. As fontes incluem suas licenças.
 
-Os arquivos mantêm a identificação “proposta 1” para preservar a versão apresentada e aprovada. Esta entrega registra a identidade; sua aplicação no programa e no instalador será uma alteração separada.
+Os arquivos mantêm a identificação “proposta 1” para preservar a versão apresentada e aprovada. O aplicativo usa a logo branca no cabeçalho, o ícone em ICO e a paleta nas telas. O instalador usa o mesmo ICO ao ser recompilado. A interface mantém Segoe UI para legibilidade e compatibilidade no Windows; o nome na logo preserva Manrope em curvas. Cartões com texto branco usam laranja escuro (#A95012) para contraste.

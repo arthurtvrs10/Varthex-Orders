@@ -157,7 +157,7 @@ public class AtendimentoTecladoXamlTests
         var semSelecao = conversor.Convert(new object[] { 5, null! }, typeof(Brush), null!, CultureInfo.InvariantCulture);
 
         Assert.Equal(Color.FromRgb(0xFB, 0xE3, 0xC2), fundoSelecionada.Color);
-        Assert.Equal(Color.FromRgb(0xD9, 0x82, 0x2B), marcaSelecionada.Color);
+        Assert.Equal(Color.FromRgb(0xC5, 0x68, 0x20), marcaSelecionada.Color);
         Assert.Same(Brushes.Transparent, outra);
         Assert.Same(Brushes.Transparent, semSelecao);
     }
