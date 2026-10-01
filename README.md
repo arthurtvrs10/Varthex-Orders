@@ -69,7 +69,11 @@ A ativação offline é obrigatória. O emissor de licenças e a chave
 privada são exclusivos do responsável e nunca devem ser enviados ao cliente.
 Veja [como emitir, ativar e renovar licenças](docs/docs/20-licenciamento-offline.md).
 
-### Gerar o instalador
+### Emissor de licenças para Android
+
+O responsável pode gerar chaves offline pelo [Varthex Licenças para Android](mobile/licencas/README.md), com planos de 1, 2, 3 meses ou vitalício. [Baixar APK](downloads/android/Varthex-Licencas-1.0.0.apk?raw=true). A chave privada é importada separadamente e nunca deve ser enviada ao cliente.
+
+### Gerar o instalador Windows
 
 Com SDK .NET 10 e Inno Setup 6 instalados, execute `.\scripts\gerar-instalador.ps1`.
 O `.exe` e seu SHA-256 ficam em `artifacts`. A cópia versionada para distribuição
