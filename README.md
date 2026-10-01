@@ -24,28 +24,19 @@ num banco SQLite local.
 
 [Abrir design no Canva](https://www.canva.com/design/DAHWxyICQfE/IsxM-jV_WbNmWiN2n2sUjQ/edit?ui=eyJFIjp7Im0iOnRydWUsIkE_IjoibiJ9LCJLIjp7IkEiOiIyZjNkNGUzNC1jMjE1LTRiMTQtYjI0Ni05ODU0Mjc5NjI3MjAifX0)
 
-## Windows — versão 1.2.3 com produtos de teste
+## Windows — versão normal 1.2.2
 
-[![Baixar para Windows](docs/design/download-windows.svg)](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.3-demo/VarthexComanda-Demo-1.2.3-Setup-win-x64.exe)
+[![Baixar para Windows](docs/design/download-windows.svg)](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.2/VarthexComanda-1.2.2-Setup-win-x64.exe)
 
-O download principal é a **edição Demonstração 1.2.3 para Windows 64 bits**, com
-**12 produtos e imagens realistas geradas por IA com fundo branco**: pastéis de carne,
-queijo, frango com requeijão e pizza; coxinha, kibe, bolinha de queijo, batata frita,
-refrigerantes cola, guaraná e laranja, além de água mineral. Preços fictícios e editáveis.
+O download principal é o **Varthex Comanda para Windows 64 bits**, versão normal,
+**sem produtos pré-cadastrados e sem modo de demonstração**. Em uma instalação nova,
+o catálogo começa vazio para você cadastrar os produtos reais do estabelecimento.
 
-Instala para o usuário atual, sem administrador, e inclui o .NET. Abra pelo atalho
-**Comanda Demonstração**. Funciona offline e requer ativação; reutiliza a licença
-existente do mesmo computador.
+Instala para o usuário atual, sem administrador, e inclui o .NET. Funciona offline
+e requer ativação. Atualizar ou reinstalar preserva os produtos e a licença já existentes.
+Os dados ficam em `%LOCALAPPDATA%\VarthexComanda`.
 
-Os dados ficam em `%LOCALAPPDATA%\VarthexComandaDemo`, separados da edição normal.
-O catálogo é criado uma única vez; reabrir, atualizar ou reinstalar preserva suas alterações.
-Feche a outra edição antes de abrir. O instalador não possui assinatura de código;
-o Windows pode exibir um aviso de aplicativo desconhecido.
-
-[Notas da versão](downloads/demo/README.md) · [SHA-256](downloads/demo/VarthexComanda-Demo-1.2.3-Setup-win-x64.exe.sha256) · [Catálogo e imagens](demo/README.md)
-
-**Alternativa sem produtos de teste:** [baixar edição normal 1.2.2](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.2/VarthexComanda-1.2.2-Setup-win-x64.exe).
-Use essa edição para atualizar uma instalação normal existente; a demonstração é instalada separadamente.
+[Instruções](downloads/windows/README.md) · [SHA-256](downloads/windows/VarthexComanda-1.2.2-Setup-win-x64.exe.sha256)
 
 ## Android — gerador de chaves
 
@@ -84,9 +75,9 @@ Histórico: vendas do dia, resumo e detalhe dos itens.
 
 ## Instalação
 
-1. [Baixe a demonstração 1.2.3 para Windows 64 bits](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.3-demo/VarthexComanda-Demo-1.2.3-Setup-win-x64.exe).
+1. [Baixe o Varthex Comanda para Windows 64 bits](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.2/VarthexComanda-1.2.2-Setup-win-x64.exe).
 2. Execute o `.exe` e siga o assistente em português; não é necessário instalar .NET ou usar administrador.
-3. Abra **Comanda Demonstração**. Se solicitado, envie o código do computador ao responsável e informe a chave recebida.
+3. Abra **Varthex Comanda**. Se solicitado, envie o código do computador ao responsável e informe a chave recebida.
 
 **Atualizar:** feche o aplicativo e execute o novo instalador. Licença e dados são
 preservados. **Desinstalar:** use Aplicativos Instalados do Windows; os dados são mantidos.
