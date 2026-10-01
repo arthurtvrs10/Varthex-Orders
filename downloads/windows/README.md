@@ -1,5 +1,8 @@
 # Downloads para Windows
 
+- **Versão normal, sem produtos de teste:** [baixar Varthex Comanda 1.2.2](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.2/VarthexComanda-1.2.2-Setup-win-x64.exe).
+- **Versão demonstração, com produtos e fotos:** [baixar Comanda Demonstração 1.2.3](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.3-demo/VarthexComanda-Demo-1.2.3-Setup-win-x64.exe). [Instruções](../demo/README.md).
+
 ## Edição normal 1.2.2 — sem produtos de teste
 
 [Baixar instalador para Windows x64](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.2/VarthexComanda-1.2.2-Setup-win-x64.exe) · [SHA-256](VarthexComanda-1.2.2-Setup-win-x64.exe.sha256)

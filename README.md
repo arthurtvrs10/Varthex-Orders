@@ -38,6 +38,17 @@ Os dados ficam em `%LOCALAPPDATA%\VarthexComanda`.
 
 [Instruções](downloads/windows/README.md) · [SHA-256](downloads/windows/VarthexComanda-1.2.2-Setup-win-x64.exe.sha256)
 
+## Windows — versão demonstração 1.2.3
+
+[![Baixar para Windows](docs/design/download-windows.svg)](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.3-demo/VarthexComanda-Demo-1.2.3-Setup-win-x64.exe)
+
+Versão para conhecer o sistema, com **12 produtos de teste, fotos e preços fictícios**:
+pastéis, salgados, porção e bebidas. Instala separadamente da versão normal e requer ativação.
+Abra pelo atalho **Comanda Demonstração**. Os dados ficam em
+`%LOCALAPPDATA%\VarthexComandaDemo`; reinstalar preserva as alterações.
+
+[Instruções](downloads/demo/README.md) · [SHA-256](downloads/demo/VarthexComanda-Demo-1.2.3-Setup-win-x64.exe.sha256)
+
 ## Android — gerador de chaves
 
 [![Baixar para Android](docs/design/download-android.svg)](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/android-v1.0.1/Varthex-Licencas-1.0.1.apk)
