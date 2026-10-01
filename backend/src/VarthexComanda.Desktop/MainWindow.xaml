@@ -20,7 +20,16 @@
     </Window.InputBindings>
     <DockPanel Background="{StaticResource Papel}">
         <Border DockPanel.Dock="Top" Background="{StaticResource Grafite}" Padding="24,16" BorderBrush="{StaticResource Laranja}" BorderThickness="0,0,0,3">
-            <Image Source="Assets/LogoBranca.png" Width="190" Height="44" Stretch="Uniform" HorizontalAlignment="Left" AutomationProperties.Name="Varthex Comanda" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Image Source="Assets/LogoBranca.png" Width="190" Height="44" Stretch="Uniform" HorizontalAlignment="Left" AutomationProperties.Name="Varthex Comanda" />
+                <TextBlock Grid.Column="1" Text="Desenvolvido pela Varthex"
+                           Foreground="#D9CFC3" FontSize="12" Margin="24,0,0,0"
+                           HorizontalAlignment="Right" VerticalAlignment="Center" TextWrapping="Wrap" />
+            </Grid>
         </Border>
         <!-- Visivel apenas no modo de restauracao (banco corrompido): ver MainWindow.EntrarModoRestauracao. -->
         <Border x:Name="FaixaRestauracao" DockPanel.Dock="Top" Background="#B23B32" Padding="16,12" Visibility="Collapsed">
