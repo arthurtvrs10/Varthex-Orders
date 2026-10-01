@@ -46,7 +46,8 @@ public class MainActivity extends Activity {
             intent.setType("*/*"); intent.addCategory(Intent.CATEGORY_OPENABLE);
             startActivityForResult(intent, IMPORT_KEY);
         });
-        button(body,"Bloquear emissor",v -> { signingKey=null; keyStatus.setText("Emissor bloqueado. Importe a chave para emitir."); clearResult(); });
+        button(body,"Colar chave privada",v -> pastePrivateKey());
+        button(body,"Bloquear emissor",v -> { signingKey=null; keyStatus.setText("Emissor bloqueado. Importe ou cole a chave para emitir."); clearResult(); });
         text(body,"Cliente ou estabelecimento",14);
         client = input(body,"Ex.: Lanchonete Exemplo",false);
         client.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(200)});
@@ -88,6 +89,34 @@ public class MainActivity extends Activity {
         client.addTextChangedListener(changes); computer.addTextChangedListener(changes);
     }
 
+    private void pastePrivateKey(){
+        LinearLayout content=new LinearLayout(this);
+        content.setOrientation(LinearLayout.VERTICAL);
+        content.setPadding(dp(20),dp(8),dp(20),dp(8));
+        text(content,"Cole todo o conteúdo do PEM, incluindo BEGIN PRIVATE KEY e END PRIVATE KEY.",14);
+        EditText pem=input(content,"Toque e segure para colar a chave",true);
+        pem.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        pem.setMinLines(3); pem.setMaxLines(6);
+        pem.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(32768)});
+        TextView error=text(content,"",14);
+        error.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+        AlertDialog dialog=new AlertDialog.Builder(this).setTitle("Colar chave privada")
+                .setView(content).setNegativeButton("Cancelar",null).setPositiveButton("Conferir chave",null).create();
+        dialog.setOnDismissListener(d -> pem.setText(""));
+        dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+        dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            signingKey=null; clearResult();
+            try(InputStream expected=getAssets().open("licenca-publica.pem")){
+                signingKey=LicenseIssuer.importKey(pem.getText().toString(),readLimited(expected));
+                keyStatus.setText("Chave conferida • pronta para emitir");
+                dialog.dismiss();
+            } catch(Exception e){
+                keyStatus.setText("Chave não importada");
+                error.setText("Não foi possível conferir a chave. Cole o PEM completo do emissor original.");
+            }
+        }));
+        dialog.show();
+    }
     private int months(){ return plan.getSelectedItemPosition()==3?0:plan.getSelectedItemPosition()+1; }
     private void refreshDates(){
         date.setText("Início: "+start.format(DISPLAY));

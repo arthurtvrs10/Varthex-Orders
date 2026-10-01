@@ -1,5 +1,13 @@
 # Histórico de alterações
 
+## Android 1.0.1 - 2026-10-01 - Colar chave privada
+
+- Permite colar o PEM completo em campo protegido, mantendo a importação por arquivo.
+- Confere formato e correspondência com a chave pública antes de permitir emissão; a chave permanece apenas na memória da sessão.
+- Atualiza os links de download do APK e a orientação de uso.
+- Testes com chaves sintéticas cobrem PEM com CRLF, conteúdo incompleto e incompatível e licenças dos quatro planos.
+- Validação visual em aparelho Android permanece pendente.
+
 ## Demonstração 1.2.3 - 2026-10-01 - Catálogo com imagens
 
 - Edição separada com 12 produtos fictícios: pastéis, salgados, porção e bebidas.

@@ -36,11 +36,11 @@ if (-not (Test-Path $keystore)) {
     & "$Java/bin/keytool.exe" -genkeypair -keystore $keystore -storetype PKCS12 -storepass:file $password -alias emissor -keyalg RSA -keysize 3072 -validity 10000 -dname 'CN=Varthex Licencas, O=Varthex, C=BR'
     Check
 }
-$apk = Join-Path $out 'Varthex-Licencas-1.0.0.apk'
+$apk = Join-Path $out 'Varthex-Licencas-1.0.1.apk'
 & "$Java/bin/java.exe" -jar "$tools/lib/apksigner.jar" sign --ks $keystore --ks-pass "file:$password" --out $apk "$out/aligned.apk"
 Check
 & "$Java/bin/java.exe" -jar "$tools/lib/apksigner.jar" verify --verbose $apk
 Check
 $hash = (Get-FileHash $apk -Algorithm SHA256).Hash
-"$hash  Varthex-Licencas-1.0.0.apk" | Set-Content "$apk.sha256" -Encoding ascii
+"$hash  Varthex-Licencas-1.0.1.apk" | Set-Content "$apk.sha256" -Encoding ascii
 Write-Host "APK gerado: $apk"

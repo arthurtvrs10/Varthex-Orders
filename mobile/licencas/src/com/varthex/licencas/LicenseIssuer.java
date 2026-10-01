@@ -14,8 +14,9 @@ public final class LicenseIssuer {
     private LicenseIssuer() {}
 
     public static PrivateKey importKey(String pem, String publicPem) throws GeneralSecurityException {
-        if (!pem.contains("-----BEGIN PRIVATE KEY-----"))
-            throw new IllegalArgumentException("Selecione a chave privada .pem do emissor original (PKCS#8).");
+        if (pem == null || pem.length() > 32768 || !pem.trim().startsWith("-----BEGIN PRIVATE KEY-----")
+                || !pem.trim().endsWith("-----END PRIVATE KEY-----"))
+            throw new IllegalArgumentException("Importe ou cole a chave privada PEM completa do emissor original (PKCS#8).");
         KeyFactory factory = KeyFactory.getInstance("RSA");
         PrivateKey privateKey = factory.generatePrivate(new PKCS8EncodedKeySpec(decode(pem, "PRIVATE KEY")));
         PublicKey expected = factory.generatePublic(new X509EncodedKeySpec(decode(publicPem, "PUBLIC KEY")));
@@ -34,7 +35,7 @@ public final class LicenseIssuer {
 
     public static String issue(PrivateKey key, String computer, String client, int months, LocalDate start)
             throws GeneralSecurityException {
-        if (key == null) throw new InvalidKeyException("Importe a chave privada primeiro.");
+        if (key == null) throw new InvalidKeyException("Importe ou cole a chave privada primeiro.");
         computer = computer.trim().toUpperCase(Locale.ROOT);
         client = client.trim();
         if (!computer.matches("[0-9A-F]{64}")) throw new IllegalArgumentException("O código deve ter 64 caracteres, de 0 a 9 e A a F.");
