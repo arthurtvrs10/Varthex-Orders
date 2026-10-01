@@ -201,7 +201,6 @@ public partial class App : System.Windows.Application
                 _serviceProvider.GetRequiredService<CriarBackupAutomatico>().Executar();
 
                 var janela = _serviceProvider.GetRequiredService<MainWindow>();
-                if (demonstracao) janela.Title = "Comanda Demonstração — produtos e preços fictícios";
                 janela.Show();
                 janelaPrincipalExibida = true;
                 _startupConcluido = true;

@@ -1,5 +1,9 @@
 # Histórico de alterações
 
+## Não lançado
+
+- A janela da edição com catálogo de apresentação usa o título padrão **Varthex Comanda**, removendo o aviso de demonstração da barra de título.
+
 ## Android 1.0.1 - 2026-10-01 - Colar chave privada
 
 - Permite colar o PEM completo em campo protegido, mantendo a importação por arquivo.
