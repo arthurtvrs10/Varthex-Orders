@@ -26,9 +26,9 @@ num banco SQLite local.
 
 ## Windows
 
-[![Baixar para Windows](docs/design/download-windows.svg)](downloads/windows/VarthexComanda-1.2.1-Setup-win-x64.exe?raw=true)
+[![Baixar para Windows](docs/design/download-windows.svg)](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.2/VarthexComanda-1.2.2-Setup-win-x64.exe)
 
-O botão baixa diretamente o instalador **Varthex Comanda 1.2.1 para Windows 64 bits**.
+O botão baixa diretamente o instalador **Varthex Comanda 1.2.2 para Windows 64 bits**.
 Instala para o usuário atual, sem exigir administrador, e já inclui o .NET.
 O aplicativo funciona offline e precisa de uma chave de ativação.
 
@@ -36,11 +36,11 @@ Para atualizar, feche o Varthex e execute o instalador. Sua licença e seus dado
 são preservados. O executável ainda não possui assinatura de código, por isso
 o Windows pode exibir um aviso de aplicativo desconhecido.
 
-[Notas da versão](downloads/windows/README.md) · [Verificar integridade (SHA-256)](downloads/windows/VarthexComanda-1.2.1-Setup-win-x64.exe.sha256)
+[Notas da versão](downloads/windows/README.md) · [Verificar integridade (SHA-256)](downloads/windows/VarthexComanda-1.2.2-Setup-win-x64.exe.sha256)
 
 ## Android — gerador de chaves
 
-[![Baixar para Android](docs/design/download-android.svg)](downloads/android/Varthex-Licencas-1.0.0.apk?raw=true)
+[![Baixar para Android](docs/design/download-android.svg)](https://raw.githubusercontent.com/arthurtvrs10/Varthex-Orders/main/downloads/android/Varthex-Licencas-1.0.0.apk)
 
 O botão baixa o APK **Varthex Licenças 1.0.0**.
 
@@ -59,7 +59,7 @@ A compatibilidade das licenças com o Windows foi validada; a instalação e a i
 
 ## Telas
 
-Telas do código atual, com cores originais, controles quadrados e marca no rodapé. Renderizadas diretamente pelo WPF com dados fictícios em memória, sem acessar o banco do usuário. O instalador 1.2.1 ainda utiliza o layout anterior.
+Telas do código atual, com cores originais, controles quadrados e marca no rodapé. Renderizadas diretamente pelo WPF com dados fictícios em memória, sem acessar o banco do usuário. O instalador 1.2.2 inclui este layout.
 
 <img src="docs/design/atendimento-comanda.png" alt="Comanda com nome do cliente, catálogo e itens selecionados na nova identidade visual" width="900">
 
@@ -75,7 +75,7 @@ Histórico: vendas do dia, resumo e detalhe dos itens.
 
 ## Instalação
 
-1. [Baixe o instalador para Windows 64 bits](downloads/windows/VarthexComanda-1.2.1-Setup-win-x64.exe?raw=true).
+1. [Baixe o instalador para Windows 64 bits](https://github.com/arthurtvrs10/Varthex-Orders/releases/download/v1.2.2/VarthexComanda-1.2.2-Setup-win-x64.exe).
 2. Execute o `.exe` e siga o assistente em português; não é necessário instalar .NET ou usar administrador.
 3. Abra o programa, envie o código do computador ao responsável e informe a chave recebida.
 
@@ -110,7 +110,7 @@ As instruções desta subseção referem-se somente a esse pacote alternativo.
 
 Isso lê a versão do `<Version>` do `VarthexComanda.Desktop.csproj`, publica em
 `artifacts\publish\win-x64` e gera `artifacts\VarthexComanda-<versão>-win-x64.zip`
-(hoje `VarthexComanda-1.2.1-win-x64.zip`, cerca de 66 MB). O parâmetro opcional
+(hoje `VarthexComanda-1.2.2-win-x64.zip`, cerca de 66 MB). O parâmetro opcional
 `-Saida <pasta>` troca a pasta `artifacts`. A pasta `artifacts\publish\win-x64`
 é apagada a cada publicação; já os `.zip` de versões anteriores **acumulam** em
 `artifacts` (apague os antigos à mão). Os arquivos `.pdb` não entram no pacote.

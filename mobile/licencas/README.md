@@ -4,7 +4,7 @@ Emissor offline para uso do responsável pelo Varthex Comanda. Android 8.0 ou su
 
 ## Instalar e usar
 
-1. Transfira [Varthex-Licencas-1.0.0.apk](../../downloads/android/Varthex-Licencas-1.0.0.apk?raw=true) para o celular, abra e permita a instalação por esse aplicativo quando o Android solicitar.
+1. Transfira [Varthex-Licencas-1.0.0.apk](https://raw.githubusercontent.com/arthurtvrs10/Varthex-Orders/main/downloads/android/Varthex-Licencas-1.0.0.apk) para o celular, abra e permita a instalação por esse aplicativo quando o Android solicitar.
 2. Transfira **somente para o celular do responsável** o arquivo `artifacts/segredos/licenca-privada.pem` existente neste projeto. Ele não está incluído no APK nem no Git.
 3. Abra **Varthex Licenças** e toque em **Importar chave privada (.pem)**. Escolha esse arquivo no seletor do Android.
 4. Informe o cliente e cole o código de 64 caracteres exibido pelo sistema Windows.

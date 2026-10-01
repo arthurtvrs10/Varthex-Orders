@@ -1,5 +1,13 @@
 # Histórico de alterações
 
+## Aplicativo 1.2.2 - 2026-10-01 - Instalador atualizado
+
+- Instalador Windows recompilado com controles quadrados, cores originais e logo e crédito somente no rodapé.
+- Download do Windows aponta para o arquivo versionado da release v1.2.2; links do Android usam endereço direto.
+- Validação: 586 testes Release aprovados, validação documental e SHA-256 do instalador conferidos.
+- Sem mudança de RF/RN de negócio. Rastreabilidade: RNF09, RNF14, RNF17 e CT21; homologação em Windows limpo continua pendente.
+
+
 ## 1.20 - 2026-09-29 - Nome na comanda (aplicativo 1.2.0)
 
 - Campo opcional Nome do cliente e botão Salvar nome na comanda aberta.
